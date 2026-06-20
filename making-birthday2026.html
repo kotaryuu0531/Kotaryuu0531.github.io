@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAKING — 映像作品 / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(38px,7vw,84px);line-height:.95;letter-spacing:-.02em;margin-bottom:22px}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px}
+
+  .hero-still{position:relative;aspect-ratio:16/9;margin:clamp(36px,6vh,60px) 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:var(--surface)}
+  .hero-still img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .hero-still .bar{position:absolute;left:0;right:0;height:clamp(22px,4vh,40px);background:var(--letterbox);z-index:2}
+  .hero-still .bar.top{top:0}.hero-still .bar.bot{bottom:0}
+
+  /* feature block (プリビズ比較) */
+  .feature{margin:clamp(40px,7vh,72px) 0;padding:clamp(32px,5vh,52px) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .feature .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:14px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(24px,3.6vw,40px);line-height:1.12;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .vid{position:relative;aspect-ratio:16/9;margin-top:26px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#000}
+  .vid video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
+
+  /* spec sheet (credits-style) */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  /* previs build + same-angle comparison */
+  .asset{display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(18px,3vw,36px);align-items:center;margin-top:26px}
+  @media(max-width:680px){.asset{grid-template-columns:1fr;gap:16px}}
+  .asset img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:var(--r)}
+  .asset .albl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:10px}
+  .asset p{color:var(--ink-mut);font-size:14.5px}
+  .cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:24px}
+  .cmp figure{margin:0}
+  .cmp .imgbox{position:relative;aspect-ratio:3/2;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+  .cmp .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .cmp figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut);padding-top:9px}
+  .cmp figcaption.amber{color:var(--amber)}
+
+  /* 準備の資料（香盤表など、横長の表）を全幅で */
+  .docs{margin-top:24px;display:grid;gap:22px}
+  .docs figure{margin:0}
+  .docs .docbox{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+  .docs .docbox img{width:100%;height:auto;display:block}
+  .docs figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:9px}
+
+  /* 単体図（サイズ制限つき） */
+  .figm{margin-top:24px;max-width:680px}
+  .figm .box{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+  .figm .box img{width:100%;height:auto;display:block}
+  .figm figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:9px}
+
+  /* 3D build asset strip */
+  .abuild{margin-top:26px}
+  .abuild .albl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:10px}
+  .abuild p{color:var(--ink-mut);font-size:14.5px}
+  .astrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-top:18px}
+  .astrip figure{margin:0}
+  .astrip .imgbox{position:relative;aspect-ratio:4/3;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+  .astrip .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .astrip figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:9px}
+
+  /* before/after slider */
+  .ba{position:relative;aspect-ratio:16/9;margin-top:26px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#000;touch-action:none;user-select:none;cursor:ew-resize}
+  .ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  .ba-before{clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
+  .ba-handle{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;background:var(--amber);transform:translateX(-1px);pointer-events:none;box-shadow:0 0 12px rgba(233,169,76,.7)}
+  .ba-handle::after{content:"⟷";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;border:2px solid var(--amber);background:rgba(10,13,18,.55);display:flex;align-items:center;justify-content:center;color:var(--amber);font-size:14px;backdrop-filter:blur(2px)}
+  .ba:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .ba-tag{position:absolute;top:12px;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--ink);background:rgba(0,0,0,.6);padding:4px 9px;border-radius:var(--r);pointer-events:none;z-index:2}
+  .ba-tag-l{left:12px}
+  .ba-tag-r{right:12px;color:var(--amber)}
+
+  /* production notes */
+  .note{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);align-items:center;
+    padding:clamp(40px,7vh,80px) 0;border-top:1px solid var(--line)}
+  .note:nth-child(even) .shot{order:2}
+  @media(max-width:780px){.note{grid-template-columns:1fr;gap:24px}.note:nth-child(even) .shot{order:0}}
+
+  .shot{position:relative;aspect-ratio:4/3;background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .shot::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#1b2026,#0e1216 60%,#1a1410)}
+  .shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .shot span{position:relative;z-index:2;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--ink-mut)}
+
+  .note-txt .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:14px}
+  .note-txt h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3vw,32px);line-height:1.15;margin-bottom:14px}
+  .note-txt p{color:var(--ink-mut);font-size:15.5px;max-width:46ch}
+
+  .foot{border-top:1px solid var(--line);margin-top:clamp(40px,7vh,80px);padding-top:36px;display:flex;
+    justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+  .foot a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  .foot a:hover,.foot a:focus-visible{border-color:var(--amber);color:var(--amber);outline:none}
+  .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  .rv{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  p,.lead{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-eizo">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">MAKING OF — 小竹竜ノ介 22歳記念PV / 60SEC</div>
+    <h1>大人序章中</h1>
+    <div class="htags"><span class="htag">実写映像</span><span class="htag">60秒PV</span><span class="htag">シネマティック</span></div>
+    <p class="lead">毎年、自分の誕生日に予告編映像をつくってきました。今年は「予告」ではなく60秒のPVに。就活を目前にした決意表明のメッセージと、昨年手に入れた憧れのバイクを、とにかくカッコよく——いわば、自分とバイクのCMです。</p>
+
+    <!-- ヒーロー静止画: 代表的な1フレーム。差し替え不要ならこのまま -->
+    <div class="hero-still">
+      <div class="bar top"></div>
+      <img src="eizo-flagship.jpg" alt="作品の代表フレーム">
+      <div class="bar bot"></div>
+    </div>
+
+    <!-- ===== プリビズ（最大のアピールポイント） ===== -->
+    <section class="feature rv">
+      <div class="lbl">PREVIS · 3D LAYOUT</div>
+      <h3>ロケハン × Google Map × Blenderで、<br>画を設計してから撮る</h3>
+      <p>ロケハンで撮影した映像とGoogle Mapを手がかりに、ロケ地を1分の1スケールでBlender上にCG化。そこでカメラ位置を詰めてVコンテ（プリビズ）を作りました。狙いは「画を先に固めてから撮る」こと。使うレンズの焦点距離をプリプロの段階で確定できたので、必要最小限のレンズだけをレンタルし、予算も抑えられました。</p>
+      <div class="vid">
+        <video autoplay muted loop playsinline preload="metadata">
+          <source src="previs-compare.webm" type="video/webm">
+          <source src="previs-compare.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="cap">Blender内のカメラ位置・Vコンテと、実際に撮影した映像を並べた比較。</div>
+
+      <!-- 3Dビルドの中身 -->
+      <div class="abuild">
+        <div class="albl">3D BUILD</div>
+        <p>ロケ地は1分の1スケールで構築。道路は今回あらたにモデリングし、バイクとヘルメットはiPhone＋Scaniverseでスキャンした3Dデータ、ライダーは過去に自作した素体を使用しています。リグは上半身FK・下半身IKで構成されています。</p>
+        <div class="astrip">
+          <figure><div class="imgbox"><img src="previs-road.jpg" alt="新規モデリングした道路の3Dモデル"></div><figcaption>ROAD — 新規モデリング</figcaption></figure>
+          <figure><div class="imgbox"><img src="scan-bike.jpg" alt="iPhone+Scaniverseでスキャンしたバイクとヘルメット"></div><figcaption>BIKE + HELMET — Scaniverseスキャン</figcaption></figure>
+          <figure><div class="imgbox"><img src="model-rig.jpg" alt="自作の人体素体。トポロジー・ボーン、上半身FK/下半身IKのリグ"></div><figcaption>RIDER — 自作素体 / FK + IK</figcaption></figure>
+        </div>
+      </div>
+
+      <!-- 同アングル比較: 3Dプリビズ vs 実写 -->
+      <div class="cmp">
+        <figure><div class="imgbox"><img src="previs-scene.jpg" alt="Blender上で再現したロケ地のプリビズ（バイク配置）"></div><figcaption class="amber">3Dプリビズ（Blender）</figcaption></figure>
+        <figure><div class="imgbox"><img src="locscout-real.jpg" alt="ロケハンで撮影した実際のロケ地（同画角）"></div><figcaption>ロケハン実写（同じ画角）</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- ===== 制作ノート（写真＋テキスト）。.note ブロックを複製すれば項目を増やせます ===== -->
+
+    <section class="feature rv">
+      <div class="lbl">PREP &amp; DIRECTION</div>
+      <h3>準備で、現場に余白をつくる</h3>
+      <p>Vコンテをもとに香盤表を作成し、あえて余裕を持ったスケジュールを組みました。おかげで本番は狙ったカットを確実に押さえたうえ、空いた時間で追加のカットを撮影。そこで生まれた良いカットは、実際に本編へ採用しています。自分を含む6名のクルーを段取りよく動かせたのも、この準備があってこそでした。</p>
+      <div class="docs">
+        <figure><div class="docbox"><img src="shotlist.jpg" alt="各カットの絵コンテ・撮影アングル・カメラ/レンズ/尺をまとめた撮影資料"></div><figcaption>各カットの絵コンテ・Blenderでの撮影アングル・カメラ／レンズ／尺・尺数までまとめた撮影資料</figcaption></figure>
+        <figure><div class="docbox"><img src="callsheet.jpg" alt="タイムスケジュールをまとめた香盤表"></div><figcaption>香盤表（当日のタイムスケジュール）</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="feature rv">
+      <div class="lbl">COLOR GRADE</div>
+      <h3>色編集はカッコ良く、わかりやすく</h3>
+      <p>撮影はLogで収録。4台のカメラの絵を揃えるため、波形（ウェーブフォーム）とベクトルスコープを使ってカメラごとの差を最小限に整えてから、本来の色づくりに入りました。DaVinci Resolveで編集とあわせて約1週間。未来に向けた前向きな決意表明のメッセージを伝えるため、水色っぽい色味に整えました。また、被写体だけを自然に明るくしてカットの主役への視線誘導をしたり、光の方向を強調することを意識しました。下のバーを左右に動かすと、前後を同じフレームで比較できます。</p>
+      <div class="ba" style="--pos:50%" tabindex="0" role="slider" aria-label="グレーディング前後の比較スライダー" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+        <img class="ba-after" src="grade-after.jpg" alt="グレーディング後">
+        <img class="ba-before" src="grade-before.jpg" alt="グレーディング前">
+        <div class="ba-handle"></div>
+        <span class="ba-tag ba-tag-l">BEFORE</span>
+        <span class="ba-tag ba-tag-r">AFTER</span>
+      </div>
+      <div class="cap">バーを左右にドラッグ — グレーディング前 / 後</div>
+      <div class="vid">
+        <video autoplay muted loop playsinline preload="metadata">
+          <source src="grade-clip.webm" type="video/webm">
+          <source src="grade-clip.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="cap">被写体だけを自然に明るくして主役へ視線を誘導し、光の方向を強調したカット。</div>
+    </section>
+
+    <section class="feature rv">
+      <div class="lbl">NARRATION &amp; SOUND</div>
+      <h3>決意表明を、自らの言葉で</h3>
+      <p>この60秒の芯にあるのは、22歳のいまの決意表明。就活を目前に、自分の人生について考えることが増え、その思いも重ねたメッセージです。ナレーションはLogic Proと自宅の録音環境で、自分の声で収録しました。これまではリビングで録っていましたが、今回はより良い音を求めて、押し入れに毛布と吸音材を敷き詰めた録音ブースを自作。さらに車のCMを数多く見て、落ち着いた語り口に挑戦しました。台本は、かっこいい言葉選びをしながらも、わかりづらくならないようバランスを考えています。</p>
+      <div class="figm">
+        <div class="box"><img src="booth.jpg" alt="押し入れに毛布と吸音材を敷き詰めて自作した録音ブース"></div>
+        <figcaption>押し入れに毛布と吸音材を敷き詰めた自作の録音ブース</figcaption>
+      </div>
+    </section>
+
+    <!-- ===== スペック / クレジット（最下部） ===== -->
+    <div class="spec-head">SPEC / CREDITS</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>RUNTIME</dt><dd>60秒</dd></div>
+      <div class="spec-row"><dt>PERIOD</dt><dd>2026年3月末〜5月</dd></div>
+      <div class="spec-row"><dt>CAMERA</dt><dd>Nikon ZR ／ Insta360 X5 ／ GoPro HERO12 ／ DJI Mini 4 Pro</dd></div>
+      <div class="spec-row"><dt>SOFTWARE</dt><dd>Blender（プリビズ） ／ Final Cut Pro（編集） ／ Logic Pro（整音・ナレーション） ／ DaVinci Resolve（カラーグレーディング）</dd></div>
+      <div class="spec-row"><dt>SCHEDULE</dt><dd>Vコンテ 3日 ／ 撮影 1日 ／ 編集・カラグレ 1週間 ／ ナレーション・整音・仕上げ 1日</dd></div>
+      <div class="spec-row"><dt>CREW</dt><dd>6名（ディレクション含む）</dd></div>
+    </dl>
+
+    <div class="foot">
+      <a href="index.html#reel-eizo">← 映像リールに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </div>
+  </main>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // before/after compare slider
+  document.querySelectorAll(".ba").forEach(ba=>{
+    const setPos=(p)=>{
+      p=Math.max(0,Math.min(100,p));
+      ba.style.setProperty("--pos",p+"%");
+      ba.setAttribute("aria-valuenow",Math.round(p));
+    };
+    const fromX=(clientX)=>{const r=ba.getBoundingClientRect();setPos(((clientX-r.left)/r.width)*100);};
+    let drag=false;
+    ba.addEventListener("pointerdown",e=>{drag=true;ba.setPointerCapture(e.pointerId);fromX(e.clientX);});
+    ba.addEventListener("pointermove",e=>{if(drag)fromX(e.clientX);});
+    ba.addEventListener("pointerup",()=>drag=false);
+    ba.addEventListener("pointercancel",()=>drag=false);
+    ba.addEventListener("keydown",e=>{
+      const cur=parseFloat(ba.style.getPropertyValue("--pos"))||50;
+      if(e.key==="ArrowLeft"){e.preventDefault();setPos(cur-4);}
+      if(e.key==="ArrowRight"){e.preventDefault();setPos(cur+4);}
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WORKS — 全作品 / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.5;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.92),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1200px;margin:0 auto;padding:clamp(110px,15vh,160px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(38px,7vw,84px);line-height:.95;letter-spacing:-.02em;margin-bottom:16px}
+  .lead{color:var(--ink-mut);font-size:clamp(15px,1.6vw,18px);max-width:60ch}
+
+  /* filter bar */
+  .filterbar{margin:clamp(34px,6vh,56px) 0 clamp(24px,4vh,40px);border-top:1px solid var(--line);padding-top:24px}
+  .search{position:relative;margin-bottom:18px;max-width:420px}
+  .search input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    color:var(--ink);font-family:"Archivo",sans-serif;font-size:14px;padding:12px 14px 12px 38px;outline:none;transition:border-color .25s}
+  .search input::placeholder{color:var(--ink-mut)}
+  .search input:focus{border-color:var(--amber-dim)}
+  .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--ink-mut);fill:none}
+  .tagrow{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  .tagrow .lbl{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--ink-mut);margin-right:4px}
+  .chip{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    background:transparent;border:1px solid var(--line);border-radius:100px;padding:7px 14px;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .chip:hover{border-color:var(--amber-dim);color:var(--ink)}
+  .chip.active{background:var(--amber);border-color:var(--amber);color:#120d05}
+  .chip.clear{color:var(--ink-mut);border-style:dashed}
+  .chip.clear:hover{color:var(--amber);border-color:var(--amber-dim)}
+  .count{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-mut);margin-top:18px}
+  .count b{color:var(--amber)}
+
+  /* works grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:clamp(18px,2.5vw,28px);margin-top:8px}
+  .card{display:flex;flex-direction:column;opacity:0;transform:translateY(14px);
+    transition:opacity .5s ease,transform .5s cubic-bezier(.2,.7,.2,1)}
+  .card.in{opacity:1;transform:none}
+  .thumb{position:relative;aspect-ratio:16/9;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+    background:var(--surface);display:block;cursor:pointer;transition:border-color .3s,transform .3s}
+  .thumb::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#1a1f25,#0f1318 60%,#181410)}
+  .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .thumb .noimg{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;color:var(--ink-mut);text-align:center;padding:0 16px}
+  .thumb .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;
+    border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .thumb .play::after{content:"";border-left:13px solid var(--ink);border-top:8px solid transparent;border-bottom:8px solid transparent;margin-left:3px;transition:border-color .3s}
+  .card:hover .thumb{border-color:var(--amber-dim);transform:translateY(-3px)}
+  .card:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .card:hover .play::after{border-left-color:var(--amber)}
+  .wbody{padding-top:13px}
+  .wtitle{font-family:"Fraunces",serif;font-weight:600;font-size:19px;line-height:1.2;margin-bottom:4px}
+  .wperiod{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-bottom:10px}
+  .wtags{display:flex;flex-wrap:wrap;gap:7px}
+  .wtag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:4px 10px;cursor:pointer;transition:all .2s}
+  .wtag:hover{border-color:var(--amber-dim);color:var(--amber)}
+  .wmaking{display:inline-block;margin-top:11px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;
+    color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);padding-bottom:2px;transition:opacity .2s}
+  .wmaking:hover{opacity:.7}
+  .empty{font-family:"Space Mono",monospace;font-size:13px;color:var(--ink-mut);padding:40px 0;text-align:center}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.card{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">ARCHIVE — ALL WORKS</div>
+    <h1>全作品</h1>
+    <p class="lead">これまで制作してきた作品を、新しい順に。タグで絞り込んだり、作品名・タグで検索できます。</p>
+
+    <div class="filterbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input id="q" type="text" placeholder="作品名・タグで検索…" aria-label="作品を検索">
+      </div>
+      <div class="tagrow" id="tagrow">
+        <span class="lbl">TAGS</span>
+        <!-- タグのボタンはJSが自動生成 -->
+      </div>
+      <div class="count" id="count"></div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" style="display:none">該当する作品がありません。</div>
+
+    <footer>
+      <a href="index.html">← ポートフォリオに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+<script>
+  /* =========================================================
+     作品データ — ここに作品を追加していきます（新しい順でなくてOK、dateで自動ソート）
+     date: "YYYY-MM-DD"（並び替え用・公開日）/ period: 画面に出る表記
+     url: 作品の動画URL（YouTube等）/ making: メイキングページ（なければ ""）
+     thumb: サムネ画像ファイル名（なければ "" で自動プレースホルダ）
+     付属の works.csv と同じ内容を保つと管理が楽です
+  ========================================================= */
+  const WORKS = [
+    {
+      title:"大人序章中",
+      tags:["実写映像","60秒PV","シネマティック"],
+      period:"2026年3月末〜5月", date:"2026-05-31",
+      url:"https://youtu.be/-laqI9Dw0Vg",
+      making:"making-birthday2026.html",
+      thumb:"eizo-flagship.jpg"
+    },
+    // ▼▼▼ 以下は表示サンプル。実際の作品に置き換えてください ▼▼▼
+    {title:"（例）3DCGショートフィルム", tags:["CG","Blender","シネマティック"], period:"2025年 秋", date:"2025-10", url:"#", making:"", thumb:""},
+    {title:"（例）音楽イベント ライブ配信", tags:["ライブ配信","マルチカメラ"], period:"2025年 夏", date:"2025-08", url:"#", making:"", thumb:""},
+    {title:"（例）プロモーション映像", tags:["実写映像","30秒","広告"], period:"2025年 春", date:"2025-04", url:"#", making:"", thumb:""},
+    {title:"（例）ミュージックビデオ", tags:["実写映像","MV"], period:"2024年", date:"2024-09", url:"#", making:"", thumb:""}
+  ];
+
+  const grid = document.getElementById("grid");
+  const tagrow = document.getElementById("tagrow");
+  const countEl = document.getElementById("count");
+  const emptyEl = document.getElementById("empty");
+  const qInput = document.getElementById("q");
+
+  let selected = new Set();
+  let query = "";
+
+  // 全タグを集計（出現順）
+  const allTags = [];
+  WORKS.forEach(w => w.tags.forEach(t => { if(!allTags.includes(t)) allTags.push(t); }));
+
+  // タグボタンを生成
+  allTags.forEach(t => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = t; b.dataset.tag = t;
+    b.addEventListener("click", () => { toggleTag(t); });
+    tagrow.appendChild(b);
+  });
+  // クリアボタン
+  const clearBtn = document.createElement("button");
+  clearBtn.className = "chip clear"; clearBtn.textContent = "すべて表示";
+  clearBtn.addEventListener("click", () => { selected.clear(); query=""; qInput.value=""; render(); });
+  tagrow.appendChild(clearBtn);
+
+  function toggleTag(t){
+    if(selected.has(t)) selected.delete(t); else selected.add(t);
+    render();
+  }
+
+  qInput.addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); render(); });
+
+  function matches(w){
+    // 選択タグはAND（すべて含む）
+    for(const t of selected){ if(!w.tags.includes(t)) return false; }
+    // 検索は作品名 or タグの部分一致
+    if(query){
+      const hay = (w.title + " " + w.tags.join(" ")).toLowerCase();
+      if(!hay.includes(query)) return false;
+    }
+    return true;
+  }
+
+  function render(){
+    // タグボタンのアクティブ表示
+    tagrow.querySelectorAll(".chip[data-tag]").forEach(b => {
+      b.classList.toggle("active", selected.has(b.dataset.tag));
+    });
+    // 新しい順にソート＆フィルタ
+    const list = WORKS.slice().sort((a,b) => b.date.localeCompare(a.date)).filter(matches);
+    grid.innerHTML = "";
+    emptyEl.style.display = list.length ? "none" : "block";
+    countEl.innerHTML = "<b>" + list.length + "</b> 件" + (selected.size||query ? " / 全 " + WORKS.length + " 件中" : "");
+
+    list.forEach((w, i) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      const thumbInner = w.thumb
+        ? '<img src="'+w.thumb+'" alt="'+w.title+'">'
+        : '<div class="noimg">'+w.title+'</div>';
+      const tagsHtml = w.tags.map(t => '<span class="wtag" data-tag="'+t+'">'+t+'</span>').join("");
+      const makingHtml = w.making ? '<a class="wmaking" href="'+w.making+'">メイキングを見る →</a>' : "";
+      const href = (w.url && w.url !== "#") ? w.url : null;
+      card.innerHTML =
+        '<a class="thumb"'+(href?(' href="'+href+'" target="_blank" rel="noopener"'):'')+'>'+
+          thumbInner +
+          '<div class="play"></div>'+
+        '</a>'+
+        '<div class="wbody">'+
+          '<div class="wtitle">'+w.title+'</div>'+
+          '<div class="wperiod">'+w.period+'</div>'+
+          '<div class="wtags">'+tagsHtml+'</div>'+
+          makingHtml +
+        '</div>';
+      grid.appendChild(card);
+      // タグクリックで絞り込み
+      card.querySelectorAll(".wtag").forEach(el => {
+        el.addEventListener("click", () => { if(!selected.has(el.dataset.tag)) selected.add(el.dataset.tag); render(); window.scrollTo({top:0,behavior:"smooth"}); });
+      });
+      requestAnimationFrame(() => setTimeout(() => card.classList.add("in"), i*40));
+    });
+  }
+
+  render();
+  window.addEventListener("load", () => document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded", () => document.body.classList.add("ready"));
+</script>
+</body>
+</html>
