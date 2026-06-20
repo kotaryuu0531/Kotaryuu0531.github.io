@@ -101,6 +101,20 @@
   footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
 
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.card{opacity:1;transform:none}}
+  /* 作品概要のホバーパネル */
+  .ovpanel{position:fixed;z-index:45;width:330px;max-width:86vw;
+    background:rgba(18,22,28,.97);border:1px solid var(--line);border-radius:var(--r);
+    padding:18px 20px 16px;box-shadow:0 18px 50px rgba(0,0,0,.55);backdrop-filter:blur(6px);
+    opacity:0;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease;pointer-events:none}
+  .ovpanel.show{opacity:1;transform:none}
+  .ov-eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--amber);margin-bottom:10px}
+  .ov-title{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-weight:600;font-size:20px;line-height:1.25;color:var(--ink);margin-bottom:3px}
+  .ov-sub{font-family:"Archivo",sans-serif;font-size:12px;color:var(--ink-mut);margin-bottom:11px}
+  .ov-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:13px}
+  .ov-tag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:3px 9px}
+  .ov-text{font-size:13px;line-height:1.7;color:var(--ink-mut);margin-bottom:14px}
+  .ov-cta{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--amber)}
 </style>
 </head>
 <body>
@@ -137,6 +151,16 @@
     </footer>
   </main>
 
+  <!-- 作品概要のホバーパネル -->
+  <div id="ovpanel" class="ovpanel" aria-hidden="true">
+    <div class="ov-eyebrow"></div>
+    <div class="ov-title"></div>
+    <div class="ov-sub"></div>
+    <div class="ov-tags"></div>
+    <p class="ov-text"></p>
+    <div class="ov-cta">メイキングを見る →</div>
+  </div>
+
 <script>
   /* =========================================================
      作品データ — ここに作品を追加していきます（新しい順でなくてOK、dateで自動ソート）
@@ -152,7 +176,8 @@
       period:"2026年3月末〜5月", date:"2026-05-31",
       url:"https://youtu.be/-laqI9Dw0Vg",
       making:"making-birthday2026.html",
-      thumb:"eizo-flagship.jpg"
+      thumb:"eizo-flagship.jpg",
+      ov:{eyebrow:"SELF PV — 60秒 / 2026", sub:"", text:"毎年、自分の誕生日に予告編映像をつくってきました。今年は「予告」ではなく60秒のPVに。就活を目前にした決意表明のメッセージと、昨年手に入れた憧れのバイクを、とにかくカッコよく——いわば、自分とバイクのCMです。"}
     },
     {
       title:"GRIT3部作 — フィジーク学生大会ドキュメンタリー",
@@ -160,7 +185,8 @@
       period:"2024年7月〜11月（3部作）", date:"2024-07-14",
       url:"https://youtu.be/ehFCFjIPhZY",
       making:"making-grit.html",
-      thumb:"https://img.youtube.com/vi/ehFCFjIPhZY/maxresdefault.jpg"
+      thumb:"https://img.youtube.com/vi/ehFCFjIPhZY/maxresdefault.jpg",
+      ov:{eyebrow:"DOCUMENTARY — 3部作 / 2024", sub:"フィジーク学生大会ドキュメンタリー", text:"フィジークの学生大会に挑む友人・関根の、大会までの約3ヶ月を追ったドキュメンタリー。2024年に全3部作として制作・公開しました。"}
     },
     // ▼▼▼ 以下は表示サンプル。実際の作品に置き換えてください ▼▼▼
     {title:"（例）3DCGショートフィルム", tags:["CG","Blender","シネマティック"], period:"2025年 秋", date:"2025-10", url:"#", making:"", thumb:""},
@@ -279,9 +305,47 @@
       card.querySelectorAll(".wtag").forEach(el => {
         el.addEventListener("click", () => { if(!selected.has(el.dataset.tag)) selected.add(el.dataset.tag); render(); window.scrollTo({top:0,behavior:"smooth"}); });
       });
+      // タイトル/「メイキングを見る」ホバーで概要パネル
+      if(w.ov){
+        [card.querySelector("a.wtitle"), card.querySelector("a.wmaking")].forEach(el=>{
+          if(!el) return;
+          el.addEventListener("mouseenter",()=>showOv(w,el));
+          el.addEventListener("mouseleave",hideOv);
+          el.addEventListener("focus",()=>showOv(w,el));
+          el.addEventListener("blur",hideOv);
+        });
+      }
       requestAnimationFrame(() => setTimeout(() => card.classList.add("in"), i*40));
     });
   }
+
+  // 概要ホバーパネル
+  const ovEl=document.getElementById("ovpanel");
+  const ovEye=ovEl.querySelector(".ov-eyebrow"), ovTit=ovEl.querySelector(".ov-title"),
+        ovSub=ovEl.querySelector(".ov-sub"), ovTags=ovEl.querySelector(".ov-tags"), ovTxt=ovEl.querySelector(".ov-text");
+  function placeOv(el){
+    const r=el.getBoundingClientRect(), pw=ovEl.offsetWidth, phh=ovEl.offsetHeight, gap=12;
+    let left=r.left+r.width/2-pw/2;
+    left=Math.max(12,Math.min(left,window.innerWidth-pw-12));
+    let top=r.top-phh-gap;
+    if(top<12) top=r.bottom+gap;
+    ovEl.style.left=left+"px"; ovEl.style.top=top+"px";
+  }
+  function showOv(w, el){
+    if(!w.ov) return;
+    ovEye.textContent=w.ov.eyebrow||"";
+    ovTit.textContent=w.title||"";
+    ovSub.textContent=w.ov.sub||""; ovSub.style.display=w.ov.sub?"":"none";
+    const tags=w.tags||[];
+    ovTags.innerHTML=tags.map(t=>'<span class="ov-tag">'+t+'</span>').join("");
+    ovTags.style.display=tags.length?"":"none";
+    ovTxt.textContent=w.ov.text||"";
+    ovEl.classList.add("show"); ovEl.setAttribute("aria-hidden","false");
+    placeOv(el);
+  }
+  function hideOv(){ ovEl.classList.remove("show"); ovEl.setAttribute("aria-hidden","true"); }
+  window.addEventListener("scroll",hideOv,true);
+  window.addEventListener("resize",hideOv);
 
   render();
   window.addEventListener("load", () => document.body.classList.add("ready"));
