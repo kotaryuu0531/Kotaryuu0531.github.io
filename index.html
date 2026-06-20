@@ -150,7 +150,8 @@
   .nb{white-space:nowrap}
   .wtags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
   .wtag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;color:var(--ink-mut);
-    border:1px solid var(--line);border-radius:100px;padding:4px 11px}
+    border:1px solid var(--line);border-radius:100px;padding:4px 11px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .wtag:hover,.wtag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
   .flag-info p{color:var(--ink-mut);font-size:15px;margin-bottom:24px}
   .btn-row{display:flex;flex-wrap:wrap;gap:12px}
   .btn{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;text-decoration:none;
@@ -282,7 +283,7 @@
       </div>
       <div class="flag-info">
         <h3><a href="making-birthday2026.html"><span class="nb">小竹竜ノ介22歳記念PV</span> <span class="nb">「大人序章中」</span></a></h3>
-        <div class="wtags"><span class="wtag">実写映像</span><span class="wtag">60秒PV</span><span class="wtag">シネマティック</span></div>
+        <div class="wtags"><a class="wtag" href="works.html?tags=実写映像">実写映像</a><a class="wtag" href="works.html?tags=60秒PV">60秒PV</a><a class="wtag" href="works.html?tags=シネマティック">シネマティック</a></div>
         <p>就活を前にした決意表明と、憧れのバイクをカッコ良く表現。ロケ地を1:1でCG化してプリビズを組み、画を設計してから撮った60秒のセルフCM。</p>
         <div class="btn-row">
           <!-- 再生は枠のクリックで。ここはメイキング（写真＋テキストの解説ページ）への導線のみ -->
@@ -319,7 +320,7 @@
       </div>
       <div class="flag-info">
         <h3>3DCG 作品のタイトル</h3>
-        <div class="wtags"><span class="wtag">CG</span><span class="wtag">Blender</span></div>
+        <div class="wtags"><a class="wtag" href="works.html?tags=CG">CG</a><a class="wtag" href="works.html?tags=Blender">Blender</a></div>
         <!-- メモ: ファンメイド作品は「非公式ファンメイド」と明記すること -->
         <p>モデリング・ライティング・コンポジットのどこに力を入れたか。映像的な質感づくりの狙いを簡潔に。</p>
         <div class="btn-row">
@@ -355,7 +356,7 @@
       </div>
       <div class="flag-info">
         <h3>ライブ配信のタイトル</h3>
-        <div class="wtags"><span class="wtag">ライブ配信</span><span class="wtag">マルチカメラ</span></div>
+        <div class="wtags"><a class="wtag" href="works.html?tags=ライブ配信">ライブ配信</a><a class="wtag" href="works.html?tags=マルチカメラ">マルチカメラ</a></div>
         <p>規模・カメラ台数・スイッチングの工夫など。年間約100件の現場経験を一言添えると強い。</p>
         <div class="btn-row">
           <!-- 配信の代表作が決まったら frame に data-yt を設定。メイキングは making-live.html を作って差し替え -->

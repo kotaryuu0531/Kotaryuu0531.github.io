@@ -40,7 +40,8 @@
     color:var(--ink-mut);white-space:nowrap;margin-bottom:22px}
   .htags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
   .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
-    border:1px solid var(--line);border-radius:100px;padding:5px 13px}
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
   .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.88}
 
   .about{margin-top:clamp(30px,5vh,48px);border-top:1px solid var(--line);padding-top:clamp(26px,4vh,40px)}
@@ -92,7 +93,7 @@
     <div class="eyebrow">DOCUMENTARY — 3部作 / 2024</div>
     <h1>GRIT3部作</h1>
     <div class="subtitle">フィジーク学生大会ドキュメンタリー</div>
-    <div class="htags"><span class="htag">実写映像</span><span class="htag">ドキュメンタリー</span></div>
+    <div class="htags"><a class="htag" href="works.html?tags=実写映像">実写映像</a><a class="htag" href="works.html?tags=ドキュメンタリー">ドキュメンタリー</a></div>
     <p class="lead">フィジークの学生大会に挑む友人・関根の、大会までの約3ヶ月を追ったドキュメンタリー。2024年に全3部作として制作・公開しました。</p>
 
     <!-- 制作について（必要に応じて加筆してください） -->

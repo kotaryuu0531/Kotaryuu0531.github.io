@@ -182,6 +182,13 @@
   const allTags = [];
   WORKS.forEach(w => w.tags.forEach(t => { if(!allTags.includes(t)) allTags.push(t); }));
 
+  // 他ページから works.html?tags=○○ で来たら、そのタグで初期フィルタ
+  (function(){
+    const p = new URLSearchParams(location.search);
+    const raw = p.get('tags') || p.get('tag');
+    if(raw){ raw.split(',').forEach(t => { t=t.trim(); if(t && allTags.includes(t)) selected.add(t); }); }
+  })();
+
   // タグボタンを生成
   allTags.forEach(t => {
     const b = document.createElement("button");

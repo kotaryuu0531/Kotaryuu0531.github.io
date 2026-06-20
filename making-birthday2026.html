@@ -41,7 +41,8 @@
   .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
   .htags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
   .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
-    border:1px solid var(--line);border-radius:100px;padding:5px 13px}
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
 
   .hero-video{position:relative;aspect-ratio:16/9;margin:clamp(36px,6vh,60px) 0;border:1px solid var(--line);
     border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
@@ -169,7 +170,7 @@
   <main class="wrap">
     <div class="eyebrow">MAKING OF — 60SEC</div>
     <h1><span class="nb">小竹竜ノ介22歳記念PV</span> <span class="nb">「大人序章中」</span></h1>
-    <div class="htags"><span class="htag">実写映像</span><span class="htag">60秒PV</span><span class="htag">シネマティック</span></div>
+    <div class="htags"><a class="htag" href="works.html?tags=実写映像">実写映像</a><a class="htag" href="works.html?tags=60秒PV">60秒PV</a><a class="htag" href="works.html?tags=シネマティック">シネマティック</a></div>
     <p class="lead">毎年、自分の誕生日に予告編映像をつくってきました。今年は「予告」ではなく60秒のPVに。就活を目前にした決意表明のメッセージと、昨年手に入れた憧れのバイクを、とにかくカッコよく——いわば、自分とバイクのCMです。</p>
 
     <!-- トップ: 本編をその場で再生（クリック/Enter） -->
