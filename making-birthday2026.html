@@ -36,17 +36,32 @@
   .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
     display:flex;align-items:center;gap:12px;margin-bottom:18px}
   .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
-  h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(38px,7vw,84px);line-height:.95;letter-spacing:-.02em;margin-bottom:22px}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:22px}
+  .nb{white-space:nowrap}
   .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
   .htags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
   .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
     border:1px solid var(--line);border-radius:100px;padding:5px 13px}
 
-  .hero-still{position:relative;aspect-ratio:16/9;margin:clamp(36px,6vh,60px) 0;border:1px solid var(--line);
-    border-radius:var(--r);overflow:hidden;background:var(--surface)}
-  .hero-still img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .hero-still .bar{position:absolute;left:0;right:0;height:clamp(22px,4vh,40px);background:var(--letterbox);z-index:2}
-  .hero-still .bar.top{top:0}.hero-still .bar.bot{bottom:0}
+  .hero-video{position:relative;aspect-ratio:16/9;margin:clamp(36px,6vh,60px) 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .hero-video .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;
+    border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .hero-video .play::after{content:"";border-left:17px solid var(--ink);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;transition:border-color .3s}
+  .hero-video:hover{border-color:var(--amber-dim)}
+  .hero-video:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .hero-video:hover .play::after{border-left-color:var(--amber)}
+  .hero-video:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .hero-video.playing{cursor:default}
+  .hero-video.playing .poster,.hero-video.playing .play{display:none}
+  .hero-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+
+  /* lightbox（画像タップで拡大） */
+  .lightbox{position:fixed;inset:0;z-index:60;background:rgba(5,7,10,.93);display:none;
+    align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
 
   /* feature block (プリビズ比較) */
   .feature{margin:clamp(40px,7vh,72px) 0;padding:clamp(32px,5vh,52px) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -152,16 +167,15 @@
   </header>
 
   <main class="wrap">
-    <div class="eyebrow">MAKING OF — 小竹竜ノ介 22歳記念PV / 60SEC</div>
-    <h1>大人序章中</h1>
+    <div class="eyebrow">MAKING OF — 60SEC</div>
+    <h1><span class="nb">小竹竜ノ介22歳記念PV</span> <span class="nb">「大人序章中」</span></h1>
     <div class="htags"><span class="htag">実写映像</span><span class="htag">60秒PV</span><span class="htag">シネマティック</span></div>
     <p class="lead">毎年、自分の誕生日に予告編映像をつくってきました。今年は「予告」ではなく60秒のPVに。就活を目前にした決意表明のメッセージと、昨年手に入れた憧れのバイクを、とにかくカッコよく——いわば、自分とバイクのCMです。</p>
 
-    <!-- ヒーロー静止画: 代表的な1フレーム。差し替え不要ならこのまま -->
-    <div class="hero-still">
-      <div class="bar top"></div>
-      <img src="eizo-flagship.jpg" alt="作品の代表フレーム">
-      <div class="bar bot"></div>
+    <!-- トップ: 本編をその場で再生（クリック/Enter） -->
+    <div class="hero-video" data-yt="-laqI9Dw0Vg" tabindex="0" role="button" aria-label="本編を再生">
+      <img class="poster" src="eizo-flagship.jpg" alt="本編のサムネイル">
+      <div class="play"></div>
     </div>
 
     <!-- ===== プリビズ（最大のアピールポイント） ===== -->
@@ -255,6 +269,8 @@
     </div>
   </main>
 
+  <div class="lightbox" id="lightbox" aria-hidden="true"><img id="lightbox-img" src="" alt=""></div>
+
 <script>
   window.addEventListener("load",()=>document.body.classList.add("ready"));
   document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
@@ -280,6 +296,31 @@
       if(e.key==="ArrowRight"){e.preventDefault();setPos(cur+4);}
     });
   });
+
+  // トップ動画: クリック/Enterで本編を再生
+  document.querySelectorAll(".hero-video[data-yt]").forEach(f=>{
+    const play=()=>{
+      if(f.classList.contains("playing"))return;
+      const ifr=document.createElement("iframe");
+      ifr.src="https://www.youtube.com/embed/"+f.getAttribute("data-yt")+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+      ifr.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";
+      ifr.setAttribute("allowfullscreen","");
+      ifr.title="本編の映像";
+      f.appendChild(ifr); f.classList.add("playing");
+    };
+    f.addEventListener("click",play);
+    f.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
+  });
+
+  // 画像タップで拡大（ライトボックス）
+  const lb=document.getElementById("lightbox"), lbImg=document.getElementById("lightbox-img");
+  document.querySelectorAll(".astrip img,.cmp img,.docs img,.figm img").forEach(img=>{
+    img.style.cursor="zoom-in";
+    img.addEventListener("click",()=>{ lbImg.src=img.src; lbImg.alt=img.alt; lb.classList.add("open"); lb.setAttribute("aria-hidden","false"); });
+  });
+  const closeLb=()=>{ lb.classList.remove("open"); lb.setAttribute("aria-hidden","true"); lbImg.src=""; };
+  lb.addEventListener("click",closeLb);
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&lb.classList.contains("open")) closeLb(); });
 </script>
 </body>
 </html>

@@ -143,8 +143,11 @@
   .frame.playing .play,.frame.playing .tc,.frame.playing .res,.frame.playing .ph,.frame.playing .thumb{display:none}
   .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5}
 
-  .flag-info h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3vw,34px);
+  .flag-info h3{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(21px,2.8vw,32px);
     line-height:1.1;margin-bottom:12px}
+  .flag-info h3 a{color:inherit;text-decoration:none;transition:color .2s}
+  .flag-info h3 a:hover,.flag-info h3 a:focus-visible{color:var(--amber);outline:none}
+  .nb{white-space:nowrap}
   .wtags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
   .wtag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;color:var(--ink-mut);
     border:1px solid var(--line);border-radius:100px;padding:4px 11px}
@@ -209,8 +212,11 @@
   .ac-title{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(30px,5.5vw,60px);line-height:1;letter-spacing:-.015em;margin-bottom:16px}
   .ac-title .light{color:var(--amber);font-style:italic;font-weight:600}
   .ac-sub{color:var(--ink-mut);font-size:15px;margin-bottom:30px}
-  .ac-btn{display:inline-flex;align-items:center;gap:12px;font-family:"Space Mono",monospace;font-size:14px;letter-spacing:.08em;color:#120d05;background:var(--amber);border:1px solid var(--amber);padding:16px 28px;border-radius:var(--r);text-decoration:none;transition:gap .3s,background .3s}
+  .ac-btn{display:inline-flex;align-items:center;gap:12px;font-family:"Space Mono",monospace;font-size:14px;letter-spacing:.08em;color:#120d05;background:var(--amber);border:1px solid var(--amber);padding:16px 28px;border-radius:var(--r);text-decoration:none;transition:gap .3s,background .3s,border-color .3s,color .3s}
   .ac-btn:hover,.ac-btn:focus-visible{background:#f3bd6b;gap:18px;outline:none}
+  .ac-btns{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+  .ac-btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .ac-btn.ghost:hover,.ac-btn.ghost:focus-visible{background:transparent;border-color:var(--amber);color:var(--amber)}
 </style>
 </head>
 <body>
@@ -275,7 +281,7 @@
         <div class="res">16:9 · 4K · GRADED</div>
       </div>
       <div class="flag-info">
-        <h3>大人序章中 — 22歳記念PV</h3>
+        <h3><a href="making-birthday2026.html"><span class="nb">小竹竜ノ介22歳記念PV</span> <span class="nb">「大人序章中」</span></a></h3>
         <div class="wtags"><span class="wtag">実写映像</span><span class="wtag">60秒PV</span><span class="wtag">シネマティック</span></div>
         <p>就活を前にした決意表明と、憧れのバイクをカッコ良く表現。ロケ地を1:1でCG化してプリビズを組み、画を設計してから撮った60秒のセルフCM。</p>
         <div class="btn-row">
@@ -369,10 +375,13 @@
 
   <!-- ===================== ARCHIVE CTA ===================== -->
   <section class="archive-cta rv">
-    <div class="ac-eyebrow">ARCHIVE</div>
+    <div class="ac-eyebrow">ARCHIVE & CREDITS</div>
     <h2 class="ac-title">これまでの、<span class="light">すべて</span>。</h2>
-    <p class="ac-sub">制作年の新しい順に、過去の全作品をタグで絞り込みながら見られます。</p>
-    <a class="ac-btn" href="works.html">過去の作品群をみる <span>→</span></a>
+    <p class="ac-sub">制作年の新しい順に並ぶ全作品群と、外部で公開・放映されている実績。</p>
+    <div class="ac-btns">
+      <a class="ac-btn" href="works.html">過去の作品群をみる <span>→</span></a>
+      <a class="ac-btn ghost" href="credits.html">実績・掲載歴をみる <span>→</span></a>
+    </div>
   </section>
 
   <!-- ===================== FOOTER ===================== -->

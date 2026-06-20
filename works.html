@@ -75,8 +75,14 @@
   .card:hover .thumb{border-color:var(--amber-dim);transform:translateY(-3px)}
   .card:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
   .card:hover .play::after{border-left-color:var(--amber)}
+  .thumb:not(.playable){cursor:default}
+  .thumb.playing{cursor:default}
+  .thumb.playing img,.thumb.playing .noimg,.thumb.playing .play{display:none}
+  .thumb iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
   .wbody{padding-top:13px}
-  .wtitle{font-family:"Fraunces",serif;font-weight:600;font-size:19px;line-height:1.2;margin-bottom:4px}
+  .wtitle{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:18px;line-height:1.45;margin-bottom:4px}
+  a.wtitle{display:inline-block;color:var(--ink);text-decoration:none;transition:color .2s}
+  a.wtitle:hover,a.wtitle:focus-visible{color:var(--amber);outline:none}
   .wperiod{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-bottom:10px}
   .wtags{display:flex;flex-wrap:wrap;gap:7px}
   .wtag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;color:var(--ink-mut);
@@ -141,12 +147,20 @@
   ========================================================= */
   const WORKS = [
     {
-      title:"大人序章中",
+      title:"小竹竜ノ介22歳記念PV 「大人序章中」",
       tags:["実写映像","60秒PV","シネマティック"],
       period:"2026年3月末〜5月", date:"2026-05-31",
       url:"https://youtu.be/-laqI9Dw0Vg",
       making:"making-birthday2026.html",
       thumb:"eizo-flagship.jpg"
+    },
+    {
+      title:"GRIT3部作 — フィジーク学生大会ドキュメンタリー",
+      tags:["実写映像","ドキュメンタリー"],
+      period:"2024年7月〜11月（3部作）", date:"2024-07-14",
+      url:"https://youtu.be/ehFCFjIPhZY",
+      making:"making-grit.html",
+      thumb:"https://img.youtube.com/vi/ehFCFjIPhZY/maxresdefault.jpg"
     },
     // ▼▼▼ 以下は表示サンプル。実際の作品に置き換えてください ▼▼▼
     {title:"（例）3DCGショートフィルム", tags:["CG","Blender","シネマティック"], period:"2025年 秋", date:"2025-10", url:"#", making:"", thumb:""},
@@ -188,8 +202,14 @@
 
   qInput.addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); render(); });
 
+  // YouTube URL/IDから動画IDを取り出す
+  function ytId(url){
+    if(!url || url === "#") return null;
+    const m = url.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);
+    return m ? m[1] : null;
+  }
+
   function matches(w){
-    // 選択タグはAND（すべて含む）
     for(const t of selected){ if(!w.tags.includes(t)) return false; }
     // 検索は作品名 or タグの部分一致
     if(query){
@@ -213,24 +233,41 @@
     list.forEach((w, i) => {
       const card = document.createElement("div");
       card.className = "card";
+      const vid = ytId(w.url);
       const thumbInner = w.thumb
-        ? '<img src="'+w.thumb+'" alt="'+w.title+'">'
+        ? '<img src="'+w.thumb+'" alt="'+w.title+'" onerror="this.onerror=null;this.src=this.src.replace(\'maxresdefault\',\'hqdefault\')">'
         : '<div class="noimg">'+w.title+'</div>';
       const tagsHtml = w.tags.map(t => '<span class="wtag" data-tag="'+t+'">'+t+'</span>').join("");
       const makingHtml = w.making ? '<a class="wmaking" href="'+w.making+'">メイキングを見る →</a>' : "";
-      const href = (w.url && w.url !== "#") ? w.url : null;
+      const titleHtml = w.making
+        ? '<a class="wtitle" href="'+w.making+'">'+w.title+'</a>'
+        : '<div class="wtitle">'+w.title+'</div>';
       card.innerHTML =
-        '<a class="thumb"'+(href?(' href="'+href+'" target="_blank" rel="noopener"'):'')+'>'+
+        '<div class="thumb'+(vid?' playable':'')+'"'+(vid?' data-yt="'+vid+'" role="button" tabindex="0" aria-label="再生"':'')+'>'+
           thumbInner +
-          '<div class="play"></div>'+
-        '</a>'+
+          (vid?'<div class="play"></div>':'')+
+        '</div>'+
         '<div class="wbody">'+
-          '<div class="wtitle">'+w.title+'</div>'+
+          titleHtml +
           '<div class="wperiod">'+w.period+'</div>'+
           '<div class="wtags">'+tagsHtml+'</div>'+
           makingHtml +
         '</div>';
       grid.appendChild(card);
+      // サムネクリックでその場再生
+      const thumbEl = card.querySelector(".thumb.playable");
+      if(thumbEl){
+        const playVid=()=>{
+          if(thumbEl.classList.contains("playing"))return;
+          const ifr=document.createElement("iframe");
+          ifr.src="https://www.youtube.com/embed/"+thumbEl.dataset.yt+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+          ifr.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";
+          ifr.setAttribute("allowfullscreen","");
+          thumbEl.appendChild(ifr); thumbEl.classList.add("playing");
+        };
+        thumbEl.addEventListener("click",playVid);
+        thumbEl.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();playVid();}});
+      }
       // タグクリックで絞り込み
       card.querySelectorAll(".wtag").forEach(el => {
         el.addEventListener("click", () => { if(!selected.has(el.dataset.tag)) selected.add(el.dataset.tag); render(); window.scrollTo({top:0,behavior:"smooth"}); });
