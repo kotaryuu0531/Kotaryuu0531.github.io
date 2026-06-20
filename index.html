@@ -173,10 +173,11 @@
   .strip::-webkit-scrollbar{height:6px}
   .strip::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
   .card{scroll-snap-align:start;position:relative;aspect-ratio:16/9;background:var(--surface);
-    border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;
+    border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;text-decoration:none;
     display:flex;align-items:flex-end;transition:border-color .3s,transform .3s}
   .card::before{content:"";position:absolute;inset:0;
     background:linear-gradient(135deg,#1a1f25,#0f1318 60%,#181410)}
+  .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
   .card:hover{border-color:var(--amber-dim);transform:translateY(-3px)}
   .card span{position:relative;z-index:2;padding:12px 14px;font-family:"Space Mono",monospace;
     font-size:11px;letter-spacing:.06em;color:var(--ink);
@@ -218,6 +219,20 @@
   .ac-btns{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
   .ac-btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
   .ac-btn.ghost:hover,.ac-btn.ghost:focus-visible{background:transparent;border-color:var(--amber);color:var(--amber)}
+  /* 作品概要のホバーパネル */
+  .ovpanel{position:fixed;z-index:45;width:330px;max-width:86vw;
+    background:rgba(18,22,28,.97);border:1px solid var(--line);border-radius:var(--r);
+    padding:18px 20px 16px;box-shadow:0 18px 50px rgba(0,0,0,.55);backdrop-filter:blur(6px);
+    opacity:0;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease;pointer-events:none}
+  .ovpanel.show{opacity:1;transform:none}
+  .ov-eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--amber);margin-bottom:10px}
+  .ov-title{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-weight:600;font-size:21px;line-height:1.2;color:var(--ink);margin-bottom:3px}
+  .ov-sub{font-family:"Archivo",sans-serif;font-size:12px;color:var(--ink-mut);margin-bottom:11px}
+  .ov-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:13px}
+  .ov-tag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:3px 9px}
+  .ov-text{font-size:13px;line-height:1.7;color:var(--ink-mut);margin-bottom:14px}
+  .ov-cta{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--amber)}
 </style>
 </head>
 <body>
@@ -295,6 +310,7 @@
     <div class="more-lbl">実写映像 — 他の作品</div>
     <div class="strip">
       <!-- カードを増やす場合はこのブロックを複製 -->
+      <a class="card" href="making-grit.html" aria-label="GRIT3部作のメイキングへ" data-ov-eyebrow="DOCUMENTARY — 3部作 / 2024" data-ov-title="GRIT3部作" data-ov-sub="フィジーク学生大会ドキュメンタリー" data-ov-tags="実写映像,ドキュメンタリー" data-ov-text="フィジークの学生大会に挑む友人・関根の、大会までの約3ヶ月を追ったドキュメンタリー。2024年に全3部作として制作・公開しました。"><img src="https://img.youtube.com/vi/ehFCFjIPhZY/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/ehFCFjIPhZY/hqdefault.jpg'" alt="GRIT3部作"><div class="ctag">ドキュメンタリー</div><span>GRIT3部作</span></a>
       <div class="card" tabindex="0" role="button"><div class="ctag">ハイライト</div><span>イベント・ハイライト</span></div>
       <div class="card" tabindex="0" role="button"><div class="ctag">MV</div><span>ミュージックビデオ</span></div>
       <div class="card" tabindex="0" role="button"><div class="ctag">広告</div><span>プロモーション映像</span></div>
@@ -401,6 +417,16 @@
     <div class="colophon">© 2026 RYUNOSUKE KOTAKE — CINEMATIC ARTIST · MOVIE PRODUCTION</div>
   </footer>
 
+  <!-- 作品概要のホバーパネル -->
+  <div id="ovpanel" class="ovpanel" aria-hidden="true">
+    <div class="ov-eyebrow"></div>
+    <div class="ov-title"></div>
+    <div class="ov-sub"></div>
+    <div class="ov-tags"></div>
+    <p class="ov-text"></p>
+    <div class="ov-cta">メイキングを見る →</div>
+  </div>
+
 <script>
   // fade up from black
   window.addEventListener("load",()=>document.body.classList.add("ready"));
@@ -437,6 +463,43 @@
     f.addEventListener("click",play);
     f.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
   });
+
+  // 作品カードのホバー/フォーカスで概要パネルを表示
+  (function(){
+    const ov=document.getElementById("ovpanel");
+    if(!ov) return;
+    const eEye=ov.querySelector(".ov-eyebrow"), eTit=ov.querySelector(".ov-title"),
+          eSub=ov.querySelector(".ov-sub"), eTags=ov.querySelector(".ov-tags"), eTxt=ov.querySelector(".ov-text");
+    function place(card){
+      const r=card.getBoundingClientRect(), pw=ov.offsetWidth, phh=ov.offsetHeight, gap=12;
+      let left=r.left+r.width/2-pw/2;
+      left=Math.max(12,Math.min(left,window.innerWidth-pw-12));
+      let top=r.top-phh-gap;
+      if(top<12) top=r.bottom+gap;
+      ov.style.left=left+"px"; ov.style.top=top+"px";
+    }
+    function show(card){
+      eEye.textContent=card.dataset.ovEyebrow||"";
+      eTit.textContent=card.dataset.ovTitle||"";
+      eSub.textContent=card.dataset.ovSub||"";
+      eSub.style.display=card.dataset.ovSub?"":"none";
+      const tags=(card.dataset.ovTags||"").split(",").map(t=>t.trim()).filter(Boolean);
+      eTags.innerHTML=tags.map(t=>'<span class="ov-tag">'+t+'</span>').join("");
+      eTags.style.display=tags.length?"":"none";
+      eTxt.textContent=card.dataset.ovText||"";
+      ov.classList.add("show"); ov.setAttribute("aria-hidden","false");
+      place(card);
+    }
+    function hide(){ ov.classList.remove("show"); ov.setAttribute("aria-hidden","true"); }
+    document.querySelectorAll("[data-ov-title]").forEach(card=>{
+      card.addEventListener("mouseenter",()=>show(card));
+      card.addEventListener("mouseleave",hide);
+      card.addEventListener("focus",()=>show(card));
+      card.addEventListener("blur",hide);
+    });
+    window.addEventListener("scroll",hide,true);
+    window.addEventListener("resize",hide);
+  })();
 </script>
 </body>
 </html>
