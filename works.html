@@ -63,6 +63,7 @@
   .card{display:flex;flex-direction:column;opacity:0;transform:translateY(14px);
     transition:opacity .5s ease,transform .5s cubic-bezier(.2,.7,.2,1)}
   .card.in{opacity:1;transform:none}
+  .badge3d{position:absolute;top:8px;right:8px;z-index:3;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--amber);background:rgba(0,0,0,.55);border:1px solid var(--amber-dim);padding:3px 8px;border-radius:100px}
   .thumb{position:relative;aspect-ratio:16/9;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
     background:var(--surface);display:block;cursor:pointer;transition:border-color .3s,transform .3s}
   .thumb::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#1a1f25,#0f1318 60%,#181410)}
@@ -188,6 +189,16 @@
       thumb:"https://img.youtube.com/vi/ehFCFjIPhZY/maxresdefault.jpg",
       ov:{eyebrow:"DOCUMENTARY — 3部作 / 2024", sub:"フィジーク学生大会ドキュメンタリー", text:"フィジークの学生大会に挑む友人・関根の、大会までの約3ヶ月を追ったドキュメンタリー。2024年に全3部作として制作・公開しました。"}
     },
+    {
+      title:"スニーカー 3DCGモデル",
+      tags:["CG","服飾","モデリング"],
+      period:"2023年12月", date:"2023-12-23",
+      url:"",
+      making:"making-sneaker.html",
+      thumb:"sneaker-thumb.jpg",
+      is3d:true,
+      ov:{eyebrow:"3DCG MODELING — スニーカー / 2023", sub:"実物リファレンスからのフルCG制作", text:"自分で購入したスニーカーの実物を参考に、Blenderで一から3DCGモデルを制作。テクスチャはProcreateで手描きで自作しました。"}
+    },
     // ▼▼▼ 以下は表示サンプル。実際の作品に置き換えてください ▼▼▼
     {title:"（例）3DCGショートフィルム", tags:["CG","Blender","シネマティック"], period:"2025年 秋", date:"2025-10", url:"#", making:"", thumb:""},
     {title:"（例）音楽イベント ライブ配信", tags:["ライブ配信","マルチカメラ"], period:"2025年 夏", date:"2025-08", url:"#", making:"", thumb:""},
@@ -278,6 +289,7 @@
       card.innerHTML =
         '<div class="thumb'+(vid?' playable':'')+'"'+(vid?' data-yt="'+vid+'" role="button" tabindex="0" aria-label="再生"':'')+'>'+
           thumbInner +
+          (w.is3d?'<div class="badge3d">3D</div>':'')+
           (vid?'<div class="play"></div>':'')+
         '</div>'+
         '<div class="wbody">'+
