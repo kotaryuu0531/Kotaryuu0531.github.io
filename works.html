@@ -116,6 +116,14 @@
     border:1px solid var(--line);border-radius:100px;padding:3px 9px}
   .ov-text{font-size:13px;line-height:1.7;color:var(--ink-mut);margin-bottom:14px}
   .ov-cta{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--amber)}
+  /* 3Dビューア・モーダル */
+  .v3d{position:fixed;inset:0;z-index:80;background:rgba(5,7,10,.94);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  .v3d.open{display:flex}
+  .v3d model-viewer{width:min(92vw,900px);height:min(82vh,680px);background:radial-gradient(130% 110% at 50% 26%,#1b212a 0%,#0c0f14 72%);border:1px solid var(--line);border-radius:var(--r);touch-action:none}
+  .v3d-close{position:absolute;top:18px;right:20px;z-index:2;background:rgba(0,0,0,.5);color:var(--ink);border:1px solid var(--line);border-radius:100px;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;padding:9px 15px;cursor:pointer}
+  .v3d-close:hover{border-color:var(--amber);color:var(--amber)}
+  .v3d-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);text-align:center;pointer-events:none;padding:0 16px}
+  .badge3d{cursor:pointer}
 </style>
 </head>
 <body>
@@ -197,6 +205,7 @@
       making:"making-sneaker.html",
       thumb:"sneaker-thumb.jpg",
       is3d:true,
+      glb:"sneaker.glb",
       ov:{eyebrow:"3DCG MODELING — スニーカー / 2023", sub:"実物リファレンスからのフルCG制作", text:"自分で購入したスニーカーの実物を参考に、Blenderで一から3DCGモデルを制作。テクスチャはProcreateで手描きで自作しました。"}
     },
     // ▼▼▼ 以下は表示サンプル。実際の作品に置き換えてください ▼▼▼
@@ -289,7 +298,7 @@
       card.innerHTML =
         '<div class="thumb'+(vid?' playable':'')+'"'+(vid?' data-yt="'+vid+'" role="button" tabindex="0" aria-label="再生"':'')+'>'+
           thumbInner +
-          (w.is3d?'<div class="badge3d">3D</div>':'')+
+          (w.is3d?'<div class="badge3d" data-glb="'+(w.glb||"")+'" data-poster="'+(w.thumb||"")+'">3D</div>':'')+
           (vid?'<div class="play"></div>':'')+
         '</div>'+
         '<div class="wbody">'+
@@ -363,5 +372,50 @@
   window.addEventListener("load", () => document.body.classList.add("ready"));
   document.addEventListener("DOMContentLoaded", () => document.body.classList.add("ready"));
 </script>
+  <!-- 3Dビューア・モーダル -->
+  <div class="v3d" id="v3d" aria-hidden="true">
+    <button class="v3d-close" aria-label="閉じる">✕ CLOSE</button>
+    <div class="v3d-hint">ドラッグ＝回転 ／ スクロール＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動</div>
+  </div>
+  <script>
+  (function(){
+    const v3d=document.getElementById("v3d"); if(!v3d) return;
+    const hint=v3d.querySelector(".v3d-hint");
+    let mv=null, loading=false;
+    function ensureLib(cb){
+      if(window.customElements && customElements.get("model-viewer")) return cb();
+      const wait=()=>{ customElements.get("model-viewer") ? cb() : setTimeout(wait,120); };
+      if(loading){ wait(); return; }
+      loading=true;
+      const s=document.createElement("script"); s.type="module";
+      s.src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js";
+      s.onload=wait; document.head.appendChild(s);
+    }
+    function openV(glb,poster){
+      v3d.classList.add("open"); v3d.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden";
+      ensureLib(()=>{
+        if(!mv){
+          mv=document.createElement("model-viewer");
+          mv.setAttribute("camera-controls","");mv.setAttribute("auto-rotate","");
+          mv.setAttribute("auto-rotate-delay","2500");mv.setAttribute("interaction-prompt","auto");
+          mv.setAttribute("shadow-intensity","0.7");mv.setAttribute("exposure","1.05");
+          mv.setAttribute("environment-image","neutral");
+          mv.setAttribute("camera-orbit","-28deg 74deg auto");mv.setAttribute("field-of-view","30deg");
+          v3d.insertBefore(mv, hint);
+        }
+        if(poster) mv.setAttribute("poster",poster);
+        mv.setAttribute("src",glb);
+      });
+    }
+    function closeV(){ v3d.classList.remove("open"); v3d.setAttribute("aria-hidden","true"); document.body.style.overflow=""; }
+    v3d.querySelector(".v3d-close").addEventListener("click",closeV);
+    v3d.addEventListener("click",e=>{ if(e.target===v3d) closeV(); });
+    document.addEventListener("keydown",e=>{ if(e.key==="Escape" && v3d.classList.contains("open")) closeV(); });
+    document.addEventListener("click",e=>{
+      const b=e.target.closest(".badge3d[data-glb]"); if(!b) return;
+      e.preventDefault(); e.stopPropagation(); openV(b.dataset.glb, b.dataset.poster);
+    });
+  })();
+  </script>
 </body>
 </html>

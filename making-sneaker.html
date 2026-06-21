@@ -48,7 +48,7 @@
 
   /* インタラクティブ3Dビューア */
   .viewer{margin-top:clamp(26px,4vh,42px)}
-  .viewer model-viewer{width:100%;height:min(68vh,560px);display:block;
+  .viewer model-viewer{width:100%;height:min(68vh,560px);display:block;touch-action:none;
     background:radial-gradient(130% 110% at 50% 26%, #1b212a 0%, #0c0f14 72%);
     border:1px solid var(--line);border-radius:var(--r);--poster-color:#0c0f14}
 
@@ -131,7 +131,7 @@
         camera-controls auto-rotate auto-rotate-delay="2500" interaction-prompt="auto"
         camera-orbit="-28deg 74deg auto" field-of-view="30deg"
         shadow-intensity="0.7" exposure="1.05" environment-image="neutral" loading="eager"></model-viewer>
-      <figcaption class="cap">ドラッグで回転 ／ 2本指スクロール（ホイール）で拡大縮小。読み込み中はレンダー画像を表示します。</figcaption>
+      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。読み込み中はレンダー画像を表示します。</figcaption>
     </div>
 
     <!-- 制作について -->
