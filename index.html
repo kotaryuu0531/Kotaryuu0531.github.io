@@ -235,7 +235,8 @@
   .v3d-close{position:absolute;top:18px;right:20px;z-index:2;background:rgba(0,0,0,.5);color:var(--ink);border:1px solid var(--line);border-radius:100px;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;padding:9px 15px;cursor:pointer}
   .v3d-close:hover{border-color:var(--amber);color:var(--amber)}
   .v3d-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);text-align:center;pointer-events:none;padding:0 16px}
-  .badge3d{cursor:pointer}
+  .badge3d{cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
+  .card .badge3d:hover,.card .badge3d:focus-visible{transform:scale(1.12);background:rgba(0,0,0,.72);border-color:var(--amber);color:#fff;box-shadow:0 4px 16px rgba(233,169,76,.22);outline:none}
 </style>
 </head>
 <body>
