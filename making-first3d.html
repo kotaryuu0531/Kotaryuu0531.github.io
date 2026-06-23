@@ -194,23 +194,17 @@
   lb.addEventListener("click",()=>lb.classList.remove("open"));
   document.addEventListener("keydown",e=>{if(e.key==="Escape")lb.classList.remove("open");});
 
-  // 3Dビューアのホイールズーム（ブラウザ差・ページスクロール競合を回避して自前処理）
-  function attachWheelZoom(el){
-    el.addEventListener("wheel",function(e){
-      e.preventDefault(); e.stopPropagation();
-      let o; try{o=el.getCameraOrbit();}catch(_){return;}
-      if(!o) return;
-      const d=Math.max(-200,Math.min(200,e.deltaY));
-      const r=o.radius*Math.exp(d*0.0012);
-      el.cameraOrbit=o.theta+"rad "+o.phi+"rad "+r+"m";
-    },{passive:false,capture:true});
+  // 3Dビューア：標準ズームは維持し、ホイール時のページスクロールだけ抑止（Safari対策・C方式）
+  function attachScrollGuard(el){
+    el.addEventListener("wheel",function(e){ e.preventDefault(); },{passive:false});
   }
   if(window.customElements){
     customElements.whenDefined("model-viewer").then(()=>{
       const hero=document.querySelector(".viewer model-viewer");
-      if(hero) attachWheelZoom(hero);
+      if(hero) attachScrollGuard(hero);
     });
   }
+
 </script>
 </body>
 </html>

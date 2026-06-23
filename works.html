@@ -410,15 +410,9 @@
     const v3d=document.getElementById("v3d"); if(!v3d) return;
     const hint=v3d.querySelector(".v3d-hint");
     let mv=null, loading=false;
-    function attachWheelZoom(el){
-      el.addEventListener("wheel",function(e){
-        e.preventDefault(); e.stopPropagation();
-        let o; try{o=el.getCameraOrbit();}catch(_){return;}
-        if(!o) return;
-        const d=Math.max(-200,Math.min(200,e.deltaY));
-        const r=o.radius*Math.exp(d*0.0012);
-        el.cameraOrbit=o.theta+"rad "+o.phi+"rad "+r+"m";
-      },{passive:false,capture:true});
+    // 3Dビューア：標準ズームは維持し、ホイール時のページスクロールだけ抑止（Safari対策・C方式）
+    function attachScrollGuard(el){
+      el.addEventListener("wheel",function(e){ e.preventDefault(); },{passive:false});
     }
     function ensureLib(cb){
       if(window.customElements && customElements.get("model-viewer")) return cb();
@@ -449,7 +443,7 @@
           });
           mv.addEventListener("error",()=>{ v3d.classList.remove("loading"); if(spinTxt) spinTxt.textContent="読み込みに失敗しました"; });
           v3d.insertBefore(mv, hint);
-          attachWheelZoom(mv);
+          attachScrollGuard(mv);
         }
         if(poster) mv.setAttribute("poster",poster);
         if(mv.getAttribute("src")!==glb){ mv.cameraOrbit="-28deg 74deg auto"; mv.setAttribute("src",glb); }
