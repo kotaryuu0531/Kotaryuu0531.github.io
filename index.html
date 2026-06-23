@@ -235,6 +235,12 @@
   .v3d-close{position:absolute;top:18px;right:20px;z-index:2;background:rgba(0,0,0,.5);color:var(--ink);border:1px solid var(--line);border-radius:100px;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;padding:9px 15px;cursor:pointer}
   .v3d-close:hover{border-color:var(--amber);color:var(--amber)}
   .v3d-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);text-align:center;pointer-events:none;padding:0 16px}
+  .v3d.loading .v3d-hint{display:none}
+  .v3d-spin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;display:none;flex-direction:column;align-items:center;gap:13px;pointer-events:none}
+  .v3d.loading .v3d-spin{display:flex}
+  .v3d-spin .ring{width:44px;height:44px;border-radius:50%;border:3px solid rgba(233,169,76,.22);border-top-color:var(--amber);animation:v3dspin .8s linear infinite}
+  .v3d-spin .txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
+  @keyframes v3dspin{to{transform:rotate(360deg)}}
   .badge3d{cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
   .card .badge3d:hover,.card .badge3d:focus-visible{transform:scale(1.12);background:rgba(0,0,0,.72);border-color:var(--amber);color:#fff;box-shadow:0 4px 16px rgba(233,169,76,.22);outline:none}
 </style>
@@ -249,6 +255,7 @@
       <a href="#reel-eizo">実写映像</a>
       <a href="#reel-cg">CG</a>
       <a href="#reel-live">配信</a>
+      <a href="about.html">ABOUT</a>
       <a href="#contact">CONTACT</a>
     </nav>
   </header>
@@ -313,6 +320,7 @@
     <div class="strip">
       <!-- カードを増やす場合はこのブロックを複製 -->
       <a class="card" href="making-grit.html" aria-label="GRIT3部作のメイキングへ" data-ov-eyebrow="DOCUMENTARY — 3部作 / 2024" data-ov-title="GRIT3部作" data-ov-sub="フィジーク学生大会ドキュメンタリー" data-ov-tags="実写映像,ドキュメンタリー" data-ov-text="フィジークの学生大会に挑む友人・関根の、大会までの約3ヶ月を追ったドキュメンタリー。2024年に全3部作として制作・公開しました。"><img src="https://img.youtube.com/vi/ehFCFjIPhZY/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/ehFCFjIPhZY/hqdefault.jpg'" alt="GRIT3部作"><div class="ctag">ドキュメンタリー</div><span>GRIT3部作</span></a>
+      <a class="card" href="making-ibs98.html" aria-label="IBS VIDEO #98のメイキングへ" data-ov-eyebrow="NEWS — 校内放送VTR / 2018" data-ov-title="IBS VIDEO #98" data-ov-sub="文化祭「郁秋祭」2018 ダイジェスト" data-ov-tags="実写映像,ニュース,IBS" data-ov-text="郁文館中学・高校の文化祭「郁秋祭」2018の結果をダイジェストで紹介した校内放送VTR。私が初めて手がけた映像制作です。"><img src="https://img.youtube.com/vi/f8WL1ncrQ3w/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/f8WL1ncrQ3w/hqdefault.jpg'" alt="IBS VIDEO #98"><div class="ctag">ニュース</div><span>IBS VIDEO #98</span></a>
       <div class="card" tabindex="0" role="button"><div class="ctag">ハイライト</div><span>イベント・ハイライト</span></div>
       <div class="card" tabindex="0" role="button"><div class="ctag">MV</div><span>ミュージックビデオ</span></div>
       <div class="card" tabindex="0" role="button"><div class="ctag">広告</div><span>プロモーション映像</span></div>
@@ -350,6 +358,7 @@
     <div class="strip">
       <div class="card" tabindex="0" role="button"><div class="ctag">ショート</div><span>3DショートフィルムＡ</span></div>
       <a class="card" href="making-sneaker.html" aria-label="スニーカー3DCGモデルのメイキングへ" data-ov-eyebrow="3DCG MODELING — スニーカー / 2023" data-ov-title="スニーカー 3DCGモデル" data-ov-sub="実物リファレンスからのフルCG制作" data-ov-tags="CG,服飾,モデリング" data-ov-text="自分で購入したスニーカーの実物を参考に、Blenderで一から3DCGモデルを制作。テクスチャはProcreateで手描きで自作しました。"><img src="sneaker-thumb.jpg" alt="スニーカー 3DCGモデル"><div class="badge3d" data-glb="sneaker.glb" data-poster="sneaker-render.jpg">3D</div><div class="ctag">服飾</div><span>スニーカー 3DCGモデル</span></a>
+      <a class="card" href="making-first3d.html" aria-label="初めてのモデリングのメイキングへ" data-ov-eyebrow="3DCG MODELING — キャラクター / 2019" data-ov-title="初めてのモデリング" data-ov-sub="はじめて触れたBlender ／ 動かせる3Dモデル" data-ov-tags="CG,キャラクター,モデリング" data-ov-text="IBSでの映像制作に慣れてきた頃、表現の幅を広げたくて3DCGに挑戦。チュートリアルに沿ってモデリング〜スキニングまで行った、はじめてのBlender作品です。"><img src="first3d-thumb.jpg" alt="初めてのモデリング"><div class="badge3d" data-glb="first3d.glb" data-poster="first3d-render.jpg">3D</div><div class="ctag">キャラクター</div><span>初めてのモデリング</span></a>
       <div class="card" tabindex="0" role="button"><div class="ctag">プロダクト</div><span>プロダクトCG</span></div>
       <div class="card" tabindex="0" role="button"><div class="ctag">環境</div><span>環境・背景CG</span></div>
       <div class="card" tabindex="0" role="button"><div class="ctag">モーション</div><span>モーショングラフィクス</span></div>
@@ -503,6 +512,7 @@
   <!-- 3Dビューア・モーダル -->
   <div class="v3d" id="v3d" aria-hidden="true">
     <button class="v3d-close" aria-label="閉じる">✕ CLOSE</button>
+    <div class="v3d-spin"><div class="ring"></div><div class="txt">読み込み中…</div></div>
     <div class="v3d-hint">ドラッグ＝回転 ／ スクロール＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動</div>
   </div>
   <script>
@@ -510,6 +520,18 @@
     const v3d=document.getElementById("v3d"); if(!v3d) return;
     const hint=v3d.querySelector(".v3d-hint");
     let mv=null, loading=false;
+    function attachWheelZoom(el){
+      el.addEventListener("wheel",function(e){
+        e.preventDefault(); e.stopPropagation();
+        let o; try{o=el.getCameraOrbit();}catch(_){return;}
+        if(!o) return;
+        if(el._baseR==null||!el._baseR) el._baseR=o.radius||0.6;
+        const d=Math.max(-120,Math.min(120,e.deltaY));
+        let r=o.radius*Math.exp(d*0.0012);
+        r=Math.max(el._baseR*0.3, Math.min(el._baseR*3, r));
+        el.cameraOrbit="auto auto "+r+"m";
+      },{passive:false,capture:true});
+    }
     function ensureLib(cb){
       if(window.customElements && customElements.get("model-viewer")) return cb();
       const wait=()=>{ customElements.get("model-viewer") ? cb() : setTimeout(wait,120); };
@@ -519,8 +541,10 @@
       s.src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js";
       s.onload=wait; document.head.appendChild(s);
     }
+    const spinTxt=v3d.querySelector(".v3d-spin .txt");
     function openV(glb,poster){
-      v3d.classList.add("open"); v3d.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden";
+      v3d.classList.add("open","loading"); v3d.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden";
+      if(spinTxt) spinTxt.textContent="読み込み中…";
       ensureLib(()=>{
         if(!mv){
           mv=document.createElement("model-viewer");
@@ -529,10 +553,19 @@
           mv.setAttribute("shadow-intensity","0.7");mv.setAttribute("exposure","1.05");
           mv.setAttribute("environment-image","neutral");
           mv.setAttribute("camera-orbit","-28deg 74deg auto");mv.setAttribute("field-of-view","30deg");
+          mv.addEventListener("load",()=>v3d.classList.remove("loading"));
+          mv.addEventListener("progress",e=>{
+            const p=Math.round((e.detail.totalProgress||0)*100);
+            if(spinTxt) spinTxt.textContent="読み込み中 "+p+"%";
+            if(e.detail.totalProgress>=1) v3d.classList.remove("loading");
+          });
+          mv.addEventListener("error",()=>{ v3d.classList.remove("loading"); if(spinTxt) spinTxt.textContent="読み込みに失敗しました"; });
           v3d.insertBefore(mv, hint);
+          attachWheelZoom(mv);
         }
         if(poster) mv.setAttribute("poster",poster);
-        mv.setAttribute("src",glb);
+        if(mv.getAttribute("src")!==glb) mv.setAttribute("src",glb);
+        if(mv.loaded && mv.getAttribute("src")===glb) v3d.classList.remove("loading");
       });
     }
     function closeV(){ v3d.classList.remove("open"); v3d.setAttribute("aria-hidden","true"); document.body.style.overflow=""; }

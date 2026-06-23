@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>スニーカー 3DCGモデル / RYUNOSUKE KOTAKE</title>
+<title>初めてのモデリング / RYUNOSUKE KOTAKE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -51,10 +51,6 @@
   .viewer model-viewer{width:100%;height:min(68vh,560px);display:block;touch-action:none;
     background:radial-gradient(130% 110% at 50% 26%, #1b212a 0%, #0c0f14 72%);
     border:1px solid var(--line);border-radius:var(--r);--poster-color:#0c0f14}
-
-  /* ヒーロー（ビューティーレンダ） */
-  .hero-img{margin-top:clamp(26px,4vh,42px)}
-  .hero-img img{width:100%;display:block;border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in}
   .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
 
   /* 制作について */
@@ -62,6 +58,9 @@
   .about h2{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(19px,2.4vw,26px);margin-bottom:14px}
   .about p{color:var(--ink-mut);font-size:15px;line-height:1.7;margin-bottom:14px}
   .about p:last-child{margin-bottom:0}
+  .about strong{color:var(--ink);font-weight:600}
+  .about a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .about a:hover{border-color:var(--amber)}
 
   /* 特集セクション */
   .feature{margin-top:clamp(40px,6vh,72px)}
@@ -74,12 +73,11 @@
   .grid3 figure{margin:0}
   .grid3 .imgbox{position:relative;aspect-ratio:4/3;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface);cursor:zoom-in}
   .grid3 .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
-  .grid3.sq .imgbox{aspect-ratio:1/1}
   .grid3 figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:8px}
 
-  /* 単体図（UV） */
-  .figm{margin-top:18px;max-width:560px}
-  .figm img{width:100%;display:block;border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in}
+  /* 単体図 */
+  .figm{margin-top:18px;max-width:520px}
+  .figm img{width:100%;display:block;border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in;background:var(--surface)}
   .figm figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:9px}
 
   /* スペック */
@@ -89,6 +87,7 @@
   .spec-row:last-child{border-bottom:1px solid var(--line)}
   .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
   .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  .spec-row dd a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
   @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
 
   /* ライトボックス */
@@ -119,78 +118,58 @@
   </header>
 
   <main class="wrap">
-    <div class="eyebrow">3DCG MODELING — スニーカー / 2023</div>
-    <h1><span class="nb">スニーカー</span> <span class="nb">3DCGモデル</span></h1>
-    <div class="subtitle">実物リファレンスからのフルCG制作</div>
-    <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=服飾">服飾</a><a class="htag" href="works.html?tags=モデリング">モデリング</a></div>
-    <p class="lead">自分で購入したスニーカーの実物を参考に、Blenderで一から3DCGモデルを制作しました。テクスチャはProcreateで手描きで自作しています。</p>
+    <div class="eyebrow">3DCG MODELING — キャラクター / 2019</div>
+    <h1>初めてのモデリング</h1>
+    <div class="subtitle">はじめて触れたBlender ／ 動かせる3Dモデル</div>
+    <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=キャラクター">キャラクター</a><a class="htag" href="works.html?tags=モデリング">モデリング</a></div>
+    <p class="lead">IBSでの映像制作に慣れてきた頃、表現の幅を広げたくて3DCGに挑戦。チュートリアルに沿って、モデリングからテクスチャペイント、スキニング（リグ付け）まで一通り行い、「動かせる3Dモデル」として完成させた、はじめてのBlender作品です。</p>
 
     <!-- インタラクティブ3Dビューア（ヒーロー） -->
     <div class="viewer rv">
-      <model-viewer src="sneaker.glb" poster="sneaker-render.jpg" alt="スニーカー3DCGモデル（ドラッグで回転できます）"
+      <model-viewer src="first3d.glb" poster="first3d-render.jpg" alt="初めてのモデリング・3Dモデル（ドラッグで回転できます）"
         camera-controls auto-rotate auto-rotate-delay="2500" interaction-prompt="auto"
-        camera-orbit="-28deg 74deg auto" field-of-view="30deg"
+        camera-orbit="-15deg 80deg auto" field-of-view="30deg"
         shadow-intensity="0.7" exposure="1.05" environment-image="neutral" loading="eager"></model-viewer>
-      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。読み込み中はレンダー画像を表示します。</figcaption>
+      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。※このビューアはリグ無しの状態を表示しています。</figcaption>
     </div>
 
-    <!-- 制作について -->
+    <!-- 制作背景 -->
     <section class="about rv">
-      <h2>制作について</h2>
-      <p>自分で購入したスニーカーを手元に置いて観察しながら、Blenderで一から形状を起こしました。サブディビジョンサーフェスを前提に、四角ポリゴンを基本としたクリーンなトポロジーで構築しています。</p>
-      <p>テクスチャはProcreateで手描きで自作。キャンバス地の質感やステッチ、ソールのテカりまでを、カラー・メタリック・ラフネスの各マップに描き分けています。</p>
+      <h2>制作背景</h2>
+      <p>IBSでの映像制作に慣れてきた頃、「自分の表現の幅をもっと広げたい」と思い、3DCGに挑戦しました。これがはじめてBlenderに触れた作品です。</p>
+      <p><a href="https://youtu.be/Xg4AXYuzEqA" target="_blank" rel="noopener">「ワニでもできる！モデリングforVRChat」</a>というチュートリアル動画に沿って、<strong>モデリング → テクスチャペイント → スキニング（リグ付け）</strong>まで一通り行い、ボーンで動かせる状態まで仕上げました。</p>
+      <p>必要な技術を、自分で教材を探して習得する——その最初の一歩がこの作品です。ここで得た3DCGの基礎が、のちの制作につながっています。</p>
     </section>
 
-    <!-- マテリアルプレビュー ターンアラウンド -->
+    <!-- リグ / スキニング -->
     <section class="feature rv">
-      <div class="lbl">TURNAROUND · MATERIAL PREVIEW</div>
-      <h3>テクスチャ適用後のターンアラウンド</h3>
-      <p>テクスチャを適用した状態を、正面・側面・背面・天面・底面から確認できるように並べました。</p>
-      <div class="grid3">
-        <figure><div class="imgbox"><img src="sneaker-mat-front.jpg" alt="マテリアル適用・正面"></div><figcaption>FRONT</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-mat-side.jpg" alt="マテリアル適用・側面"></div><figcaption>SIDE</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-mat-back.jpg" alt="マテリアル適用・背面"></div><figcaption>BACK</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-mat-top.jpg" alt="マテリアル適用・天面"></div><figcaption>TOP</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-mat-bottom.jpg" alt="マテリアル適用・底面"></div><figcaption>BOTTOM</figcaption></figure>
-      </div>
+      <div class="lbl">RIG · SKINNING</div>
+      <h3>スキニング（リグ）</h3>
+      <p>アーマチュア（ボーン）を入れてスキニングし、ポーズを付けて動かせる状態まで仕上げました。チュートリアルの主目的だった「動かせる3Dモデル」を、最後まで通して経験できた一本です。</p>
+      <figure class="figm"><img src="first3d-rig.jpg" alt="アーマチュア（ボーン）とスキニング"><figcaption>アーマチュア（ボーン）＋スキニング</figcaption></figure>
     </section>
 
     <!-- ワイヤーフレーム -->
     <section class="feature rv">
-      <div class="lbl">WIREFRAME · CONTROL CAGE</div>
-      <h3>ワイヤーフレーム（サブディビジョン適用前）</h3>
-      <p>トポロジーが見えるよう、サブディビジョンサーフェス適用前のベースメッシュ（コントロールケージ）を掲載しています。曲面はサブディビジョンで生成するため、土台は四角ポリゴンを基本に組んでいます。</p>
+      <div class="lbl">WIREFRAME</div>
+      <h3>ワイヤーフレーム</h3>
+      <p>正面・側面・天面のワイヤーフレーム。シンプルな形状を、扱いやすい構成で組んでいます。</p>
       <div class="grid3">
-        <figure><div class="imgbox"><img src="sneaker-wire-front.jpg" alt="ワイヤーフレーム・正面"></div><figcaption>FRONT</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-wire-side.jpg" alt="ワイヤーフレーム・側面"></div><figcaption>SIDE</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-wire-back.jpg" alt="ワイヤーフレーム・背面"></div><figcaption>BACK</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-wire-top.jpg" alt="ワイヤーフレーム・天面"></div><figcaption>TOP</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-wire-bottom.jpg" alt="ワイヤーフレーム・底面"></div><figcaption>BOTTOM</figcaption></figure>
-      </div>
-    </section>
-
-    <!-- UV + テクスチャ -->
-    <section class="feature rv">
-      <div class="lbl">UV · HAND-PAINTED TEXTURE</div>
-      <h3>UV展開とProcreateで自作したテクスチャ</h3>
-      <p>UVを展開し、カラー・メタリック・ラフネスの3マップをすべてProcreateで手描きしました（各2048×2048）。</p>
-      <figure class="figm"><img src="sneaker-uv.jpg" alt="UVレイアウトとカラーテクスチャ"><figcaption>UVレイアウト ＋ カラーテクスチャ</figcaption></figure>
-      <div class="grid3 sq">
-        <figure><div class="imgbox"><img src="sneaker-tex-color.jpg" alt="カラー（ベースカラー）マップ"></div><figcaption>COLOR / ベースカラー</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-tex-metallic.jpg" alt="メタリックマップ"></div><figcaption>METALLIC / メタリック</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-tex-rough.jpg" alt="ラフネス（粗さ）マップ"></div><figcaption>ROUGHNESS / 粗さ</figcaption></figure>
+        <figure><div class="imgbox"><img src="first3d-wire-front.jpg" alt="ワイヤーフレーム・正面"></div><figcaption>FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="first3d-wire-side.jpg" alt="ワイヤーフレーム・側面"></div><figcaption>SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="first3d-wire-top.jpg" alt="ワイヤーフレーム・天面"></div><figcaption>TOP</figcaption></figure>
       </div>
     </section>
 
     <!-- スペック -->
     <div class="spec-head">SPEC</div>
     <dl class="spec">
-      <div class="spec-row"><dt>制作</dt><dd>2023年12月（制作期間 約1日）</dd></div>
-      <div class="spec-row"><dt>ポリゴン</dt><dd>ベースメッシュ：頂点 2,188 ／ 三角面 4,260（両足合計）</dd></div>
-      <div class="spec-row"><dt>サブディビジョン</dt><dd>レベル1適用後：頂点 8,618 ／ 三角面 17,080（3Dビューアで表示中の状態）</dd></div>
+      <div class="spec-row"><dt>制作</dt><dd>2019年10月22日（制作期間 約1日）</dd></div>
+      <div class="spec-row"><dt>ポリゴン</dt><dd>頂点 538 ／ 三角面 784（書き出したモデル）</dd></div>
       <div class="spec-row"><dt>マテリアル</dt><dd>1</dd></div>
-      <div class="spec-row"><dt>テクスチャ</dt><dd>2048 × 2048（カラー／メタリック／ラフネス）</dd></div>
-      <div class="spec-row"><dt>使用ソフト</dt><dd>Blender（モデリング・レンダリング） ／ Procreate（テクスチャ）</dd></div>
+      <div class="spec-row"><dt>リグ</dt><dd>アーマチュア＋スキニング（ポーズ可能）</dd></div>
+      <div class="spec-row"><dt>使用ソフト</dt><dd>Blender（モデリング・テクスチャペイント・リグ）</dd></div>
+      <div class="spec-row"><dt>教材</dt><dd><a href="https://youtu.be/Xg4AXYuzEqA" target="_blank" rel="noopener">「ワニでもできる！モデリングforVRChat」</a>（YouTube チュートリアル）に沿って制作</dd></div>
     </dl>
 
     <footer>
@@ -209,7 +188,7 @@
 
   // ライトボックス（画像タップで拡大）
   const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img");
-  document.querySelectorAll(".hero-img img,.grid3 img,.figm img").forEach(img=>{
+  document.querySelectorAll(".grid3 img,.figm img").forEach(img=>{
     img.addEventListener("click",()=>{lbImg.src=img.src;lb.classList.add("open");});
   });
   lb.addEventListener("click",()=>lb.classList.remove("open"));

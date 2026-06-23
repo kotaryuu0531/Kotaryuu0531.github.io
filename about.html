@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.5;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.92),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:clamp(110px,15vh,160px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(38px,7vw,72px);line-height:1.08;letter-spacing:.01em;margin-bottom:8px}
+  .role{font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.1em;color:var(--ink-mut);margin-bottom:24px}
+  .lead{color:var(--ink);font-size:clamp(15px,1.8vw,20px);line-height:1.7;opacity:.9;max-width:none}
+
+  .section{margin-top:clamp(42px,7vh,84px)}
+  .sec-lbl{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--amber);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+  .sec-lbl::before{content:"";width:34px;height:1px;background:var(--amber)}
+
+  .bio p{color:var(--ink-mut);font-size:15.5px;line-height:1.85;margin-bottom:16px}
+  .bio p:last-child{margin-bottom:0}
+  .bio strong{color:var(--ink);font-weight:600}
+
+  .pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .pillar{border:1px solid var(--line);border-radius:var(--r);padding:22px;background:var(--surface)}
+  .pillar .pno{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber)}
+  .pillar h3{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:20px;margin:9px 0 10px}
+  .pillar p{color:var(--ink-mut);font-size:13.5px;line-height:1.75}
+
+  .tools{display:flex;flex-direction:column;gap:16px}
+  .toolrow{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:start}
+  .toolrow .tk{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber);padding-top:5px}
+  .toolrow .tv{display:flex;flex-wrap:wrap;gap:8px}
+  .tool{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.03em;color:var(--ink);border:1px solid var(--line);border-radius:100px;padding:5px 12px}
+  @media(max-width:560px){.toolrow{grid-template-columns:1fr;gap:8px}}
+
+  .timeline{display:flex;flex-direction:column}
+  .tl{display:grid;grid-template-columns:96px 1fr;gap:20px;padding:15px 0;border-top:1px solid var(--line)}
+  .tl:last-child{border-bottom:1px solid var(--line)}
+  .tl .yr{font-family:"Space Mono",monospace;font-size:13px;color:var(--amber);letter-spacing:.04em}
+  .tl .ev{color:var(--ink);font-size:14.5px;line-height:1.6}
+  .tl .ev small{color:var(--ink-mut);font-size:12.5px;font-family:"Space Mono",monospace;letter-spacing:.04em}
+
+  .contact{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+  .contact a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;color:var(--ink);text-decoration:none;border:1px solid var(--line);padding:14px 22px;border-radius:var(--r);transition:all .3s}
+  .contact a:hover{border-color:var(--amber);color:var(--amber)}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  p,.lead,.bio p{text-wrap:pretty}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html">← HOME</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">ABOUT — プロフィール</div>
+    <h1>小竹竜ノ介</h1>
+    <div class="role">RYUNOSUKE KOTAKE ／ 実写映像 · CG · ライブ配信</div>
+    <p class="lead">「感情を動かす」ことを軸に、実写映像・3DCG・ライブ配信をつくっています。目指すのは、ゲームのシネマティック（ムービー）制作。遊ぶ人の感情と、画面の中で起きる演出が重なる瞬間をつくりたいと考えています。</p>
+
+    <!-- これまで -->
+    <section class="section bio rv">
+      <div class="sec-lbl">JOURNEY — これまで</div>
+      <p>中学1年で放送部「IBS」に入り、校内ニュースの放送や、体育祭・文化祭といった学校行事の撮影・編集に明け暮れました。<strong>中学3年から高校3年の6月までは局長（部長）</strong>として部を率い、ここで映像づくりの土台をつくりました。</p>
+      <p>2017年に映像をはじめてから、実写の撮影・編集を軸に、中学時代から触れているBlenderでの3DCG、音楽イベントなどのライブ配信まで、制作の幅を広げてきました。<strong>「感情を動かす／手段は選ばず」</strong>——必要な技術はそのつど取りに行くスタイルです。</p>
+      <p>つくり手として大切にしているのは、<strong>「演出」と「体験」が一致しているか</strong>。観る人・遊ぶ人の感情の流れと、画面で起きることが噛み合った瞬間に、映像はいちばん強く働くと考えています。</p>
+    </section>
+
+    <!-- 領域 -->
+    <section class="section rv">
+      <div class="sec-lbl">FIELDS — 3つの領域</div>
+      <div class="pillars">
+        <div class="pillar">
+          <div class="pno">01</div>
+          <h3>実写映像</h3>
+          <p>撮影から編集まで一貫して。シネマティックな1本ものから、被写体に寄り添うドキュメンタリーまで。いちばん長く取り組んできた軸です。</p>
+        </div>
+        <div class="pillar">
+          <div class="pno">02</div>
+          <h3>CG</h3>
+          <p>Blenderでのモデリング。テクスチャはProcreateで手描きで自作。実写では撮れない画づくりの引き出しです。</p>
+        </div>
+        <div class="pillar">
+          <div class="pno">03</div>
+          <h3>ライブ配信</h3>
+          <p>音楽イベントを中心に、マルチカメラでの撮影・配信の現場を数多く経験。一発勝負の現場対応力が身につく場です。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ツール -->
+    <section class="section rv">
+      <div class="sec-lbl">TOOLS — 道具</div>
+      <div class="tools">
+        <div class="toolrow"><div class="tk">映像</div><div class="tv"><span class="tool">Final Cut Pro</span><span class="tool">DaVinci Resolve</span><span class="tool">Logic Pro</span></div></div>
+        <div class="toolrow"><div class="tk">3DCG</div><div class="tv"><span class="tool">Blender</span><span class="tool">Procreate</span></div></div>
+      </div>
+    </section>
+
+    <!-- 経歴 -->
+    <section class="section rv">
+      <div class="sec-lbl">TIMELINE — 歩み</div>
+      <div class="timeline">
+        <div class="tl"><div class="yr">2017</div><div class="ev">映像をはじめる <small>放送部 IBS で活動開始</small></div></div>
+        <div class="tl"><div class="yr">2018</div><div class="ev">初の映像制作「IBS VIDEO #98」 <small>郁秋祭ダイジェスト・一部の構成/編集を担当</small></div></div>
+      </div>
+    </section>
+
+    <!-- 連絡 -->
+    <section class="section rv" id="contact">
+      <div class="sec-lbl">CONTACT — 連絡先</div>
+      <div class="contact">
+        <a href="mailto:kotaryuu0531@gmail.com">✉ kotaryuu0531@gmail.com</a>
+        <a href="https://www.instagram.com/kotaryu0531/" target="_blank" rel="noopener">Instagram @kotaryu0531</a>
+      </div>
+    </section>
+
+    <footer>
+      <a href="index.html">← トップに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
