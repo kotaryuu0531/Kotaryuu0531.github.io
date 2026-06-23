@@ -358,7 +358,6 @@
     <div class="strip">
       <div class="card" tabindex="0" role="button"><div class="ctag">ショート</div><span>3DショートフィルムＡ</span></div>
       <a class="card" href="making-sneaker.html" aria-label="スニーカー3DCGモデルのメイキングへ" data-ov-eyebrow="3DCG MODELING — スニーカー / 2023" data-ov-title="スニーカー 3DCGモデル" data-ov-sub="実物リファレンスからのフルCG制作" data-ov-tags="CG,服飾,モデリング" data-ov-text="自分で購入したスニーカーの実物を参考に、Blenderで一から3DCGモデルを制作。テクスチャはProcreateで手描きで自作しました。"><img src="sneaker-thumb.jpg" alt="スニーカー 3DCGモデル"><div class="badge3d" data-glb="sneaker.glb" data-poster="sneaker-render.jpg">3D</div><div class="ctag">服飾</div><span>スニーカー 3DCGモデル</span></a>
-      <a class="card" href="making-first3d.html" aria-label="初めてのモデリングのメイキングへ" data-ov-eyebrow="3DCG MODELING — キャラクター / 2019" data-ov-title="初めてのモデリング" data-ov-sub="はじめて触れたBlender ／ 動かせる3Dモデル" data-ov-tags="CG,キャラクター,モデリング" data-ov-text="IBSでの映像制作に慣れてきた頃、表現の幅を広げたくて3DCGに挑戦。チュートリアルに沿ってモデリング〜スキニングまで行った、はじめてのBlender作品です。"><img src="first3d-thumb.jpg" alt="初めてのモデリング"><div class="badge3d" data-glb="first3d.glb" data-poster="first3d-render.jpg">3D</div><div class="ctag">キャラクター</div><span>初めてのモデリング</span></a>
       <div class="card" tabindex="0" role="button"><div class="ctag">プロダクト</div><span>プロダクトCG</span></div>
       <div class="card" tabindex="0" role="button"><div class="ctag">環境</div><span>環境・背景CG</span></div>
       <div class="card" tabindex="0" role="button"><div class="ctag">モーション</div><span>モーショングラフィクス</span></div>
@@ -525,9 +524,11 @@
         e.preventDefault(); e.stopPropagation();
         let o; try{o=el.getCameraOrbit();}catch(_){return;}
         if(!o) return;
-        const d=Math.max(-200,Math.min(200,e.deltaY));
-        const r=o.radius*Math.exp(d*0.0012);
-        el.cameraOrbit=o.theta+"rad "+o.phi+"rad "+r+"m";
+        if(el._baseR==null||!el._baseR) el._baseR=o.radius||0.6;
+        const d=Math.max(-120,Math.min(120,e.deltaY));
+        let r=o.radius*Math.exp(d*0.0012);
+        r=Math.max(el._baseR*0.3, Math.min(el._baseR*3, r));
+        el.cameraOrbit="auto auto "+r+"m";
       },{passive:false,capture:true});
     }
     function ensureLib(cb){
@@ -562,7 +563,7 @@
           attachWheelZoom(mv);
         }
         if(poster) mv.setAttribute("poster",poster);
-        if(mv.getAttribute("src")!==glb){ mv.cameraOrbit="-28deg 74deg auto"; mv.setAttribute("src",glb); }
+        if(mv.getAttribute("src")!==glb) mv.setAttribute("src",glb);
         if(mv.loaded && mv.getAttribute("src")===glb) v3d.classList.remove("loading");
       });
     }

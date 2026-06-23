@@ -216,17 +216,6 @@
       ov:{eyebrow:"3DCG MODELING — スニーカー / 2023", sub:"実物リファレンスからのフルCG制作", text:"自分で購入したスニーカーの実物を参考に、Blenderで一から3DCGモデルを制作。テクスチャはProcreateで手描きで自作しました。"}
     },
     {
-      title:"初めてのモデリング",
-      tags:["CG","キャラクター","モデリング"],
-      period:"2019年10月", date:"2019-10-22",
-      url:"",
-      making:"making-first3d.html",
-      thumb:"first3d-thumb.jpg",
-      is3d:true,
-      glb:"first3d.glb",
-      ov:{eyebrow:"3DCG MODELING — キャラクター / 2019", sub:"はじめて触れたBlender ／ 動かせる3Dモデル", text:"IBSでの映像制作に慣れてきた頃、表現の幅を広げたくて3DCGに挑戦。チュートリアルに沿ってモデリング〜スキニングまで行った、はじめてのBlender作品です。"}
-    },
-    {
       title:"IBS VIDEO #98",
       tags:["実写映像","ニュース","IBS"],
       period:"2018年11月", date:"2018-11-26",
@@ -415,9 +404,11 @@
         e.preventDefault(); e.stopPropagation();
         let o; try{o=el.getCameraOrbit();}catch(_){return;}
         if(!o) return;
-        const d=Math.max(-200,Math.min(200,e.deltaY));
-        const r=o.radius*Math.exp(d*0.0012);
-        el.cameraOrbit=o.theta+"rad "+o.phi+"rad "+r+"m";
+        if(el._baseR==null||!el._baseR) el._baseR=o.radius||0.6;
+        const d=Math.max(-120,Math.min(120,e.deltaY));
+        let r=o.radius*Math.exp(d*0.0012);
+        r=Math.max(el._baseR*0.3, Math.min(el._baseR*3, r));
+        el.cameraOrbit="auto auto "+r+"m";
       },{passive:false,capture:true});
     }
     function ensureLib(cb){
@@ -452,7 +443,7 @@
           attachWheelZoom(mv);
         }
         if(poster) mv.setAttribute("poster",poster);
-        if(mv.getAttribute("src")!==glb){ mv.cameraOrbit="-28deg 74deg auto"; mv.setAttribute("src",glb); }
+        if(mv.getAttribute("src")!==glb) mv.setAttribute("src",glb);
         if(mv.loaded && mv.getAttribute("src")===glb) v3d.classList.remove("loading");
       });
     }
