@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3Dビューア ズーム比較（デバッグ）</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js"></script>
+<style>
+  :root{--bg:#0A0D12;--surface:#14181E;--ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:4px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;line-height:1.6;padding:24px;-webkit-font-smoothing:antialiased}
+  h1{font-size:20px;margin-bottom:6px}
+  .sub{color:var(--ink-mut);font-size:13px;margin-bottom:18px}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:20px}
+  .bar span{color:var(--ink-mut);font-size:12px;margin-right:4px}
+  button{font:inherit;font-size:12px;color:var(--ink);background:var(--surface);border:1px solid var(--line);
+    border-radius:100px;padding:8px 16px;cursor:pointer;transition:border-color .2s,color .2s}
+  button:hover{border-color:var(--amber);color:var(--amber)}
+  button.on{border-color:var(--amber);color:var(--amber)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .col{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden;display:flex;flex-direction:column}
+  .tag{font-size:12px;font-weight:600;letter-spacing:.02em;padding:11px 14px;border-bottom:1px solid var(--line);color:var(--amber)}
+  model-viewer{width:100%;height:340px;display:block;touch-action:none;
+    background:radial-gradient(130% 110% at 50% 26%,#1b212a 0%,#0c0f14 72%)}
+  .read{font-family:"Space Mono",ui-monospace,monospace;font-size:12px;color:var(--ink);background:#0c0f14;
+    padding:9px 14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);min-height:34px}
+  .desc{font-size:12px;color:var(--ink-mut);padding:11px 14px}
+  .note{margin-top:22px;color:var(--ink-mut);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  .note b{color:var(--ink)}
+  .spacer{height:60vh;display:flex;align-items:flex-start;justify-content:center;color:var(--ink-mut);
+    font-size:12px;padding-top:24px}
+</style>
+</head>
+<body>
+  <h1>3Dビューア ズーム比較（デバッグ）</h1>
+  <div class="sub">同じモデルを3つの実装で並べています。各ビューアでドラッグ＝回転／ホイール＝拡大縮小を試して、寄り引きの幅・回転の挙動・正面スナップの有無を比べてください。下に距離(r)と角度(θ/φ)をライブ表示します。</div>
+
+  <div class="bar">
+    <span>モデル：</span>
+    <button id="mSneaker" class="on" onclick="setModel('sneaker.glb','sneaker-render.jpg',this)">スニーカー</button>
+    <button id="mFirst" onclick="setModel('first3d.glb','first3d-render.jpg',this)">かぼちゃ</button>
+    <span style="margin-left:12px">　</span>
+    <button onclick="resetView()">ビューをリセット</button>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+      <div class="tag">A：標準ズーム（旧版相当・自前コードなし）</div>
+      <model-viewer id="mvA" src="sneaker.glb" poster="sneaker-render.jpg" camera-controls interaction-prompt="none"
+        camera-orbit="-15deg 80deg auto" field-of-view="30deg" shadow-intensity="0.7" exposure="1.05" environment-image="neutral"></model-viewer>
+      <div class="read" id="readA">—</div>
+      <div class="desc">model-viewer標準のまま。Safariはホイールでページが上下する想定（＝元の問題）。</div>
+    </div>
+
+    <div class="col">
+      <div class="tag">B：自前ズーム（現行版）</div>
+      <model-viewer id="mvB" src="sneaker.glb" poster="sneaker-render.jpg" camera-controls interaction-prompt="none"
+        camera-orbit="-15deg 80deg auto" field-of-view="30deg" shadow-intensity="0.7" exposure="1.05" environment-image="neutral"></model-viewer>
+      <div class="read" id="readB">—</div>
+      <div class="desc">attachWheelZoom：角度を保持して距離だけ変更・クランプ無し。Safari対策あり。</div>
+    </div>
+
+    <div class="col">
+      <div class="tag">C：標準ズーム＋ページスクロール阻止のみ</div>
+      <model-viewer id="mvC" src="sneaker.glb" poster="sneaker-render.jpg" camera-controls interaction-prompt="none"
+        camera-orbit="-15deg 80deg auto" field-of-view="30deg" shadow-intensity="0.7" exposure="1.05" environment-image="neutral"></model-viewer>
+      <div class="read" id="readC">—</div>
+      <div class="desc">標準ズームは触らず、ホイール時に preventDefault だけ。Safariで標準ズームが生き残るか検証用。</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>見るポイント</b>：①回してから拡大したとき<b>正面に戻らないか</b>（B旧実装の不具合）／②<b>どこまで寄れて・引けるか</b>の幅（A=標準の基準）／③Safariで各ビューアが<b>ズームするか・ページが動くか</b>。<br>
+    もし <b>C がSafariでもちゃんとズームし、ページが動かない</b>なら、それが本命（標準の感触＋Safari対策）になります。
+  </div>
+  <div class="spacer">↓ このページはわざとスクロール可能にしてあります（Safariのスクロール競合を再現するため）</div>
+
+<script>
+  // B：自前ズーム（現行版と同一）
+  function attachWheelZoom(el){
+    el.addEventListener("wheel",function(e){
+      e.preventDefault(); e.stopPropagation();
+      let o; try{o=el.getCameraOrbit();}catch(_){return;}
+      if(!o) return;
+      const d=Math.max(-200,Math.min(200,e.deltaY));
+      const r=o.radius*Math.exp(d*0.0012);
+      el.cameraOrbit=o.theta+"rad "+o.phi+"rad "+r+"m";
+    },{passive:false,capture:true});
+  }
+  // C：標準ズームのまま、ページスクロールだけ止める（override しない）
+  function attachScrollGuard(el){
+    el.addEventListener("wheel",function(e){ e.preventDefault(); },{passive:false});
+  }
+
+  const mvA=document.getElementById("mvA"), mvB=document.getElementById("mvB"), mvC=document.getElementById("mvC");
+  const readA=document.getElementById("readA"), readB=document.getElementById("readB"), readC=document.getElementById("readC");
+
+  function fmt(mv){
+    try{ const o=mv.getCameraOrbit();
+      return "r="+o.radius.toFixed(3)+"m   θ="+(o.theta*180/Math.PI).toFixed(0)+"°   φ="+(o.phi*180/Math.PI).toFixed(0)+"°";
+    }catch(_){ return "—"; }
+  }
+  function bind(mv,el){
+    const upd=()=>{ el.textContent=fmt(mv); };
+    mv.addEventListener("camera-change",upd);
+    mv.addEventListener("load",upd);
+  }
+
+  function setModel(glb,poster,btn){
+    [mvA,mvB,mvC].forEach(mv=>{ if(poster) mv.setAttribute("poster",poster); mv.setAttribute("src",glb); mv.cameraOrbit="-15deg 80deg auto"; });
+    document.querySelectorAll(".bar button.on").forEach(b=>b.classList.remove("on"));
+    if(btn) btn.classList.add("on");
+  }
+  function resetView(){
+    [mvA,mvB,mvC].forEach(mv=>{ mv.cameraOrbit="-15deg 80deg auto"; mv.fieldOfView="30deg"; });
+  }
+
+  if(window.customElements){
+    customElements.whenDefined("model-viewer").then(()=>{
+      attachWheelZoom(mvB);
+      attachScrollGuard(mvC);
+      bind(mvA,readA); bind(mvB,readB); bind(mvC,readC);
+    });
+  }
+</script>
+</body>
+</html>
