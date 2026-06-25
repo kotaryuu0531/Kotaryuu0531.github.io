@@ -131,6 +131,7 @@
   @keyframes v3dspin{to{transform:rotate(360deg)}}
   .badge3d{cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
   .badge3d:hover,.badge3d:focus-visible{transform:scale(1.12);background:rgba(0,0,0,.72);border-color:var(--amber);color:#fff;box-shadow:0 4px 16px rgba(233,169,76,.22);outline:none}
+  .buildver{position:fixed;left:12px;bottom:10px;z-index:40;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);opacity:.5;pointer-events:none}
 </style>
 </head>
 <body>
@@ -187,8 +188,91 @@
   ========================================================= */
   const WORKS = [
     {
+      title:"1日1モデリング 30日チャレンジ",
+      tags:["CG","モデリング"],
+      period:"2021年7月〜8月（30日間）", date:"2021-08-17",
+      url:"",
+      making:"making-challenge.html",
+      thumb:"challenge-thumb.jpg",
+      ov:{eyebrow:"30-DAY CHALLENGE — Blender習得 / 2021", sub:"Blender習得のための30日間", text:"高2の夏、Blender習得のため『30日間・1日1モデリング』を決意しInstagramに毎日投稿。ガリガリくんに始まり、27日目のRX-7まで上達を重ねた30日間の記録です。"}
+    },
+    {
+      title:"RX-7 VEILSIDE仕様 3DCGモデル",
+      tags:["CG","車","モデリング"],
+      period:"2021年8月", date:"2021-08-17",
+      url:"https://youtu.be/2Xtg3e1T2Xs",
+      making:"making-rx7.html",
+      thumb:"rx7-render.jpg",
+      is3d:true,
+      glb:"rx7.glb",
+      ov:{eyebrow:"3DCG MODELING — RX-7 VEILSIDE仕様 / 2021", sub:"“ハンのRX-7”の再現（非公式・ファン制作）", text:"高2の夏『1日1モデリングチャレンジ』の締めくくり。『ワイルド・スピード』のハンのRX-7（VEILSIDE仕様）を3面図から起こし、映画『カーズ』冒頭を再現する動画にした習作です。"}
+    },
+    {
+      title:"小竹竜ノ介21歳誕生日予告",
+      tags:["実写映像","30秒CM","誕生日予告"],
+      period:"2025年5月", date:"2025-05-30",
+      url:"https://youtu.be/ruV5QP93_dk",
+      making:"making-birthday21.html",
+      thumb:"https://img.youtube.com/vi/ruV5QP93_dk/maxresdefault.jpg",
+      ov:{eyebrow:"BIRTHDAY TEASER — 21歳・選手紹介風CM / 2025", sub:"「21歳拳で」／格闘技の選手紹介風CM", text:"20歳ごろから日常的にネタを練るように。『21歳拳で』という有名ネットミームを決め台詞に、格闘技の選手紹介風の30秒CMへ。初のスタジオ撮影・予算投入・Log撮影、Blender背景への合成と、技術的な挑戦が一気に増えた一本です。"}
+    },
+    {
+      title:"小竹竜ノ介20歳誕生日予告",
+      tags:["実写映像","映画予告","誕生日予告"],
+      period:"2024年5月", date:"2024-05-30",
+      url:"https://youtu.be/Nx8aw06uRGk",
+      making:"making-birthday20.html",
+      thumb:"https://img.youtube.com/vi/Nx8aw06uRGk/maxresdefault.jpg",
+      ov:{eyebrow:"BIRTHDAY TEASER — 20歳・夢の問い直し / 2024", sub:"「スメルズライクティーンスピリット」／夢を問い直す物語の予告", text:"20歳の節目に、夢を見失った青年コタケの前へ10歳のコタケがタイムスリップ。二人三脚でゲーム制作に挑む物語の予告編。「あくまで誕生日予告」の縛りを初めて解き、10歳の自分をCG合成（UEアセット＋自室スキャン）で隣に立たせた挑戦作です。"}
+    },
+    {
+      title:"小竹竜ノ介19歳誕生日予告",
+      tags:["実写映像","映画予告","誕生日予告"],
+      period:"2023年5月", date:"2023-05-24",
+      url:"https://youtu.be/PqgRY7M-S2M",
+      making:"making-birthday19.html",
+      thumb:"https://img.youtube.com/vi/PqgRY7M-S2M/maxresdefault.jpg",
+      ov:{eyebrow:"BIRTHDAY TEASER — 19歳・青春映画 / 2023", sub:"「5月31日小竹竜ノ介の誕生日だってよ」／青春映画風", text:"大学という新環境で『質の高い動画を作る面白いやつがいる』と思わせ、誕生日を祝ってもらう——明確な目的で作った青春映画風の予告。走って転んでまた走る構成で最後まで見せ、実際に人脈が広がった自信作です。"}
+    },
+    {
+      title:"小竹竜ノ介18歳誕生日予告「ザファイナル」",
+      tags:["実写映像","映画予告","誕生日予告"],
+      period:"2022年6月", date:"2022-06-01",
+      url:"https://youtu.be/zW8uieu_9KI",
+      making:"making-birthday18.html",
+      thumb:"https://img.youtube.com/vi/zW8uieu_9KI/maxresdefault.jpg",
+      ov:{eyebrow:"BIRTHDAY TEASER — 18歳・アクション予告 / 2022", sub:"「小竹竜ノ介ザファイナル」", text:"誕生日予告シリーズ3作目。IBSは実は化け物と戦う秘密組織——部長が後輩にIBSを託し旅立つ設定に、現実のIBS引き継ぎの時期を重ねた一本。出来は前作に及ばないが、毎年つくる習慣を守った点に意味があります。"}
+    },
+    {
+      title:"小竹竜ノ介17歳誕生日予告",
+      tags:["実写映像","映画予告","誕生日予告"],
+      period:"2021年5月", date:"2021-05-30",
+      url:"https://youtu.be/9-eVi-qQLWU",
+      making:"making-birthday17.html",
+      thumb:"https://img.youtube.com/vi/9-eVi-qQLWU/maxresdefault.jpg",
+      ov:{eyebrow:"BIRTHDAY TEASER — 17歳・アクション予告 / 2021", sub:"アクション映画予告スタイルの2作目", text:"誕生日予告シリーズの2作目。コロナ禍で観たハリウッドのアクション映画を意識し、1人で全役を演じて「ぽいシーン」を再現。誕生日予告であって架空の映画予告ではない、というラインを守るのに苦労した一本です。"}
+    },
+    {
+      title:"入学式2019 OP",
+      tags:["ライブ配信","MC","イベント","IBS"],
+      period:"2019年4月", date:"2019-04-06",
+      url:"https://youtu.be/Gv1qoxDBubU",
+      making:"making-nyugaku2019.html",
+      thumb:"https://img.youtube.com/vi/Gv1qoxDBubU/maxresdefault.jpg",
+      ov:{eyebrow:"MC — 入学式の司会進行 / 2019", sub:"MC・進行", text:"郁文館の入学式恒例「Welcome VTR」に出演し、MCとしてVTRと合わせたステージ進行で新入生を歓迎。実際にMCをしている姿が見られる映像です。"}
+    },
+    {
+      title:"校内イベントの撮影・配信・運営",
+      tags:["ライブ配信","イベント","IBS"],
+      period:"2017〜2022（6年間）", date:"2022-03-01",
+      url:"",
+      making:"making-ibsevent.html",
+      thumb:"s2.jpg",
+      ov:{eyebrow:"LIVE & EVENT — 校内イベントの撮影・配信 / 2017–2022", sub:"カメラマン・スイッチャー・MC", text:"体育祭・文化祭・入学式・卒業式などの校内イベントで、撮影・スイッチング・MC・配信を担当。カメラから全体の俯瞰へ、「なんでもやる」の原点になった経験です。"}
+    },
+    {
       title:"小竹竜ノ介22歳記念PV 「大人序章中」",
-      tags:["実写映像","60秒PV","シネマティック"],
+      tags:["実写映像","60秒PV","シネマティック","誕生日予告"],
       period:"2026年3月末〜5月", date:"2026-05-31",
       url:"https://youtu.be/-laqI9Dw0Vg",
       making:"making-birthday2026.html",
@@ -203,6 +287,15 @@
       making:"making-grit.html",
       thumb:"https://img.youtube.com/vi/ehFCFjIPhZY/maxresdefault.jpg",
       ov:{eyebrow:"DOCUMENTARY — 3部作 / 2024", sub:"フィジーク学生大会ドキュメンタリー", text:"フィジークの学生大会に挑む友人・関根の、大会までの約3ヶ月を追ったドキュメンタリー。2024年に全3部作として制作・公開しました。"}
+    },
+    {
+      title:"IDF（郁文ドリームフェスティバル）",
+      tags:["実写映像","文化祭","企画・演出"],
+      period:"2021年10月", date:"2021-10-04",
+      url:"https://youtu.be/iLv0dK8ZmzU",
+      making:"making-idf.html",
+      thumb:"https://img.youtube.com/vi/iLv0dK8ZmzU/maxresdefault.jpg",
+      ov:{eyebrow:"DIRECTION — 文化祭代替プロジェクト / 2021", sub:"文化祭が中止になった年、その熱狂を映像でつくった1週間", text:"コロナ禍で文化祭が中止に。代わりに文化祭の興奮を映像で届ける1週間を企画し、毎日昼休みに放送した。企画・交渉・演出まで担った、映像制作を超える「コンテンツ制作」の経験です。"}
     },
     {
       title:"スニーカー 3DCGモデル",
@@ -224,10 +317,73 @@
       thumb:"first3d-thumb.jpg",
       is3d:true,
       glb:"first3d.glb",
-      ov:{eyebrow:"3DCG MODELING — キャラクター / 2019", sub:"はじめて触れたBlender ／ 動かせる3Dモデル", text:"IBSでの映像制作に慣れてきた頃、表現の幅を広げたくて3DCGに挑戦。チュートリアルに沿ってモデリング〜スキニングまで行った、はじめてのBlender作品です。"}
+      ov:{eyebrow:"3DCG MODELING — キャラクター / 2019", sub:"はじめて触れたBlender ／ 動かせる3Dモデル", text:"実写での映像制作に慣れてきた頃、表現の幅を広げたくて3DCGに挑戦。チュートリアルに沿ってモデリング〜スキニングまで行った、はじめてのBlender作品です。"}
     },
     {
-      title:"IBS VIDEO #98",
+      title:"小竹竜ノ介15歳誕生日予告",
+      tags:["実写映像","誕生日予告"],
+      period:"2019年5月", date:"2019-05-30",
+      url:"https://youtu.be/gK91lsdb1eA",
+      making:"making-birthday15.html",
+      thumb:"https://img.youtube.com/vi/gK91lsdb1eA/maxresdefault.jpg",
+      ov:{eyebrow:"BIRTHDAY TEASER — 15歳・予告編 / 2019", sub:"毎年つくる誕生日予告編の原点", text:"あるYouTuberの誕生日予告編に憧れて、見よう見まねでつくった自分の誕生日の予告編。毎年つくり続けることになる、その第1作です。"}
+    },
+    {
+      title:"IBS VIDEO #102「密着！野球部と学生寮！」",
+      tags:["実写映像","密着取材","IBS"],
+      period:"2020年11月", date:"2020-11-24",
+      url:"https://youtu.be/b5ba9a8X5Co",
+      making:"making-ibs102.html",
+      thumb:"https://img.youtube.com/vi/b5ba9a8X5Co/maxresdefault.jpg",
+      ov:{eyebrow:"REPORTAGE — 野球部 密着取材 / 2020", sub:"野球部と新設・男子寮への半日密着", text:"野球部と剣道部だけが入れる新設の男子寮——生徒が知らない学校の設備を伝えるため、野球部の一日に半日密着した校内放送VTR。高校時代の自信作です。"}
+    },
+    {
+      title:"IBS新入生歓迎CM 2021",
+      tags:["実写映像","CM","IBS"],
+      period:"2021年4月", date:"2021-04-11",
+      url:"https://youtu.be/iAjpdrE0gOc",
+      making:"making-ibscm.html",
+      thumb:"https://img.youtube.com/vi/iAjpdrE0gOc/maxresdefault.jpg",
+      ov:{eyebrow:"RECRUITMENT CM — 放送部 新入生歓迎 / 2021", sub:"放送部の新入部員を勧誘するCM", text:"放送部IBSの新入生勧誘CM。普通の学校では見られないカメラやイベント撮影を見せつつ、実際の部員コメントで魅力を紹介。企画・撮影・編集・出演を担当しました。"}
+    },
+    {
+      title:"IBS新入生歓迎CM 2022「ODOSUBU」",
+      tags:["実写映像","寸劇","IBS"],
+      period:"2022年4月", date:"2022-04-11",
+      url:"https://youtu.be/J02gmWmfsok",
+      making:"making-ibscm2022.html",
+      thumb:"https://img.youtube.com/vi/J02gmWmfsok/maxresdefault.jpg",
+      ov:{eyebrow:"RECRUITMENT CM — 放送部 新入生歓迎 / 2022", sub:"後輩が撮影した寸劇を編集で仕上げる", text:"2022年度の新入生歓迎CM。後輩が構成・撮影、私は編集を担当。色味やシネマスコープで「それっぽい」雰囲気に仕上げ、編集が動画の質を左右することを実感した一本です。"}
+    },
+    {
+      title:"夢の日2020 OP",
+      tags:["実写映像","再現してみた"],
+      period:"2020年2月", date:"2020-02-15",
+      url:"https://youtu.be/YvSpcUJSh3o",
+      making:"making-yumenohi2020.html",
+      thumb:"https://img.youtube.com/vi/YvSpcUJSh3o/maxresdefault.jpg",
+      ov:{eyebrow:"RECREATION — 校内イベント「夢の日」OP / 2020", sub:"鬼滅の刃のOPを再現した校内イベントVTR", text:"郁文館の校内イベント「夢の日」のOP。当時社会現象だった「鬼滅の刃」のOPを再現し、会場の1000人を沸かせた一本。企画・撮影・編集・出演を担当しました。"}
+    },
+    {
+      title:"IBS VIDEO #99.5「紹介！新応援団長！」",
+      tags:["実写映像","人物紹介","IBS"],
+      period:"2019年5月", date:"2019-05-18",
+      url:"https://youtu.be/3SKstS_Puco",
+      making:"making-ibs995.html",
+      thumb:"https://img.youtube.com/vi/3SKstS_Puco/maxresdefault.jpg",
+      ov:{eyebrow:"SPORTS DAY TEASER — 新応援団長紹介 / 2019", sub:"体育祭に向けて各団の応援団長を紹介", text:"体育祭の予告VTR。各団の新応援団長を特技ベースで紹介し、団の結束を高める狙い。陸上の先輩との50m走対決や柔道部の先輩に投げられるリポートなど、体を張った企画も。"}
+    },
+    {
+      title:"IBS VIDEO #99.6「勝手にグラチャン」",
+      tags:["実写映像","検証","IBS"],
+      period:"2019年9月", date:"2019-09-17",
+      url:"https://youtu.be/0-VZyN4P7eg",
+      making:"making-ibs996.html",
+      thumb:"https://img.youtube.com/vi/0-VZyN4P7eg/maxresdefault.jpg",
+      ov:{eyebrow:"FESTIVAL TEASER — 郁秋祭予告 / 2019", sub:"郁秋祭の歴代パフォーマンスのグラチャンを検証", text:"郁文館の文化祭「郁秋祭」の予告VTR。独自の基準で歴代パフォーマンスのグランドチャンピオンを決める検証企画。基準の良し悪しまで自己分析した一本です。"}
+    },
+    {
+      title:"IBS VIDEO #98「夢キュンの行方」",
       tags:["実写映像","ニュース","IBS"],
       period:"2018年11月", date:"2018-11-26",
       url:"https://youtu.be/f8WL1ncrQ3w",
@@ -460,5 +616,6 @@
     });
   })();
   </script>
+  <div class="buildver">build 2026.06.25 23:54 JST</div>
 </body>
 </html>

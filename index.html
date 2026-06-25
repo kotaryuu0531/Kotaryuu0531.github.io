@@ -243,6 +243,7 @@
   @keyframes v3dspin{to{transform:rotate(360deg)}}
   .badge3d{cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
   .card .badge3d:hover,.card .badge3d:focus-visible{transform:scale(1.12);background:rgba(0,0,0,.72);border-color:var(--amber);color:#fff;box-shadow:0 4px 16px rgba(233,169,76,.22);outline:none}
+  .buildver{position:fixed;left:12px;bottom:10px;z-index:40;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);opacity:.5;pointer-events:none}
 </style>
 </head>
 <body>
@@ -587,5 +588,6 @@
     });
   })();
   </script>
+  <div class="buildver">build 2026.06.25 23:54 JST</div>
 </body>
 </html>
