@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1日1モデリング 30日チャレンジ / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-size:clamp(15px,1.9vw,19px);color:var(--ink-mut);margin-bottom:20px;opacity:.92}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+
+  .about{margin:clamp(40px,7vh,72px) 0 0;padding:clamp(32px,5vh,52px) 0 0;border-top:1px solid var(--line)}
+  .about h2{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3vw,32px);margin-bottom:14px}
+  .about p{color:var(--ink-mut);font-size:15.5px}
+  .about p+p{margin-top:14px}
+  .about a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  .about a:hover{border-color:var(--amber)}
+
+  .feature{margin:clamp(40px,7vh,72px) 0 0;padding:clamp(32px,5vh,52px) 0 0;border-top:1px solid var(--line)}
+  .lbl{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--amber);margin-bottom:12px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3.4vw,38px);line-height:1.14;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  .feature a:hover{border-color:var(--amber)}
+
+  /* 30日ギャラリー */
+  .days{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:22px}
+  .day{margin:0}
+  .day .imgbox{position:relative;aspect-ratio:16/9;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface);cursor:zoom-in}
+  .day .imgbox img,.day .imgbox video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .day .dno{position:absolute;top:7px;left:7px;z-index:2;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.12em;
+    color:var(--amber);background:rgba(0,0,0,.6);border:1px solid var(--amber-dim);padding:3px 8px;border-radius:100px}
+  .day figcaption{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.04em;color:var(--ink-mut);padding-top:8px;line-height:1.45}
+
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  .spec-row dd a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  .lightbox{position:fixed;inset:0;z-index:60;background:rgba(5,7,10,.93);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  p,.lead,.feature p,.about p{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+  <header class="topbar">
+    <a class="back" href="index.html#reel-cg">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">30-DAY CHALLENGE — Blender習得 / 2021</div>
+    <h1><span class="nb">1日1モデリング</span> <span class="nb">30日チャレンジ</span></h1>
+    <div class="subtitle">高校2年の夏、Blender習得のために自分へ課した30日間</div>
+    <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=モデリング">モデリング</a></div>
+    <p class="lead">高校2年の夏休み、Blenderを習得するために「30日間、1日1個なにかをモデリングして、Instagramに上げる」と決めました。ところどころ休んだ日もありましたが、30日間しっかりやり遂げました。1日目のガリガリくんから、27日目のRX-7まで——毎日手を動かし続けた、上達の記録です。</p>
+
+    <section class="about rv">
+      <h2>ルールは、ひとつだけ</h2>
+      <p>ルールはシンプルです。毎日ひとつ、何かをモデリングして、Instagramに投稿する。お題はその日に目に入ったもの、心に残ったものから選びました。東京オリンピックの開会式を観た日はドラクエのスライムを、映画『竜とそばかすの姫』を観た日はベルを——その日の自分が、そのまま並んでいます。</p>
+      <p>毎日続けるなかで、形の取り方や面の貼り方、ライティングのコツが少しずつ手に馴染んでいきました。完璧な1個より、毎日1個。この30日が、のちの制作すべての土台になっています。</p>
+    </section>
+
+    <section class="feature rv">
+      <div class="lbl">30 DAYS</div>
+      <h3>30日間の、全記録</h3>
+      <p>実際にInstagramへ投稿した日々の作品です（休んだ日は番号が飛んでいます）。タップで拡大できます。シンプルな静物から始まり、終盤には車1台を組み上げるまでになりました。</p>
+      <div class="days">
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 01</span><img src="challenge-01.jpg" alt="DAY 01：ガリガリくん"></div><figcaption>ガリガリくん</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 02</span><img src="challenge-02.jpg" alt="DAY 02：砂浜とスイカ"></div><figcaption>砂浜とスイカ</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 03</span><img src="challenge-03.jpg" alt="DAY 03：モンスターの缶"></div><figcaption>モンスターの缶</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 04</span><img src="challenge-04.jpg" alt="DAY 04：海と浮き輪"></div><figcaption>海と浮き輪</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 05</span><img src="challenge-05.jpg" alt="DAY 05：ドラクエのスライム（東京五輪 開会式の日）"></div><figcaption>ドラクエのスライム（東京五輪 開会式の日）</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 06</span><img src="challenge-06.jpg" alt="DAY 06：ブルーインパルス"></div><figcaption>ブルーインパルス</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 08</span><img src="challenge-08.jpg" alt="DAY 08：ベル（『竜とそばかすの姫』を観た日）"></div><figcaption>ベル（『竜とそばかすの姫』を観た日）</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 09</span><img src="challenge-09.jpg" alt="DAY 09：ビー玉"></div><figcaption>ビー玉</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 10</span><img src="challenge-10.jpg" alt="DAY 10：水とガラスのコップ"></div><figcaption>水とガラスのコップ</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 11</span><img src="challenge-11.jpg" alt="DAY 11：クラゲ"></div><figcaption>クラゲ</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 12</span><img src="challenge-12.jpg" alt="DAY 12：アウディ（制作途中・映画『トランスポーター』の影響）"></div><figcaption>アウディ（制作途中・映画『トランスポーター』の影響）</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 15</span><img src="challenge-15.jpg" alt="DAY 15：タイヤ"></div><figcaption>タイヤ</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 16</span><img src="challenge-16.jpg" alt="DAY 16：アウディ（完成）"></div><figcaption>アウディ（完成）</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 17</span><img src="challenge-17.jpg" alt="DAY 17：木"></div><figcaption>木</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 18</span><img src="challenge-18.jpg" alt="DAY 18：キャンドルライト"></div><figcaption>キャンドルライト</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 19</span><img src="challenge-19.jpg" alt="DAY 19：星"></div><figcaption>星</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 20</span><img src="challenge-20.jpg" alt="DAY 20：スマホ"></div><figcaption>スマホ</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 21</span><img src="challenge-21.jpg" alt="DAY 21：マグカップ"></div><figcaption>マグカップ</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 22</span><video class="dvid" autoplay loop muted playsinline preload="metadata" poster=""><source src="challenge-22.webm" type="video/webm"><source src="challenge-22.mp4" type="video/mp4"></video></div><figcaption>日本刀</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 24</span><img src="challenge-24.jpg" alt="DAY 24：トマト（256ポリゴンで）"></div><figcaption>トマト（256ポリゴンで）</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 25</span><img src="challenge-25.jpg" alt="DAY 25：ネジ"></div><figcaption>ネジ</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 26</span><img src="challenge-26.jpg" alt="DAY 26：ドラゴンボール"></div><figcaption>ドラゴンボール</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 27</span><img src="challenge-27.jpg" alt="DAY 27：RX-7"></div><figcaption>RX-7</figcaption></figure>
+      <figure class="day"><div class="imgbox"><span class="dno">DAY 30</span><img src="challenge-30.jpg" alt="DAY 30：RX-7アニメーション"></div><figcaption>RX-7アニメーション（最終日）</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="feature rv">
+      <div class="lbl">FINALE</div>
+      <h3>締めくくりは、RX-7</h3>
+      <p>27日目に作ったのが、映画『ワイルド・スピード』の“ハンのRX-7”。そして30日目には、そのモデルを動かして映画『カーズ』冒頭を再現したアニメーションで、30日間を締めくくりました。チャレンジの集大成となったこの一台は、<a href="making-rx7.html">RX-7 VEILSIDE仕様のページ</a>で、回せる3Dモデルと再現動画をまとめています。</p>
+    </section>
+
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>期間</dt><dd>2021年7月19日スタート ／ 30日間</dd></div>
+      <div class="spec-row"><dt>目的</dt><dd>Blenderの習得</dd></div>
+      <div class="spec-row"><dt>ルール</dt><dd>毎日1個モデリングし、Instagramに投稿（休んだ日もあるが完走）</dd></div>
+      <div class="spec-row"><dt>集大成</dt><dd>27日目 RX-7 ／ 30日目 RX-7アニメーション（<a href="making-rx7.html">専用ページ</a>）</dd></div>
+      <div class="spec-row"><dt>ツール</dt><dd>Blender</dd></div>
+    </dl>
+
+    <footer>
+      <a href="index.html#reel-cg">← CGリールに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+  <div class="lightbox" id="lightbox"><img src="" alt="拡大表示"></div>
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.08});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img");
+  document.querySelectorAll(".day .imgbox img").forEach(img=>{
+    img.parentElement.addEventListener("click",()=>{lbImg.src=img.src;lb.classList.add("open");});
+  });
+  lb.addEventListener("click",()=>lb.classList.remove("open"));
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")lb.classList.remove("open");});
+</script>
+</body>
+</html>

@@ -80,6 +80,11 @@
   .figm img{width:100%;display:block;border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in;background:var(--surface)}
   .figm figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:9px}
 
+  /* 正方形図（UV＋テクスチャ） */
+  .figsq{margin-top:18px;max-width:600px}
+  .figsq img{width:100%;display:block;border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in;background:var(--surface)}
+  .figsq figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:9px}
+
   /* スペック */
   .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
   .spec{margin:0 0 clamp(8px,2vh,16px)}
@@ -122,7 +127,7 @@
     <h1>初めてのモデリング</h1>
     <div class="subtitle">はじめて触れたBlender ／ 動かせる3Dモデル</div>
     <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=キャラクター">キャラクター</a><a class="htag" href="works.html?tags=モデリング">モデリング</a></div>
-    <p class="lead">IBSでの映像制作に慣れてきた頃、表現の幅を広げたくて3DCGに挑戦。チュートリアルに沿って、モデリングからテクスチャペイント、スキニング（リグ付け）まで一通り行い、「動かせる3Dモデル」として完成させた、はじめてのBlender作品です。</p>
+    <p class="lead">実写での映像制作に慣れてきた頃、表現の幅を広げたくて3DCGに挑戦。チュートリアルに沿って、モデリングからテクスチャペイント、スキニング（リグ付け）まで一通り行い、「動かせる3Dモデル」として完成させた、はじめてのBlender作品です。</p>
 
     <!-- インタラクティブ3Dビューア（ヒーロー） -->
     <div class="viewer rv">
@@ -136,7 +141,7 @@
     <!-- 制作背景 -->
     <section class="about rv">
       <h2>制作背景</h2>
-      <p>IBSでの映像制作に慣れてきた頃、「自分の表現の幅をもっと広げたい」と思い、3DCGに挑戦しました。これがはじめてBlenderに触れた作品です。</p>
+      <p>実写での映像制作に慣れてきた頃、「自分の表現の幅をもっと広げたい」と思い、3DCGに挑戦しました。これがはじめてBlenderに触れた作品です。</p>
       <p><a href="https://youtu.be/Xg4AXYuzEqA" target="_blank" rel="noopener">「ワニでもできる！モデリングforVRChat」</a>というチュートリアル動画に沿って、<strong>モデリング → テクスチャペイント → スキニング（リグ付け）</strong>まで一通り行い、ボーンで動かせる状態まで仕上げました。</p>
       <p>必要な技術を、自分で教材を探して習得する——その最初の一歩がこの作品です。ここで得た3DCGの基礎が、のちの制作につながっています。</p>
     </section>
@@ -161,12 +166,21 @@
       </div>
     </section>
 
+    <!-- UV・テクスチャ -->
+    <section class="feature rv">
+      <div class="lbl">UV · TEXTURE</div>
+      <h3>UV展開とテクスチャペイント</h3>
+      <p>モデルのUVを展開し、Blenderのテクスチャペイント機能で、1024×1024のテクスチャに直接描き込みました。地面・水・草といった色は、平面に開いたUVの上を見ながら手で塗り分けています。下の図は、テクスチャの上にUVのアイランド（メッシュの展開図）を重ねて表示したものです。</p>
+      <figure class="figsq"><img src="first3d-uv.jpg" alt="UVレイアウトとテクスチャペイント（1024×1024）"><figcaption>UVレイアウト＋テクスチャ ／ 1024×1024 ／ Blender テクスチャペイント</figcaption></figure>
+    </section>
+
     <!-- スペック -->
     <div class="spec-head">SPEC</div>
     <dl class="spec">
       <div class="spec-row"><dt>制作</dt><dd>2019年10月22日（制作期間 約1日）</dd></div>
-      <div class="spec-row"><dt>ポリゴン</dt><dd>頂点 538 ／ 三角面 784（書き出したモデル）</dd></div>
+      <div class="spec-row"><dt>ポリゴン</dt><dd>頂点 403 ／ 三角面 784</dd></div>
       <div class="spec-row"><dt>マテリアル</dt><dd>1</dd></div>
+      <div class="spec-row"><dt>テクスチャ</dt><dd>1024 × 1024（Blender テクスチャペイントで手描き）</dd></div>
       <div class="spec-row"><dt>リグ</dt><dd>アーマチュア＋スキニング（ポーズ可能）</dd></div>
       <div class="spec-row"><dt>使用ソフト</dt><dd>Blender（モデリング・テクスチャペイント・リグ）</dd></div>
       <div class="spec-row"><dt>教材</dt><dd><a href="https://youtu.be/Xg4AXYuzEqA" target="_blank" rel="noopener">「ワニでもできる！モデリングforVRChat」</a>（YouTube チュートリアル）に沿って制作</dd></div>
@@ -188,7 +202,7 @@
 
   // ライトボックス（画像タップで拡大）
   const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img");
-  document.querySelectorAll(".grid3 img,.figm img").forEach(img=>{
+  document.querySelectorAll(".grid3 img,.figm img,.figsq img").forEach(img=>{
     img.addEventListener("click",()=>{lbImg.src=img.src;lb.classList.add("open");});
   });
   lb.addEventListener("click",()=>lb.classList.remove("open"));

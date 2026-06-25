@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDF 郁文ドリームフェスティバル / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-size:clamp(15px,1.9vw,19px);color:var(--ink-mut);margin-bottom:20px;opacity:.92}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+  .roles{display:flex;flex-wrap:wrap;align-items:center;gap:11px;margin:-2px 0 22px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;color:var(--ink-mut)}
+  .roles span{display:inline-flex;align-items:center;gap:11px}
+  .roles span:not(:last-child)::after{content:"";width:3px;height:3px;border-radius:50%;background:var(--amber-dim)}
+
+  /* 動画フレーム（クリック再生） */
+  .vframe{position:relative;aspect-ratio:16/9;margin:clamp(36px,6vh,60px) 0 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .vframe .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .vframe .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;
+    border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .vframe .play::after{content:"";border-left:17px solid var(--ink);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;transition:border-color .3s}
+  .vframe:hover{border-color:var(--amber-dim)}
+  .vframe:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .vframe:hover .play::after{border-left-color:var(--amber)}
+  .vframe:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .vframe.playing{cursor:default}
+  .vframe.playing .poster,.vframe.playing .play{display:none}
+  .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+  .vcap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-mut);margin-top:10px}
+
+  /* feature block */
+  .feature{margin:clamp(40px,7vh,72px) 0;padding:clamp(32px,5vh,52px) 0;border-top:1px solid var(--line)}
+  .feature .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:14px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(24px,3.6vw,40px);line-height:1.12;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .feature a:hover{border-color:var(--amber)}
+
+  /* パフォーマンス3本 */
+  .perf-grid{display:grid;grid-template-columns:1fr;gap:clamp(30px,5vh,50px);margin-top:30px}
+  .perf .vframe{margin:0}
+  .perf h4{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(19px,2.6vw,26px);margin:16px 0 8px}
+  .perf p{color:var(--ink-mut);font-size:14.5px}
+
+  /* spec sheet */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(20px,4vh,40px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  .foot{border-top:1px solid var(--line);margin-top:clamp(40px,7vh,80px);padding-top:36px;display:flex;
+    justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+  .foot a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  .foot a:hover,.foot a:focus-visible{border-color:var(--amber);color:var(--amber);outline:none}
+  .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  .rv{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  p,.lead{text-wrap:pretty}
+  h1,h3,h4{text-wrap:balance}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-eizo">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">DIRECTION — 文化祭代替プロジェクト / 2021</div>
+    <h1><span class="nb">IDF</span> <span class="nb">郁文ドリームフェスティバル</span></h1>
+    <div class="subtitle">文化祭が中止になった年、その熱狂を映像でつくった1週間</div>
+    <div class="htags"><a class="htag" href="works.html?tags=実写映像">実写映像</a><a class="htag" href="works.html?tags=文化祭">文化祭</a><a class="htag" href="works.html?tags=企画・演出">企画・演出</a></div>
+    <div class="roles"><span>企画</span><span>演出</span><span>撮影</span><span>編集</span></div>
+    <p class="lead">コロナ禍で文化祭が中止になった2021年。その代わりに、文化祭の興奮そのものを映像で届ける1週間——「郁文ドリームフェスティバル（IDF）」を企画しました。毎日昼休みに校内放送した一連のVTRであり、私にとっては単なる映像制作を超えた、企画・交渉・演出までを担う「コンテンツ制作」の経験です。</p>
+
+    <!-- ヒーロー: オープニング映像 -->
+    <div class="vframe rv" data-yt="iLv0dK8ZmzU" role="button" tabindex="0" aria-label="オープニング映像を再生">
+      <img class="poster" src="https://img.youtube.com/vi/iLv0dK8ZmzU/maxresdefault.jpg"
+           onerror="this.onerror=null;this.src='https://img.youtube.com/vi/iLv0dK8ZmzU/hqdefault.jpg'" alt="IDF オープニング映像">
+      <div class="play"></div>
+    </div>
+    <p class="vcap">2021.10.04 公開 ／ IDF オープニング映像</p>
+
+    <!-- 経緯 -->
+    <section class="feature rv">
+      <div class="lbl">PROJECT</div>
+      <h3>文化祭が、なくなった</h3>
+      <p>2020年度、文化祭はコロナ禍で中止になりました。翌2021年度はマスク着用のうえ通常授業が行われていたので「今年こそは」と期待していたのですが、文化祭はまたしても中止。代わりに、通常授業とは異なるレクリエーション中心の1週間が設けられることになりました。</p>
+      <p>でも、私にはそれでは不十分でした。中高一貫校で6年間この学校にいた私は、ここの文化祭が——バンドバトルやダンスバトルの熱狂が——他校とは一線を画すものだと知っていたからです。あの興奮がなければ、文化祭の代わりとは認められない。ならばその興奮を、映像で伝えようと決めました。</p>
+      <p>先生に「代替週間のなかでバンドバトルやダンスバトルを映像で行う」という企画書を提出。話し合いの末、「文化部の活動紹介VTR」としてなら放送してよい、という許可を得ました。条件は、軽音部やダンス部といった目当ての部活だけでなく、すべての文化部を扱うこと。そこで、毎日昼休みに放送するVTRを1週間分つくることになったのです。そしてこの提案から、代替週間そのものの名前も「IDF（郁文ドリームフェスティバル）」に決まりました。</p>
+    </section>
+
+    <!-- オープニングの狙い -->
+    <section class="feature rv">
+      <div class="lbl">OPENING</div>
+      <h3>冒頭で、心を掴む</h3>
+      <p>オープニング映像は、実際の文化祭を知らない1・2年生に向けて構成しました。まず過去の輝かしいステージを紹介し、それに匹敵するパフォーマンス映像で「文化祭の代わりがやってきた」と伝え、最後に1週間のコンテンツを案内する——とにかく冒頭のパフォーマンスで生徒の心を掴むことを意識しています。</p>
+      <p>この映像は、IDF初日の朝にZoomで各教室のプロジェクターへ流す開会式の冒頭で上映されました。その開会式の構成も私が考えています。「教頭先生の説明を先にすべき」という部員と意見が分かれましたが、生徒の集中力が最も高い冒頭でこそパフォーマンスを見せるべきだと考え、企画者として自分の構成を通しました。「冒頭で心を掴む」という狙いは、映像だけでなく1週間のイベント全体に通じる判断でした。</p>
+    </section>
+
+    <!-- コラボ -->
+    <section class="feature rv">
+      <div class="lbl">COLLABORATION</div>
+      <h3>才能がコラボする — 美術 × 軽音 × 書道</h3>
+      <p>オープニングのパフォーマンスは「才能がコラボする」をテーマにしました。まず美術部に相談すると「和」をテーマにしようという案が生まれ、その「和」をテーマに軽音部へ作曲を依頼。さらに「和」といえば、と校内でも強豪の書道部に、軽音部の音楽に合わせて企画名「郁文ドリームフェスティバル」を「郁夢祭」と揮毫してもらうことにして、パフォーマンスの内容が決まりました。</p>
+      <p>撮影では、軽音部が後ろでセッションするなか、書道部がパフォーマンス。VTRで流れている音楽は別途編集したものです。企画発足後すぐに各部へ連絡し、練習から撮影・編集までを約3週間で仕上げました。</p>
+    </section>
+
+    <!-- 各部活パフォーマンス -->
+    <section class="feature rv">
+      <div class="lbl">PERFORMANCES</div>
+      <h3>3つのステージ</h3>
+      <p>映像映えするパフォーマンスを持つ部活は私が撮影・編集を担当し、それ以外の部活はメンバーがCMとして制作。先生から提示された「全文化部を扱う」という条件を満たしながら、見応えのある映像にしました。ここでは、私が手がけた3つのパフォーマンス映像を紹介します。</p>
+      <div class="perf-grid">
+        <div class="perf">
+          <div class="vframe" data-yt="2OCiOMCc4mk" role="button" tabindex="0" aria-label="ダンス部パフォーマンスを再生">
+            <img class="poster" src="https://img.youtube.com/vi/2OCiOMCc4mk/maxresdefault.jpg"
+                 onerror="this.onerror=null;this.src='https://img.youtube.com/vi/2OCiOMCc4mk/hqdefault.jpg'" alt="ダンス部パフォーマンス">
+            <div class="play"></div>
+          </div>
+          <h4>ダンス部</h4>
+          <p>インタビューやドラマパートは部員が担当。体育館だけでなく校内のいろいろな場所で撮影し、曲調に合わせて照明を変えています。</p>
+        </div>
+        <div class="perf">
+          <div class="vframe" data-yt="qWAukDILivk" role="button" tabindex="0" aria-label="書道部パフォーマンスを再生">
+            <img class="poster" src="https://img.youtube.com/vi/qWAukDILivk/maxresdefault.jpg"
+                 onerror="this.onerror=null;this.src='https://img.youtube.com/vi/qWAukDILivk/hqdefault.jpg'" alt="書道部パフォーマンス">
+            <div class="play"></div>
+          </div>
+          <h4>書道部</h4>
+          <p>体育館のなかでドローンを飛ばして撮影。出演した4人の書道部員がパフォーマンスにかける思い、そして書道部パフォーマンスの歴史を意識した演出に注目です。</p>
+        </div>
+        <div class="perf">
+          <div class="vframe" data-yt="P7BWv5k0bMs" role="button" tabindex="0" aria-label="軽音部パフォーマンスを再生">
+            <img class="poster" src="https://img.youtube.com/vi/P7BWv5k0bMs/maxresdefault.jpg"
+                 onerror="this.onerror=null;this.src='https://img.youtube.com/vi/P7BWv5k0bMs/hqdefault.jpg'" alt="軽音部パフォーマンス">
+            <div class="play"></div>
+          </div>
+          <h4>軽音部</h4>
+          <p>音楽室で「Mステ」を意識した番組に。部室の機材置き場から5年目にして初めてミキサーを取り出し、その場で録音と撮影を同時に行いました。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 総括 -->
+    <section class="feature rv">
+      <div class="lbl">REFLECTION</div>
+      <h3>映像制作を超えた、コンテンツ制作</h3>
+      <p>IDFは、カメラを回して編集する「映像制作」にとどまりません。文化祭がないという状況に対して、何をどう届ければ生徒の心が動くかを考え、先生と交渉し、複数の部活を巻き込み、1週間のイベントとして設計しました。より広い視座で「コンテンツ」そのものをつくった経験——それが、私にとってのIDFです。</p>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>公開</dt><dd>2021年10月4日</dd></div>
+      <div class="spec-row"><dt>形式</dt><dd>文化祭代替プロジェクト「IDF」／ 校内放送VTR（1週間・毎日昼休み放送）</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>企画・演出・開会式構成 ／ 主要パフォーマンス映像（オープニング・軽音部・ダンス部・書道部）の撮影・編集</dd></div>
+      <div class="spec-row"><dt>協働</dt><dd>美術部・軽音部・書道部・ダンス部ほか文化部、放送部IBSの部員（一部パート・他部活CMを分担）</dd></div>
+      <div class="spec-row"><dt>制作期間</dt><dd>企画発足から約3週間</dd></div>
+    </dl>
+
+    <div class="foot">
+      <a href="index.html#reel-eizo">← 映像リールに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </div>
+  </main>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  document.querySelectorAll(".vframe[data-yt]").forEach(f=>{
+    const play=()=>{
+      if(f.classList.contains("playing"))return;
+      const ifr=document.createElement("iframe");
+      ifr.src="https://www.youtube.com/embed/"+f.getAttribute("data-yt")+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+      ifr.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";
+      ifr.setAttribute("allowfullscreen","");
+      ifr.title="本編の映像";
+      f.appendChild(ifr); f.classList.add("playing");
+    };
+    f.addEventListener("click",play);
+    f.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
+  });
+</script>
+</body>
+</html>

@@ -82,6 +82,22 @@
   .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
   .rv.in{opacity:1;transform:none}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+
+  /* 動画埋め込み（IBSコーナー） */
+  .vframe{position:relative;aspect-ratio:16/9;margin:24px 0 0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .vframe .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .vframe .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .vframe .play::after{content:"";border-left:16px solid var(--ink);border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px;transition:border-color .3s}
+  .vframe:hover{border-color:var(--amber-dim)}
+  .vframe:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .vframe:hover .play::after{border-left-color:var(--amber)}
+  .vframe:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .vframe.playing{cursor:default}
+  .vframe.playing .poster,.vframe.playing .play{display:none}
+  .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+  .vcap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:10px}
+  .vcap a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  .vcap a:hover{border-color:var(--amber)}
 </style>
 </head>
 <body>
@@ -104,6 +120,20 @@
       <p>中学1年で放送部「IBS」に入り、校内ニュースの放送や、体育祭・文化祭といった学校行事の撮影・編集に明け暮れました。<strong>中学3年から高校3年の6月までは局長（部長）</strong>として部を率い、ここで映像づくりの土台をつくりました。</p>
       <p>2017年に映像をはじめてから、実写の撮影・編集を軸に、中学時代から触れているBlenderでの3DCG、音楽イベントなどのライブ配信まで、制作の幅を広げてきました。<strong>「感情を動かす／手段は選ばず」</strong>——必要な技術はそのつど取りに行くスタイルです。</p>
       <p>つくり手として大切にしているのは、<strong>「演出」と「体験」が一致しているか</strong>。観る人・遊ぶ人の感情の流れと、画面で起きることが噛み合った瞬間に、映像はいちばん強く働くと考えています。</p>
+    </section>
+
+    <!-- IBS -->
+    <section class="section rv" id="ibs">
+      <div class="sec-lbl">IBS — 放送部での6年間</div>
+      <p>IBS（郁文館 放送部）は、私の映像制作の原点です。校内ニュースをテレビ番組のように放送し、体育祭・文化祭などの学校行事を撮影・編集する部活で、中学1年から所属し、<strong>中学3年から高校3年の6月まで局長（部長）</strong>を務めました。中学・高校の6年間、ここでコンテンツ制作を学んできました。</p>
+      <p>特徴的だったのは、<strong>現役のプロ映像ディレクターがコーチとして指導してくださっていた</strong>ことです。「IBS VIDEO #」シリーズの制作では、企画の段階から会議でアドバイスをもらい、編集した映像を何度もプレビューで見てもらって、構成のOKが出てはじめて、プロも使う外部スタジオでEED・MA（映像と音声の最終仕上げ）を行う——という本格的な工程を踏んでいました。学生扱いせず、プロと同じ基準で修正を求められる環境で鍛えられたことが、いまの制作の基礎になっています。</p>
+      <p>下のCMは、その新入部員を勧誘するために私が企画・撮影・編集・出演したものです。IBSが普段どんな活動をしているのかが伝わると思います。</p>
+      <div class="vframe rv" data-yt="iAjpdrE0gOc" role="button" tabindex="0" aria-label="IBS新入生歓迎CMを再生">
+        <img class="poster" src="https://img.youtube.com/vi/iAjpdrE0gOc/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/iAjpdrE0gOc/hqdefault.jpg'" alt="IBS 新入生歓迎CM">
+        <div class="play"></div>
+      </div>
+      <p class="vcap"><a href="making-ibscm.html">IBS新入生歓迎CM 2021 のメイキングを見る →</a></p>
+      <p style="margin-top:24px">そして、IBSの活動はVTR制作だけではありません。体育祭・文化祭・入学式・卒業式といった校内イベントでは、撮影・スイッチング・MC、そしてコロナ禍では配信も担っていました。カメラマンからスイッチャー、MCへと役割を広げた経験は、<a href="making-ibsevent.html">校内イベントの撮影・配信・運営</a>にまとめています。</p>
     </section>
 
     <!-- 領域 -->
@@ -166,6 +196,20 @@
   document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
   const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
   document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  document.querySelectorAll(".vframe[data-yt]").forEach(f=>{
+    const play=()=>{
+      if(f.classList.contains("playing"))return;
+      const ifr=document.createElement("iframe");
+      ifr.src="https://www.youtube.com/embed/"+f.getAttribute("data-yt")+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+      ifr.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";
+      ifr.setAttribute("allowfullscreen","");
+      ifr.title="本編の映像";
+      f.appendChild(ifr); f.classList.add("playing");
+    };
+    f.addEventListener("click",play);
+    f.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
+  });
 </script>
 </body>
 </html>

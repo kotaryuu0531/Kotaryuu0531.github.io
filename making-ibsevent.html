@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>校内イベントの撮影・配信・運営 / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-size:clamp(15px,1.9vw,19px);color:var(--ink-mut);margin-bottom:20px;opacity:.92}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+  .roles{display:flex;flex-wrap:wrap;align-items:center;gap:11px;margin:14px 0 0;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;color:var(--ink-mut)}
+  .roles span{display:inline-flex;align-items:center;gap:11px}
+  .roles span:not(:last-child)::after{content:"";width:3px;height:3px;border-radius:50%;background:var(--amber-dim)}
+
+  .feature{margin:clamp(36px,6vh,64px) 0 0;padding:clamp(32px,5vh,52px) 0 0;border-top:1px solid var(--line)}
+  .feature .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:14px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3.4vw,38px);line-height:1.14;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .feature a:hover{border-color:var(--amber)}
+
+  .foot{border-top:1px solid var(--line);margin-top:clamp(40px,7vh,80px);padding-top:36px;display:flex;
+    justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+  .foot a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  .foot a:hover,.foot a:focus-visible{border-color:var(--amber);color:var(--amber);outline:none}
+  .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  .rv{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  p,.lead{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+
+  /* ステージ写真カルーセル */
+  .carousel{margin-top:30px}
+  .caro-stage{position:relative;aspect-ratio:16/9;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .caro-img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .caro-btn{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(10,13,18,.55);color:var(--ink);font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s;backdrop-filter:blur(2px);z-index:2}
+  .caro-btn:hover,.caro-btn:focus-visible{border-color:var(--amber);color:var(--amber);outline:none}
+  .caro-btn.prev{left:12px}
+  .caro-btn.next{right:12px}
+  .caro-cap{display:flex;align-items:center;gap:12px;margin-top:11px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut)}
+  .caro-no{color:var(--amber);white-space:nowrap}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-live">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">LIVE &amp; EVENT — 校内イベントの撮影・配信 / 2017–2022</div>
+    <h1><span class="nb">校内イベントの</span> <span class="nb">撮影・配信・運営</span></h1>
+    <div class="subtitle">カメラマン・スイッチャー・MC ／ IBSでのイベント制作</div>
+    <p class="lead">IBSの活動は、VTR制作だけではありません。体育祭・文化祭・入学式・卒業式といった校内イベントでは、ステージの撮影・スイッチング・実況を行い、コロナ禍では配信も担っていました。私はカメラマンから始まり、MC、スイッチャーへと役割を広げるなかで、自分の担当だけでなく「コンテンツ全体を俯瞰する」視点を身につけました。</p>
+    <div class="htags"><a class="htag" href="works.html?tags=ライブ配信">ライブ配信</a><a class="htag" href="works.html?tags=イベント">イベント</a><a class="htag" href="works.html?tags=IBS">IBS</a></div>
+    <div class="roles"><span>カメラ</span><span>スイッチング</span><span>MC</span><span>配信</span></div>
+
+    <section class="feature rv">
+      <div class="lbl">SET UP</div>
+      <h3>現場のしくみ</h3>
+      <p>体育祭以外のイベントは、いつも地下体育館で行われます。業者が入ってステージが設営され、IBSはそのステージ上のスクリーンにカメラ映像を映し、後方の席の人にも状況を伝えながら収録します。イベント中のコーナー切り替えVTRも制作し、MCのキューワードに合わせて出力する。映像は基本的に、3台のカメラをスイッチングして作っていました。文化祭では、地下のステージと地上を結ぶ生中継も行いました。</p>
+      <figure class="carousel" aria-label="ステージの写真">
+        <div class="caro-stage">
+          <img class="caro-img" src="s1.jpg" alt="文化祭のステージ（リハーサル時に撮影）">
+          <button class="caro-btn prev" type="button" aria-label="前の写真">&#8249;</button>
+          <button class="caro-btn next" type="button" aria-label="次の写真">&#8250;</button>
+        </div>
+        <figcaption class="caro-cap"><span class="caro-no">1 / 4</span><span class="caro-txt">文化祭のステージ（リハーサル時に撮影）</span></figcaption>
+        <script type="application/json" class="caro-data">[{"src": "s1.jpg", "cap": "文化祭のステージ（リハーサル時に撮影）"}, {"src": "s2.jpg", "cap": "卒業式のステージ"}, {"src": "s3.jpg", "cap": "卒業式のステージ（俯瞰）"}, {"src": "s4.jpg", "cap": "文化祭のステージ（バンドバトルに出演した時）"}]</script>
+      </figure>
+    </section>
+
+    <section class="feature rv">
+      <div class="lbl">CAMERA</div>
+      <h3>カメラマンとして — 画を探す</h3>
+      <p>私のスタートは、カメラマンでした。3人のカメラマンのうち、ほかの2人より自分のカメラが長く使われるように、常にいい画を探し回っていました。その積み重ねが、いまの自分の絵作りや構図のセンスを養ってくれたのだと思います。</p>
+      <figure class="carousel" aria-label="カメラマンをしている様子">
+        <div class="caro-stage">
+          <img class="caro-img" src="c1.jpg" alt="NX5Rでの撮影">
+          <button class="caro-btn prev" type="button" aria-label="前の写真">&#8249;</button>
+          <button class="caro-btn next" type="button" aria-label="次の写真">&#8250;</button>
+        </div>
+        <figcaption class="caro-cap"><span class="caro-no">1 / 4</span><span class="caro-txt">基本はNX5Rを使います</span></figcaption>
+        <script type="application/json" class="caro-data">[{"src": "c1.jpg", "cap": "基本はNX5Rを使います"}, {"src": "c2.jpg", "cap": "センター後方カメラはENGを使います"}, {"src": "c3.jpg", "cap": "体育祭ではハンディで走り回ります"}, {"src": "c4.jpg", "cap": "ハンディの強みは高さに縛られないこと。最もいい絵が撮れる高さで構えます"}, {"src": "c5.jpg", "cap": "文化祭では地下ステージと地上を結ぶ生中継も。これは地上の中継の様子です"}]</script>
+      </figure>
+    </section>
+
+    <section class="feature rv">
+      <div class="lbl">MC</div>
+      <h3>MCとして — ステージを俯瞰する</h3>
+      <p>カメラマン以外に、イベントのMCを務める機会にも恵まれました。中学2年から高校2年まで毎年、入学式に登場していたので、校内で一番顔を知られた生徒だったはずです。</p>
+      <p>MCとは、マスター・オブ・セレモニー。事前準備でそのイベントの目的と、それを達成するための段取りを把握し、本番ではステージ上の様子を見ながら進行を進めていく。リアルタイムでステージを俯瞰して、いま何をすべきかを判断する力が、ここで身につきました。</p>
+    </section>
+
+    <section class="feature rv">
+      <div class="lbl">SWITCHER</div>
+      <h3>スイッチャーへ — 必要な画を切る</h3>
+      <p>カメラの経験を積んでくると、今度はスイッチャーの仕事も担うようになりました。間にMCを経験していたおかげで、イベントの段取りや進行が自然と見えていて、どのタイミングでどの画が必要かが分かるようになっていました。それをカメラマンに指示し、必要な画を切る——それがスイッチャーの仕事です。</p>
+      <p>特に、有力な先輩たちがまとまって引退してしまった中学3年の「夢の日」では、スイッチャー未経験者がそのポジションに座らざるを得なくなりました。そこで私は、センター後方でカメラを構えながら、ステージ全体を俯瞰して、残り2人のカメラマンにもスイッチャーにも指示を出す——という離れ技で乗り切りました。</p>
+      <figure class="carousel" aria-label="スイッチャーをしている様子">
+        <div class="caro-stage">
+          <img class="caro-img" src="sw1.jpg" alt="スイッチャーの操作">
+          <button class="caro-btn prev" type="button" aria-label="前の写真">&#8249;</button>
+          <button class="caro-btn next" type="button" aria-label="次の写真">&#8250;</button>
+        </div>
+        <figcaption class="caro-cap"><span class="caro-no">1 / 2</span><span class="caro-txt">スイッチャーとして、複数のカメラを切り替えます</span></figcaption>
+        <script type="application/json" class="caro-data">[{"src": "sw1.jpg", "cap": "スイッチャーとして、複数のカメラを切り替えます"}, {"src": "sw2.jpg", "cap": "カメラとスイッチャーはSDIで接続。本番当日に自分が熱を出しても、冷えピタを貼りながらケーブルを引き回していました。それくらい、大好きな活動でした"}]</script>
+      </figure>
+    </section>
+
+    <section class="feature rv">
+      <div class="lbl">REFLECTION</div>
+      <h3>「なんでもやる」の原点</h3>
+      <p>これらの経験から学んだのは、カメラはカメラだけに集中していてはいけない、ということです。コンテンツ全体を俯瞰してはじめて、より良いカメラワークが狙える。同じように、コンテンツ制作は、自分の担当以外のことにも目を配ってこそ成立する。これが、私の「なんでもやる」というスタンスの原点のひとつになっています。</p>
+    </section>
+
+    <div class="foot">
+      <a href="index.html#reel-live">← 配信リールに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </div>
+  </main>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // 写真カルーセル（複数対応）
+  document.querySelectorAll(".carousel").forEach(car=>{
+    const dataEl=car.querySelector(".caro-data");
+    if(!dataEl) return;
+    let data; try{data=JSON.parse(dataEl.textContent);}catch(e){return;}
+    let i=0;
+    const img=car.querySelector(".caro-img");
+    const cap=car.querySelector(".caro-txt");
+    const no=car.querySelector(".caro-no");
+    function show(){img.src=data[i].src;img.alt=data[i].cap;cap.textContent=data[i].cap;no.textContent=(i+1)+" / "+data.length;}
+    car.querySelector(".caro-btn.prev").addEventListener("click",()=>{i=(i-1+data.length)%data.length;show();});
+    car.querySelector(".caro-btn.next").addEventListener("click",()=>{i=(i+1)%data.length;show();});
+    show();
+  });
+</script>
+</body>
+</html>
