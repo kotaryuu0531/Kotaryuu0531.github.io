@@ -118,6 +118,7 @@
   h1,h3{text-wrap:balance}
   .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
   .rv.in{opacity:1;transform:none}
+  .rigvid{width:100%;aspect-ratio:16/9;display:block;margin:18px 0 0;border:1px solid var(--line);border-radius:var(--r);background:#000;object-fit:cover}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
@@ -182,6 +183,18 @@
              onerror="this.onerror=null;this.src='https://img.youtube.com/vi/2Xtg3e1T2Xs/hqdefault.jpg'" alt="カーズ冒頭の再現動画">
         <div class="play"></div>
       </div>
+    </section>
+
+    <!-- リグ -->
+    <section class="feature rv">
+      <div class="lbl">RIG</div>
+      <h3>タイヤが地面をグリップする仕掛け</h3>
+      <p>動かす段でこだわったのが、タイヤの転がりです。車体全体を前進させる root ボーンのY軸方向の移動量を、タイヤ用ボーンの回転にコンストレイントで連動させました。進んだ距離に応じてタイヤがちょうど回るので、地面を滑らずにグリップして走っているように見えます。移動と回転を手付けで合わせるのではなく、移動量からタイヤの回転を自動で導く——シンプルなリグですが、走りの説得力がぐっと増しました。</p>
+      <video class="rigvid" autoplay loop muted playsinline preload="metadata">
+        <source src="rx7-rig.webm" type="video/webm">
+        <source src="rx7-rig.mp4" type="video/mp4">
+      </video>
+      <p class="cap">root ボーンのY軸移動に、タイヤの回転をコンストレイントで連動（メイキング）。</p>
     </section>
 
     <!-- スペック -->
