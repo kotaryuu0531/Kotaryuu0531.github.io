@@ -56,8 +56,9 @@
   .tools{display:flex;flex-direction:column;gap:16px}
   .toolrow{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:start}
   .toolrow .tk{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber);padding-top:5px}
-  .toolrow .tv{display:flex;flex-wrap:wrap;gap:8px}
-  .tool{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.03em;color:var(--ink);border:1px solid var(--line);border-radius:100px;padding:5px 12px}
+  .toolrow .tv{color:var(--ink);font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.03em;line-height:1.9}
+  .tool{display:inline;white-space:nowrap}
+  .tool:not(:last-child)::after{content:"/";color:var(--ink-mut);margin:0 9px}
   @media(max-width:560px){.toolrow{grid-template-columns:1fr;gap:8px}}
 
   .timeline{display:flex;flex-direction:column}

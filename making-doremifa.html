@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ドレミファダンスコンサート2025 ハイライト / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(17px,2.4vw,24px);color:var(--ink);margin:0 0 22px;letter-spacing:.02em;opacity:.9}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+
+  .hero-video{position:relative;aspect-ratio:16/9;margin:clamp(36px,6vh,60px) 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .hero-video .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;
+    border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .hero-video .play::after{content:"";border-left:17px solid var(--ink);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;transition:border-color .3s}
+  .hero-video:hover{border-color:var(--amber-dim)}
+  .hero-video:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .hero-video:hover .play::after{border-left-color:var(--amber)}
+  .hero-video:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .hero-video.playing{cursor:default}
+  .hero-video.playing .poster,.hero-video.playing .play{display:none}
+  .hero-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+
+  /* feature block */
+  .feature{margin:clamp(40px,7vh,72px) 0;padding:clamp(32px,5vh,52px) 0;border-top:1px solid var(--line)}
+  .feature:last-of-type{border-bottom:1px solid var(--line)}
+  .feature .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:14px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(24px,3.6vw,40px);line-height:1.12;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .feature a:hover{border-color:var(--amber)}
+
+  /* spec sheet */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  .spec-row dd a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  .foot{border-top:1px solid var(--line);margin-top:clamp(40px,7vh,80px);padding-top:36px;display:flex;
+    justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+  .foot a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  .foot a:hover,.foot a:focus-visible{border-color:var(--amber);color:var(--amber);outline:none}
+  .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  .rv{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  p,.lead{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  /* 撮影中の写真 */
+  .shots{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+  .shots img{width:100%;aspect-ratio:3/2;object-fit:cover;border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in;transition:opacity .2s}
+  .shots img:hover{opacity:.9}
+  .shots-cap{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.06em;color:var(--ink-mut);margin-top:10px}
+  @media(max-width:560px){.shots{grid-template-columns:1fr}}
+  .lightbox{position:fixed;inset:0;z-index:80;background:rgba(5,7,10,.93);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:94vw;max-height:90vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-eizo">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">HIGHLIGHT — ボランティア撮影 / 2025</div>
+    <h1><span class="nb">ドレミファダンスコンサート2025</span> <span class="nb">ハイライト</span></h1>
+    <div class="subtitle">東京都障害者ダンス大会の、撮影ボランティア記録</div>
+    <div class="htags"><a class="htag" href="works.html?tags=実写映像">実写映像</a><a class="htag" href="works.html?tags=ハイライト">ハイライト</a><a class="htag" href="works.html?tags=ボランティア">ボランティア</a></div>
+    <p class="lead">2025年5月11日、東京体育館で開かれた東京都障害者ダンス大会「ドレミファダンスコンサート」に、撮影・配信スタッフの一員としてボランティアで参加しました。生配信に使うカメラではなく、メイキング用としてZ200を回し、朝早くの会場設営から本番、撤収までの一日を記録。約6時間ぶんの素材から、3分半のハイライトに仕上げています。</p>
+
+    <!-- 本編 -->
+    <div class="hero-video" data-yt="mXolgUeuSOo" tabindex="0" role="button" aria-label="本編を再生">
+      <img class="poster" src="https://img.youtube.com/vi/mXolgUeuSOo/maxresdefault.jpg"
+           onerror="this.onerror=null;this.src='https://img.youtube.com/vi/mXolgUeuSOo/hqdefault.jpg'" alt="ドレミファダンスコンサート2025 ハイライトのサムネイル">
+      <div class="play"></div>
+    </div>
+
+    <!-- ボランティアとして -->
+    <section class="feature rv">
+      <div class="lbl">VOLUNTEER</div>
+      <h3>一日に、密着する役割で</h3>
+      <p>このイベントには、撮影・配信のボランティアスタッフとして関わりました。担当したのは、生配信のステージカメラではなく「メイキング用」のポジション。Z200を手に、朝早くの会場設営から、選手たちのダンス本番、そして撤収まで——表に映らない時間も含めて、一日まるごとに密着しました。</p>
+      <p>生配信が「舞台の上」を切り取るなら、こちらは「会場そのものの空気」を残す役割。準備に動くスタッフ、出番を待つ緊張、踊りきったあとの表情まで、その場でしか撮れないものをひたすら収録していきました。</p>
+      <div class="shots">
+        <img src="doremifa-shoot1.jpg" alt="東京体育館での撮影の様子 1">
+        <img src="doremifa-shoot2.jpg" alt="東京体育館での撮影の様子 2">
+      </div>
+      <p class="shots-cap">2025年5月11日、東京体育館での撮影の様子。</p>
+    </section>
+
+    <!-- 編集 -->
+    <section class="feature rv">
+      <div class="lbl">EDIT</div>
+      <h3>6時間を、3分半に</h3>
+      <p>持ち帰った約6時間ぶんの素材から、3分半のハイライトを編集しました。大会主催者からは「障害の有無に関係なく、会場にいる人の笑顔があふれている様子を伝えてほしい」というテーマをいただき、その意図に沿って構成。情報を詰め込むより、表情と熱量がつながって見えるテンポを優先しました。</p>
+    </section>
+
+    <!-- 評価 -->
+    <section class="feature rv">
+      <div class="lbl">RECOGNITION</div>
+      <h3>受賞選考の、補足資料に</h3>
+      <p>ドレミファダンスコンサートの運営に協力している東京表参道ライオンズクラブが、2026年3月、ライオンズクラブ国際協会から<a href="https://www.lionsclubs.org/ja/member-resource-center/grants-and-awards/association-awards/kindness-matters-service-award" target="_blank" rel="noopener">「思いやりは大切なこと」奉仕アワード</a>を受賞しました。全世界 約5万クラブのうち30クラブだけが選ばれる賞です。その選考にあたっての補足資料として、このハイライト映像が使用されました。</p>
+      <p>受賞したのはクラブの活動そのものですが、その価値を伝える資料の一部として自分の映像が役立った——撮って編集したものが、場の外でも意味を持った一例です。ほかの外部実績は<a href="credits.html">CREDITS</a>にまとめています。</p>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>公開</dt><dd>2025年7月25日</dd></div>
+      <div class="spec-row"><dt>イベント</dt><dd>2025年5月11日／東京体育館（東京都障害者ダンス大会「ドレミファダンスコンサート」）</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>撮影・編集（ボランティア）</dd></div>
+      <div class="spec-row"><dt>撮影</dt><dd>Z200（メイキング収録）／約6時間の素材</dd></div>
+      <div class="spec-row"><dt>尺</dt><dd>約3分半のハイライト</dd></div>
+      <div class="spec-row"><dt>外部での使用</dt><dd>東京表参道ライオンズクラブの<a href="https://www.lionsclubs.org/ja/member-resource-center/grants-and-awards/association-awards/kindness-matters-service-award" target="_blank" rel="noopener">国際協会アワード</a>受賞選考の補足資料に採用</dd></div>
+    </dl>
+
+    <div class="foot">
+      <a href="index.html#reel-eizo">← 映像リールに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </div>
+  </main>
+
+  <div class="lightbox" id="lightbox"><img src="" alt="拡大表示"></div>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // 撮影写真: タップで拡大
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img");
+  document.querySelectorAll(".shots img").forEach(img=>{
+    img.addEventListener("click",()=>{lbImg.src=img.src;lb.classList.add("open");});
+  });
+  lb.addEventListener("click",()=>lb.classList.remove("open"));
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")lb.classList.remove("open");});
+
+  // トップ動画: クリック/Enterで本編を再生
+  document.querySelectorAll(".hero-video[data-yt]").forEach(f=>{
+    const play=()=>{
+      if(f.classList.contains("playing"))return;
+      const ifr=document.createElement("iframe");
+      ifr.src="https://www.youtube.com/embed/"+f.getAttribute("data-yt")+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+      ifr.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";
+      ifr.setAttribute("allowfullscreen","");
+      ifr.title="本編の映像";
+      f.appendChild(ifr); f.classList.add("playing");
+    };
+    f.addEventListener("click",play);
+    f.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
+  });
+</script>
+</body>
+</html>

@@ -73,7 +73,10 @@
 
   .lightbox{position:fixed;inset:0;z-index:60;background:rgba(5,7,10,.93);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
   .lightbox.open{display:flex}
-  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lightbox img,.lightbox video{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lightbox .lb-vid{display:none}
+  .lightbox.show-vid img{display:none}
+  .lightbox.show-vid .lb-vid{display:block}
 
   footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
   footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
@@ -160,18 +163,33 @@
     </footer>
   </main>
 
-  <div class="lightbox" id="lightbox"><img src="" alt="拡大表示"></div>
+  <div class="lightbox" id="lightbox"><img src="" alt="拡大表示"><video class="lb-vid" loop muted playsinline></video></div>
 <script>
   window.addEventListener("load",()=>document.body.classList.add("ready"));
   document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
   const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.08});
   document.querySelectorAll(".rv").forEach(el=>io.observe(el));
-  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img");
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img"), lbVid=lb.querySelector(".lb-vid");
+  function openImg(src){ lb.classList.remove("show-vid"); lbVid.pause(); lbImg.src=src; lb.classList.add("open"); }
+  function openVid(webm,mp4){
+    lb.classList.add("show-vid");
+    lbVid.innerHTML=(webm?'<source src="'+webm+'" type="video/webm">':'')+(mp4?'<source src="'+mp4+'" type="video/mp4">':'');
+    lbVid.load(); lb.classList.add("open"); lbVid.play().catch(()=>{});
+  }
+  function closeLb(){ lb.classList.remove("open"); lbVid.pause(); }
+  // 画像タイル → 拡大
   document.querySelectorAll(".day .imgbox img").forEach(img=>{
-    img.parentElement.addEventListener("click",()=>{lbImg.src=img.src;lb.classList.add("open");});
+    img.parentElement.addEventListener("click",()=>openImg(img.src));
   });
-  lb.addEventListener("click",()=>lb.classList.remove("open"));
-  document.addEventListener("keydown",e=>{if(e.key==="Escape")lb.classList.remove("open");});
+  // 動画タイル（22日目など）→ 拡大してループ再生
+  document.querySelectorAll(".day .imgbox video").forEach(v=>{
+    v.parentElement.addEventListener("click",()=>{
+      const w=v.querySelector('source[type="video/webm"]'), m=v.querySelector('source[type="video/mp4"]');
+      openVid(w?w.getAttribute("src"):"", m?m.getAttribute("src"):"");
+    });
+  });
+  lb.addEventListener("click",closeLb);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb();});
 </script>
 </body>
 </html>

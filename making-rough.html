@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2025年度農工祭 rough公演 / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(17px,2.4vw,24px);color:var(--ink);margin:0 0 22px;letter-spacing:.02em;opacity:.9}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+
+  .hero-video{position:relative;aspect-ratio:16/9;margin:clamp(36px,6vh,60px) 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .hero-video .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;
+    border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .hero-video .play::after{content:"";border-left:17px solid var(--ink);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;transition:border-color .3s}
+  .hero-video:hover{border-color:var(--amber-dim)}
+  .hero-video:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .hero-video:hover .play::after{border-left-color:var(--amber)}
+  .hero-video:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .hero-video.playing{cursor:default}
+  .hero-video.playing .poster,.hero-video.playing .play{display:none}
+  .hero-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+
+  /* 動画 近日公開プレースホルダ */
+  .hero-ph{position:relative;aspect-ratio:16/9;margin:clamp(36px,6vh,60px) 0;border:1px dashed var(--line);
+    border-radius:var(--r);background:radial-gradient(130% 110% at 50% 30%,#161b22 0%,#0c0f14 75%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px}
+  .hero-ph .ph-no{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.22em;color:var(--amber)}
+  .hero-ph .ph-t{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(18px,2.6vw,26px);color:var(--ink)}
+  .hero-ph .ph-s{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut)}
+
+  /* feature block */
+  .feature{margin:clamp(40px,7vh,72px) 0;padding:clamp(32px,5vh,52px) 0;border-top:1px solid var(--line)}
+  .feature:last-of-type{border-bottom:1px solid var(--line)}
+  .feature .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:14px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(24px,3.6vw,40px);line-height:1.12;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .feature a:hover{border-color:var(--amber)}
+
+  /* spec sheet */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  .spec-row dd a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  .foot{border-top:1px solid var(--line);margin-top:clamp(40px,7vh,80px);padding-top:36px;display:flex;
+    justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+  .foot a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  .foot a:hover,.foot a:focus-visible{border-color:var(--amber);color:var(--amber);outline:none}
+  .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  .rv{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  p,.lead{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  /* 機材リスト画像・クルー写真 */
+  .listimg{display:block;width:100%;margin-top:22px;border:1px solid var(--line);border-radius:var(--r);background:#fff;cursor:zoom-in}
+  .fig-cap{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.05em;color:var(--ink-mut);margin-top:10px;line-height:1.5}
+  .crew{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+  .crew img{width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in;transition:opacity .2s}
+  .crew img:hover{opacity:.9}
+  @media(max-width:560px){.crew{grid-template-columns:1fr}}
+  .lightbox{position:fixed;inset:0;z-index:80;background:rgba(5,7,10,.93);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-eizo">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">MULTICAM LIVE — 撮影ディレクション / 2025</div>
+    <h1><span class="nb">2025年度農工祭</span> <span class="nb">rough公演</span></h1>
+    <div class="subtitle">7カメ・5人体制で、ストリートダンスの舞台を撮る</div>
+    <div class="htags"><a class="htag" href="works.html?tags=実写映像">実写映像</a><a class="htag" href="works.html?tags=ライブ撮影">ライブ撮影</a><a class="htag" href="works.html?tags=マルチカメラ">マルチカメラ</a></div>
+    <p class="lead">2025年11月15日、東京農工大学の学祭「農工祭」。公認ストリートダンスサークル「rough」のステージ公演を、撮影チームを率いて記録しました。定点を含む7カメ・5人体制。機材費の交渉から、当日の撮影ディレクション、2か月にわたる7カメ編集とカラーグレーディングまで——撮る前から納品まで、全体を統括した一本です。</p>
+
+    <!-- 本編 -->
+    <div class="hero-video" data-yt="0iCX3daaViw" tabindex="0" role="button" aria-label="本編を再生">
+      <img class="poster" src="https://img.youtube.com/vi/0iCX3daaViw/maxresdefault.jpg"
+           onerror="this.onerror=null;this.src='https://img.youtube.com/vi/0iCX3daaViw/hqdefault.jpg'" alt="2025年度農工祭 rough公演のサムネイル">
+      <div class="play"></div>
+    </div>
+
+    <!-- チームを率いる -->
+    <section class="feature rv">
+      <div class="lbl">DIRECTION</div>
+      <h3>撮影チームを、率いる</h3>
+      <p>この公演では、撮影チームのリーダーを務めました。クルーは高校時代の部活のつながりから声をかけて集め、私を含めて5人。定点カメラを含む7カメ体制で、1時間を超えるステージ公演に臨みました。単に「自分が撮る」のではなく、誰がどの画を担当し、どこを必ず押さえるか——チーム全体の絵づくりを設計する立場です。</p>
+    </section>
+
+    <!-- 交渉 -->
+    <section class="feature rv">
+      <div class="lbl">NEGOTIATION</div>
+      <h3>機材費を、プレゼンで交渉する</h3>
+      <p>人件費はボランティア、機材費は rough に出してもらう前提で、サークル幹部と交渉しました。ただ予算を求めるのではなく、「機材費が変わると映像がどのくらい変わるか」をプレゼンしながら、コストと映像クオリティのバランスを一緒に詰めていく進め方です。実際に使用する機材のレンタル費用や借り先をまとめた機材リストを用意し、それを幹部に見せながら交渉しました。</p>
+      <p>もらった予算で足りない部分は自腹を切りました。それでも良いものにしたい——映像にかける熱量は、そこに出ていると思います。</p>
+      <img class="listimg" src="rough-list.jpg" alt="実際に使用した機材リスト（抜粋）" loading="lazy">
+      <p class="fig-cap">実際に使った機材リストの一部。レンタル費用や借り先をまとめ、rough 幹部との交渉に使いました。（タップで拡大）</p>
+    </section>
+
+    <!-- 当日 -->
+    <section class="feature rv">
+      <div class="lbl">SHOOT</div>
+      <h3>50分で、7カメを立てる</h3>
+      <p>機材は公演前日からレンタルし、rough の前日リハーサルに合わせて、こちらも機材チェックとリハを実施。カメラマンの動きと機材の動線を事前に細かく組み、当日は大学の友人や rough メンバーにも搬入を手伝ってもらいました。前のステージプログラムが終わってから rough の公演が始まるまで、セッティングに使える時間はわずか50分。その中で7カメを立てきり、冒頭からしっかり撮影に入ることができました。</p>
+      <p>私自身はセンター後方の FX6 に B4レンズを付けたカメラで、ステージ上の「寄り」を担当。事前にもらった練習映像や前日リハの映像を何度も見返してすべてのショーケースの流れを暗記し、シミュレートしておいた“いちばんかっこいい画”を撮り続けました。自分のカメラだけでなく、各カメラマンに「ここだけは押さえてほしい」を事前ミーティングで共有したうえで、本番中も無線で指示を出しながら撮影を回しました。</p>
+      <div class="crew">
+        <img src="rough-crew1.jpg" alt="三脚に立てた放送カメラで撮影するクルー" loading="lazy">
+        <img src="rough-crew4.jpg" alt="ジンバルで動きのある画を狙うクルー" loading="lazy">
+        <img src="rough-crew2.jpg" alt="ステージのダンスを撮影するクルー" loading="lazy">
+        <img src="rough-crew5.jpg" alt="本番のステージと撮影クルー" loading="lazy">
+      </div>
+      <p class="fig-cap">本番の撮影チーム。定点の放送カメラからジンバルまで、複数の機材でステージを多角的に捉えました。（タップで拡大）</p>
+    </section>
+
+    <!-- 編集 -->
+    <section class="feature rv">
+      <div class="lbl">EDIT</div>
+      <h3>1時間44分を、2か月で仕上げる</h3>
+      <p>撮影後から公開までの約2か月は、編集に充てました。約1時間44分・17本のショーケースを、まず Premiere Pro で7カメのカット編集。かっこよさを意識しつつ、適度に引きの画を混ぜて「ステージで今なにが起きているか」が分かりやすくなるよう構成しています。そのうえで、Log撮影された素材を DaVinci Resolve でカラーグレーディングしました。</p>
+      <p>色編集は、撮影クルーのうち対応できるメンバーにも分担してもらい、素早い納品をめざしました。全17本のうち10本は自分で色を担当し、残りの7本も任せきりにはせず進捗を確認。納期に間に合わなさそうな分は別のメンバーに振り分けたり、自分で巻き取ったりして、1月8日に全ショーケースの納品を完了しました。目標にしていた「公演後2か月以内の納品」を、1週間前倒しで達成した形です。納品データは、rough の公式Instagramで1月17日より順次公開されていきました。</p>
+      <p>カラーグレーディングはそれまで Final Cut Pro で行っていましたが、この案件をきっかけに DaVinci Resolve を導入。初めてのソフトでしたが、このタイミングでしっかり習得しました。</p>
+    </section>
+
+    <!-- 音声 -->
+    <section class="feature rv">
+      <div class="lbl">AUDIO</div>
+      <h3>音割れした本番音声を、立て直す</h3>
+      <p>音声でも、現場でのリカバリーがありました。ステージ音響を担当するPAさんからLINE OUTをもらい、センター固定のFX3に入力していたのですが、その音がすべて音割れ（クリップ）してしまっていたのです。そこで、rough がPAさんに渡していた音源そのものを分けてもらい、映像の音として代わりに使うことにしました。</p>
+      <p>ただしこれは、PA側で音量バランスが整えられる前の素材。そのため自分で整音したうえで、カメラマイクで拾った観客の応援の声をミックスし、その場の臨場感を足していきました。トラブルをそのまま事故にせず、むしろライブ感のある音に仕立て直す——撮ったものを最高の形にする意識で、後処理まで向き合いました。</p>
+    </section>
+
+    <!-- 最後の公演 -->
+    <section class="feature rv">
+      <div class="lbl">MEMORY</div>
+      <h3>3年生にとっての、最後の公演</h3>
+      <p>この公演は、3年生にとって最後の舞台でした。この本編（YouTube版）は、ダンスパート（Instagram公開分と同じ）に加えてMCの映像なども入れ、公演をまるごと1本にまとめた rough メンバー向けのバージョンです。最後の公演という思い出を、最高の形で残せるように編集しました。</p>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>公開</dt><dd>2026年1月17日より順次（rough 公式Instagram）</dd></div>
+      <div class="spec-row"><dt>イベント</dt><dd>2025年11月15日／東京農工大学「農工祭」（rough 公演）</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>撮影ディレクション・カメラ・編集（チームを統括）</dd></div>
+      <div class="spec-row"><dt>体制</dt><dd>撮影クルー5人／7カメ（定点含む）</dd></div>
+      <div class="spec-row"><dt>カメラ（自分）</dt><dd>Sony FX6 ＋ B4レンズ（センター後方・寄り担当）</dd></div>
+      <div class="spec-row"><dt>編集</dt><dd>Premiere Pro（7カメ カット編集）→ DaVinci Resolve（カラーグレーディング／本作で習得）</dd></div>
+      <div class="spec-row"><dt>規模</dt><dd>17ショーケース・約1時間44分</dd></div>
+      <div class="spec-row"><dt>納品</dt><dd>公演後2か月以内の目標を1週間前倒しで達成（1月8日完了）</dd></div>
+    </dl>
+
+    <div class="foot">
+      <a href="index.html#reel-eizo">← 映像リールに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </div>
+  </main>
+
+  <div class="lightbox" id="lightbox"><img src="" alt="拡大表示"></div>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // 機材リスト・クルー写真: タップで拡大
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img");
+  document.querySelectorAll(".listimg, .crew img").forEach(img=>{
+    img.addEventListener("click",()=>{lbImg.src=img.src;lb.classList.add("open");});
+  });
+  lb.addEventListener("click",()=>lb.classList.remove("open"));
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")lb.classList.remove("open");});
+
+  // トップ動画: クリック/Enterで本編を再生（YouTubeリンク差し替え後に有効化）
+  document.querySelectorAll(".hero-video[data-yt]").forEach(f=>{
+    const play=()=>{
+      if(f.classList.contains("playing"))return;
+      const ifr=document.createElement("iframe");
+      ifr.src="https://www.youtube.com/embed/"+f.getAttribute("data-yt")+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+      ifr.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";
+      ifr.setAttribute("allowfullscreen","");
+      ifr.title="本編の映像";
+      f.appendChild(ifr); f.classList.add("playing");
+    };
+    f.addEventListener("click",play);
+    f.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
+  });
+</script>
+</body>
+</html>

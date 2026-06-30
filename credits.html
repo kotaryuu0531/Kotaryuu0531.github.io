@@ -61,13 +61,15 @@
   .cmedia.playing .poster,.cmedia.playing .play{display:none}
   .cmedia iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
 
-  .cbadges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-  .cbadge{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;color:var(--amber);
-    border:1px solid var(--amber-dim);border-radius:100px;padding:4px 11px}
+  .cbadges{margin-bottom:14px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--amber)}
+  .cbadge{display:inline;white-space:nowrap}
+  .cbadge:not(:last-child)::after{content:"/";color:var(--ink-mut);margin:0 8px}
   .ctitle{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(19px,2.2vw,26px);line-height:1.3;margin-bottom:10px}
   .crole{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.04em;color:var(--ink);margin-bottom:12px}
   .crole b{color:var(--amber);font-weight:400}
   .cnote{color:var(--ink-mut);font-size:14.5px;line-height:1.65}
+  .cnote a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);white-space:nowrap}
+  .cnote a:hover{border-color:var(--amber)}
 
   footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
     display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
@@ -78,6 +80,15 @@
 
   .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
   .rv.in{opacity:1;transform:none}
+  /* 店内放映の証拠写真（小・横並び） */
+  .evidence{margin-top:clamp(34px,6vh,60px)}
+  .ev-lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--ink-mut);margin-bottom:12px}
+  .ev-row{display:flex;flex-wrap:wrap;gap:12px}
+  .ev-row img{height:120px;width:auto;border:1px solid var(--line);border-radius:var(--r);object-fit:cover;cursor:zoom-in;opacity:.88;transition:opacity .2s}
+  .ev-row img:hover{opacity:1}
+  .lightbox{position:fixed;inset:0;z-index:80;background:rgba(5,7,10,.93);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:94vw;max-height:90vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
@@ -92,9 +103,25 @@
   <main class="wrap">
     <div class="eyebrow">CREDITS — 実績・掲載歴</div>
     <h1>外部で使われた仕事</h1>
-    <p class="lead">勤務先（イケシブ）の公式YouTubeチャンネルや店舗内で公開・放映されている、依頼ベースの映像。撮影・編集を担当しています。</p>
+    <p class="lead">撮影・編集を担当した映像のうち、外部で公開・放映されたり、第三者の場で使われたりしたもの。ボランティアで関わった大会の記録から、勤務先（イケシブ）の依頼映像まで。</p>
 
     <div class="credits-list">
+
+      <!-- ドレミファ ハイライト（受賞選考の補足資料） -->
+      <article class="credit rv">
+        <div class="cmedia" data-yt="mXolgUeuSOo" role="button" tabindex="0" aria-label="本編を再生">
+          <img class="poster" src="https://img.youtube.com/vi/mXolgUeuSOo/maxresdefault.jpg"
+               onerror="this.onerror=null;this.src='https://img.youtube.com/vi/mXolgUeuSOo/hqdefault.jpg'"
+               alt="ドレミファダンスコンサート2025 ハイライト">
+          <div class="play"></div>
+        </div>
+        <div class="cinfo">
+          <div class="cbadges"><span class="cbadge">ボランティア</span><span class="cbadge">受賞選考の補足資料</span></div>
+          <h2 class="ctitle">ドレミファダンスコンサート2025 ハイライト</h2>
+          <div class="crole">担当：<b>撮影・編集</b></div>
+          <p class="cnote">東京都障害者ダンス大会のメイキングをボランティアで撮影・編集。運営に協力する東京表参道ライオンズクラブが、ライオンズクラブ国際協会「思いやりは大切なこと」奉仕アワード（2026年3月／全世界 約5万クラブ中30クラブ）を受賞した際、その選考の補足資料として本映像が使用されました。<a href="making-doremifa.html">メイキングを見る →</a></p>
+        </div>
+      </article>
 
       <!-- 開店記念動画（16:9） -->
       <article class="credit rv">
@@ -130,17 +157,36 @@
 
     </div>
 
+    <section class="evidence rv">
+      <div class="ev-lbl">店内モニターで放映されている様子（証拠写真）</div>
+      <div class="ev-row">
+        <img src="credit-store1.jpg" alt="店舗内モニターで映像が放映されている様子 1">
+        <img src="credit-store2.jpg" alt="店舗内モニターで映像が放映されている様子 2">
+      </div>
+    </section>
+
     <footer>
       <a href="index.html">← ポートフォリオに戻る</a>
       <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
     </footer>
   </main>
 
+  <div class="lightbox" id="lightbox"><img src="" alt="拡大表示"></div>
+
 <script>
   window.addEventListener("load",()=>document.body.classList.add("ready"));
   document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
   const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
   document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // 証拠写真：タップで拡大
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img");
+  document.querySelectorAll(".ev-row img").forEach(img=>{
+    img.addEventListener("click",()=>{lbImg.src=img.src;lb.classList.add("open");});
+  });
+  lb.addEventListener("click",()=>lb.classList.remove("open"));
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")lb.classList.remove("open");});
+</script>
 
   // クリック/Enterでその場再生
   document.querySelectorAll(".cmedia[data-yt]").forEach(f=>{

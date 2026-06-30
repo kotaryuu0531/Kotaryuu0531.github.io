@@ -188,6 +188,24 @@
   ========================================================= */
   const WORKS = [
     {
+      title:"2025年度農工祭 rough公演",
+      tags:["実写映像","ライブ撮影","マルチカメラ"],
+      period:"2025年11月〜2026年1月", date:"2026-01-17",
+      url:"https://youtu.be/0iCX3daaViw",
+      making:"making-rough.html",
+      thumb:"https://img.youtube.com/vi/0iCX3daaViw/maxresdefault.jpg",
+      ov:{eyebrow:"MULTICAM LIVE — 撮影ディレクション / 2025", sub:"7カメ・5人体制のステージ撮影", text:"東京農工大学の学祭で、公認ダンスサークルroughの公演を撮影チームを率いて記録。機材費の交渉から、7カメ・5人の現場ディレクション、Premiere＋DaVinciでの2か月の編集統括まで担当。17本・約1時間44分を前倒しで納品しました。"}
+    },
+    {
+      title:"ドレミファダンスコンサート2025 ハイライト",
+      tags:["実写映像","ハイライト","ボランティア"],
+      period:"2025年5〜7月", date:"2025-07-25",
+      url:"https://youtu.be/mXolgUeuSOo",
+      making:"making-doremifa.html",
+      thumb:"https://img.youtube.com/vi/mXolgUeuSOo/maxresdefault.jpg",
+      ov:{eyebrow:"HIGHLIGHT — ボランティア撮影 / 2025", sub:"東京都障害者ダンス大会の撮影ボランティア記録", text:"東京体育館での障害者ダンス大会にメイキング撮影のボランティアとして参加。約6時間の素材から3分半のハイライトに編集。運営協力するライオンズクラブの国際協会アワード受賞選考の補足資料にも使用されました。"}
+    },
+    {
       title:"1日1モデリング 30日チャレンジ",
       tags:["CG","モデリング"],
       period:"2021年7月〜8月（30日間）", date:"2021-08-17",
@@ -592,15 +610,16 @@
           mv.addEventListener("progress",e=>{
             const p=Math.round((e.detail.totalProgress||0)*100);
             if(spinTxt) spinTxt.textContent="読み込み中 "+p+"%";
-            if(e.detail.totalProgress>=1) v3d.classList.remove("loading");
+            // ダウンロード100%でも、モデルが実際に表示可能になる（loadイベント）まではスピナー継続
           });
           mv.addEventListener("error",()=>{ v3d.classList.remove("loading"); if(spinTxt) spinTxt.textContent="読み込みに失敗しました"; });
           v3d.insertBefore(mv, hint);
           attachScrollGuard(mv);
         }
+        const alreadyLoaded = (mv.getAttribute("src")===glb && mv.loaded);
         if(poster) mv.setAttribute("poster",poster);
         if(mv.getAttribute("src")!==glb){ mv.cameraOrbit="-28deg 74deg auto"; mv.setAttribute("src",glb); }
-        if(mv.loaded && mv.getAttribute("src")===glb) v3d.classList.remove("loading");
+        if(alreadyLoaded) v3d.classList.remove("loading");
       });
     }
     function closeV(){ v3d.classList.remove("open"); v3d.setAttribute("aria-hidden","true"); document.body.style.overflow=""; }
@@ -613,6 +632,6 @@
     });
   })();
   </script>
-  <div class="buildver">build 2026.06.27 14:29 JST</div>
+  <div class="buildver">build 2026.06.30 17:17 JST</div>
 </body>
 </html>
