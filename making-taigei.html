@@ -168,11 +168,12 @@
   const camera=new THREE.PerspectiveCamera(28,1,0.01,100);
 
   // ライト（トゥーンの段はgradientMapで作る。ここは方向だけ）
-  scene.add(new THREE.AmbientLight(0xffffff,.55));
-  const key=new THREE.DirectionalLight(0xffffff,1.0); key.position.set(1.5,2.2,2.5); scene.add(key);
+  // 明部＝テクスチャ原色(合計1.0)、影＝80% になる配分
+  scene.add(new THREE.AmbientLight(0xffffff,.4));
+  const key=new THREE.DirectionalLight(0xffffff,.6); key.position.set(1.5,2.2,2.5); scene.add(key);
 
-  // --- セル段調（3段）のグラデーションマップ ---
-  const grad=new THREE.DataTexture(new Uint8Array([90,170,255]),3,1,THREE.RedFormat);
+  // --- セル段調（2段：明部100%／影80%）のグラデーションマップ ---
+  const grad=new THREE.DataTexture(new Uint8Array([170,255]),2,1,THREE.RedFormat);
   grad.minFilter=grad.magFilter=THREE.NearestFilter; grad.needsUpdate=true;
 
   // --- 操作（回転・ズーム・パン、自動回転、ホイールはOrbitControlsがpreventDefault） ---
