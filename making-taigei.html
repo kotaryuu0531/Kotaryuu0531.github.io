@@ -92,6 +92,7 @@
   .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
   .rv.in{opacity:1;transform:none}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+  .buildver{position:fixed;left:12px;bottom:10px;z-index:40;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);opacity:.5;pointer-events:none}
 </style>
 </head>
 <body>
@@ -162,16 +163,16 @@
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.NoToneMapping; // アニメ塗りの色をいじらない
+  renderer.useLegacyLights=true; // ライト強度を旧来の直感的な単位に固定（明部1.0/影0.8の設計を保証）
   holder.appendChild(renderer.domElement);
 
   const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(28,1,0.01,100);
 
   // ライト（トゥーンの段はgradientMapで作る。ここは方向だけ）
-  // 明部＝テクスチャ原色(合計1.0)、影＝80% になる配分。
-  // three.js r155+ は物理ライティング(内部で1/π)のため、πを掛けて設計値に合わせる
-  scene.add(new THREE.AmbientLight(0xffffff,.4*Math.PI));
-  const key=new THREE.DirectionalLight(0xffffff,.6*Math.PI); key.position.set(1.5,2.2,2.5); scene.add(key);
+  // 明部＝テクスチャ原色(合計1.0)、影＝80% になる配分（legacy lights単位）
+  scene.add(new THREE.AmbientLight(0xffffff,.4));
+  const key=new THREE.DirectionalLight(0xffffff,.6); key.position.set(1.5,2.2,2.5); scene.add(key);
 
   // --- セル段調（2段：明部100%／影80%）のグラデーションマップ ---
   const grad=new THREE.DataTexture(new Uint8Array([170,255]),2,1,THREE.RedFormat);
@@ -269,5 +270,6 @@
   resize();
   renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera);});
 </script>
+  <div class="buildver">build 2026.07.03 18:40 JST</div>
 </body>
 </html>
