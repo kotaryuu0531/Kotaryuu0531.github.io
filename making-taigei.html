@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大鯨 3Dキャラクターモデル（ファンアート） / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js"></script>
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.5;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.92),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:clamp(110px,15vh,160px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(34px,6vw,66px);line-height:1.1;letter-spacing:.01em;margin-bottom:10px}
+  .nb{white-space:nowrap}
+  .subtitle{font-family:"Archivo",sans-serif;font-weight:500;font-size:clamp(14px,2vw,20px);letter-spacing:.02em;
+    color:var(--ink-mut);margin-bottom:22px}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.88}
+
+  /* ファンアート注記 */
+  .disclaimer{margin-top:16px;padding:12px 16px;border:1px solid var(--line);border-left:2px solid var(--amber-dim);
+    border-radius:var(--r);background:rgba(233,169,76,.04);font-size:13px;line-height:1.65;color:var(--ink-mut)}
+
+  /* インタラクティブ3Dビューア */
+  .viewer{margin-top:clamp(26px,4vh,42px)}
+  .viewer model-viewer{width:100%;height:min(72vh,620px);display:block;touch-action:none;
+    background:radial-gradient(130% 110% at 50% 26%, #1b212a 0%, #0c0f14 72%);
+    border:1px solid var(--line);border-radius:var(--r);--poster-color:#0c0f14}
+  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px;line-height:1.6}
+
+  /* 制作について */
+  .about{margin-top:clamp(30px,5vh,48px);border-top:1px solid var(--line);padding-top:clamp(26px,4vh,40px)}
+  .about h2{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(19px,2.4vw,26px);margin-bottom:14px}
+  .about p{color:var(--ink-mut);font-size:15px;line-height:1.7;margin-bottom:14px}
+  .about p:last-child{margin-bottom:0}
+
+  /* スペック */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:180px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  p,.lead,.about p{text-wrap:pretty}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="works.html">← ARCHIVE</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">3D CHARACTER — 非公式ファンアート</div>
+    <h1><span class="nb">大鯨（Taigei）</span> <span class="nb">3Dモデル</span></h1>
+    <div class="subtitle">『艦隊これくしょん -艦これ-』のキャラクターを題材にしたファンアート</div>
+    <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=モデリング">モデリング</a><a class="htag" href="works.html?tags=キャラクター">キャラクター</a></div>
+    <p class="lead">『艦隊これくしょん -艦これ-』のキャラクター「大鯨」を題材に制作した、非公式のファンアート3Dモデルです。モデリングとテクスチャを担当しました。ドラッグで自由に回して見られます。</p>
+    <div class="disclaimer">本作は個人制作の<strong>非公式ファンアート</strong>です。キャラクター「大鯨」および『艦隊これくしょん -艦これ-』のデザイン・著作権は原作者および運営（DMM GAMES／KADOKAWA 等）に帰属します。キャラクターデザインを自作したものではありません。</div>
+
+    <!-- インタラクティブ3Dビューア -->
+    <div class="viewer rv">
+      <model-viewer src="Taigei_figure.glb" alt="大鯨 3Dキャラクターモデル（ドラッグで回転できます）"
+        camera-controls auto-rotate auto-rotate-delay="3000" interaction-prompt="auto"
+        camera-orbit="20deg 82deg auto" field-of-view="28deg"
+        shadow-intensity="0.5" exposure="1.0" environment-image="neutral" loading="eager"></model-viewer>
+      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。<br>データが大きめのため、読み込みに数秒かかることがあります。</figcaption>
+    </div>
+
+    <!-- 制作について -->
+    <section class="about rv">
+      <h2>このモデルについて</h2>
+      <p>アニメ調のキャラクターを立体に起こす練習として制作したモデルです。髪・顔・ボディ・制服をそれぞれ分けてUV展開し、テクスチャを描き分けています。ビューアは通常のPBRシェーディングで表示しているため、実際のアニメ調（トゥーン）シェーディングとは見え方が異なります。</p>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>種別</dt><dd>3Dキャラクターモデル（非公式ファンアート）</dd></div>
+      <div class="spec-row"><dt>題材</dt><dd>『艦隊これくしょん -艦これ-』／大鯨 ※デザイン・著作権は原作に帰属</dd></div>
+      <div class="spec-row"><dt>ポリゴン</dt><dd>約6万ポリゴン（三角面換算 78,130）</dd></div>
+      <div class="spec-row"><dt>マテリアル</dt><dd>8</dd></div>
+      <div class="spec-row"><dt>テクスチャ</dt><dd>5枚（髪 1K ／ 顔・ボディ・制服 各2K ／ 制服・追加 4K）</dd></div>
+      <div class="spec-row"><dt>使用ソフト</dt><dd>Blender</dd></div>
+    </dl>
+
+    <footer>
+      <a href="works.html">← アーカイブに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // 3Dビューア：標準ズームは維持し、ホイール時のページスクロールだけ抑止（Safari対策・C方式）
+  function attachScrollGuard(el){
+    el.addEventListener("wheel",function(e){ e.preventDefault(); },{passive:false});
+  }
+  if(window.customElements){
+    customElements.whenDefined("model-viewer").then(()=>{
+      const hero=document.querySelector(".viewer model-viewer");
+      if(hero) attachScrollGuard(hero);
+    });
+  }
+</script>
+</body>
+</html>
