@@ -168,9 +168,10 @@
   const camera=new THREE.PerspectiveCamera(28,1,0.01,100);
 
   // ライト（トゥーンの段はgradientMapで作る。ここは方向だけ）
-  // 明部＝テクスチャ原色(合計1.0)、影＝80% になる配分
-  scene.add(new THREE.AmbientLight(0xffffff,.4));
-  const key=new THREE.DirectionalLight(0xffffff,.6); key.position.set(1.5,2.2,2.5); scene.add(key);
+  // 明部＝テクスチャ原色(合計1.0)、影＝80% になる配分。
+  // three.js r155+ は物理ライティング(内部で1/π)のため、πを掛けて設計値に合わせる
+  scene.add(new THREE.AmbientLight(0xffffff,.4*Math.PI));
+  const key=new THREE.DirectionalLight(0xffffff,.6*Math.PI); key.position.set(1.5,2.2,2.5); scene.add(key);
 
   // --- セル段調（2段：明部100%／影80%）のグラデーションマップ ---
   const grad=new THREE.DataTexture(new Uint8Array([170,255]),2,1,THREE.RedFormat);
