@@ -274,7 +274,7 @@
   // ワイヤーモード：クレイ（下地）＋四角面ワイヤー（対角線を除去したライン）
   const clayMat=new THREE.MeshStandardMaterial({color:0xb6bcc6,roughness:.95,metalness:0,side:THREE.DoubleSide,
     polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}); // 面を奥に押してライン描画を安定させる
-  const lineMat=new THREE.LineBasicMaterial({color:0xE9A94C});
+  const lineMat=new THREE.LineBasicMaterial({color:0x14161c}); // クレイ上の視認性優先で黒
   const wires=[]; let wiresBuilt=false;
 
   // 三角形化で入った対角線を除去したワイヤーを作る。
@@ -527,6 +527,6 @@
   resize();
   renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-  <div class="buildver">build 2026.07.04 22:23 JST</div>
+  <div class="buildver">build 2026.07.04 22:37 JST</div>
 </body>
 </html>
