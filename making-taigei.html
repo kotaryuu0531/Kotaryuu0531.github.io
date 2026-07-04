@@ -169,8 +169,8 @@
   const RIM_COLOR=[.85,.92,1.0];     // リムの色（青白）
   const THRESHOLD=.46, SOFT=.035;    // セル境界の位置と柔らかさ
   const OUTLINE={
-    screen:.0009,   // 画面基準の線の太さ（距離に応じて世界空間の幅を自動調整）
-    maxFrac:.0035,  // 引きで見たときの太さ上限（モデル高比）
+    screen:.0008,   // 画面基準の線の太さ（距離に応じて世界空間の幅を自動調整）
+    maxFrac:.0026,  // 引きで見たときの太さ上限（モデル高比）
     partCap:.18,    // 小パーツの太さ上限（パーツ半径比）
     minPart:.055,   // これ未満の小メッシュには線を出さない（モデル高比、髪は除く）
     color:0x171a26,
@@ -276,8 +276,12 @@
       vertexShader:`
         uniform float oScreen; uniform float oMax;
         void main(){
+          float mask=1.0;
+          #ifdef USE_COLOR
+            mask=color.r;   // 頂点カラーR＝線の太さ倍率（黒＝線なし）
+          #endif
           vec4 mv=modelViewMatrix*vec4(position,1.0);
-          float w=min(oScreen*max(-mv.z,0.0),oMax);
+          float w=min(oScreen*max(-mv.z,0.0),oMax)*mask;
           vec3 p=position+normalize(normal)*w;
           gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
         }`,
@@ -322,7 +326,9 @@
       // 白目など極小の顔パーツには線を出さない（髪の房は対象外）
       if(r<maxDim*OUTLINE.minPart && matName!=="tex_hair")return;
       const cap=Math.min(maxDim*OUTLINE.maxFrac, r*OUTLINE.partCap);
-      const ol=new THREE.Mesh(o.geometry,outlineMat(cap)); ol.renderOrder=-1;
+      const om=outlineMat(cap);
+      if(o.geometry.attributes.color) om.vertexColors=true; // 頂点カラーがあれば太さマスクに使う
+      const ol=new THREE.Mesh(o.geometry,om); ol.renderOrder=-1;
       outlines.push([o,ol]);
     });
     console.log("[taigei] meshes:",dbg.join(" / "));
@@ -355,6 +361,6 @@
   resize();
   renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-  <div class="buildver">build 2026.07.04 16:28 JST</div>
+  <div class="buildver">build 2026.07.04 16:40 JST</div>
 </body>
 </html>
