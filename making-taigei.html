@@ -259,16 +259,21 @@
     return makeToon(albedo, solid, paramsFor(src.name));
   }
 
-  // 背面法アウトライン
+  // 背面法アウトライン（自作シェーダー：法線方向に膨らませた裏面を単色で描く）
   function outlineMat(width){
-    const m=new THREE.MeshBasicMaterial({color:0x171a26,side:THREE.BackSide});
-    m.onBeforeCompile=(sh)=>{
-      sh.uniforms.oW={value:width};
-      sh.vertexShader="uniform float oW;\n"+sh.vertexShader.replace(
-        "#include <begin_vertex>",
-        "#include <begin_vertex>\n\ttransformed += normalize(objectNormal) * oW;");
-    };
-    return m;
+    return new THREE.ShaderMaterial({
+      side:THREE.BackSide,
+      uniforms:{oW:{value:width},oColor:{value:new THREE.Color(0x171a26)}},
+      vertexShader:`
+        uniform float oW;
+        void main(){
+          vec3 p=position+normalize(normal)*oW;
+          gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
+        }`,
+      fragmentShader:`
+        uniform vec3 oColor;
+        void main(){ gl_FragColor=vec4(oColor,1.0); }`
+    });
   }
 
   const loader=new GLTFLoader();
@@ -277,7 +282,7 @@
     const box=new THREE.Box3().setFromObject(model);
     const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
     const maxDim=Math.max(size.x,size.y,size.z);
-    const oMat=outlineMat(maxDim*0.0022);
+    const oMat=outlineMat(maxDim*0.0028);
 
     const outlines=[];
     model.traverse((o)=>{
@@ -318,6 +323,6 @@
   resize();
   renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-  <div class="buildver">build 2026.07.03 18:50 JST</div>
+  <div class="buildver">build 2026.07.04 15:28 JST</div>
 </body>
 </html>
