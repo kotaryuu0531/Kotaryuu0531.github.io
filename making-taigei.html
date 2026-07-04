@@ -282,17 +282,26 @@
     const box=new THREE.Box3().setFromObject(model);
     const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
     const maxDim=Math.max(size.x,size.y,size.z);
-    const oMat=outlineMat(maxDim*0.0028);
-
+    const baseW=maxDim*0.0020;
+    const NO_OUTLINE=new Set(["tongue","body.001"]); // 口内・目や眉のオーバーレイには線を出さない
+    model.updateMatrixWorld(true);
     const outlines=[];
+    const tmpS=new THREE.Vector3();
     model.traverse((o)=>{
       if(!o.isMesh)return;
-      const name=(o.material&&o.material.name)||"";
+      const matName=(o.material&&o.material.name)||"";
+      const nodeName=o.name||"";
       o.material=convert(o.material);
-      if(name!=="highlight"){
-        const ol=new THREE.Mesh(o.geometry,oMat); ol.renderOrder=-1;
-        outlines.push([o,ol]);
-      }
+      if(matName==="highlight")return;      // 瞳ハイライト
+      if(matName==="")return;               // マテリアル無しの装飾片（服の白い破線トリム等）
+      if(NO_OUTLINE.has(nodeName))return;   // 口内・顔パーツのオーバーレイ
+      // 小さいパーツほど細い線に（ワールドサイズに応じて上限をかける）
+      if(!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+      o.getWorldScale(tmpS);
+      const r=o.geometry.boundingSphere.radius*Math.max(tmpS.x,tmpS.y,tmpS.z);
+      const w=Math.min(baseW, r*0.15);
+      const ol=new THREE.Mesh(o.geometry,outlineMat(w)); ol.renderOrder=-1;
+      outlines.push([o,ol]);
     });
     outlines.forEach(([o,ol])=>o.add(ol));
     scene.add(model);
@@ -323,6 +332,6 @@
   resize();
   renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-  <div class="buildver">build 2026.07.04 15:28 JST</div>
+  <div class="buildver">build 2026.07.04 16:00 JST</div>
 </body>
 </html>
