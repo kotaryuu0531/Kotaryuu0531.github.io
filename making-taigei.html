@@ -64,6 +64,18 @@
   #tviewer .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:tvspin 1s linear infinite}
   #tviewer .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
   @keyframes tvspin{to{transform:rotate(360deg)}}
+  .tv-ui{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:12px;
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut)}
+  .tv-ui .seg{display:flex;gap:6px}
+  .tv-ui button{font-family:inherit;font-size:11px;letter-spacing:.06em;background:none;
+    border:1px solid var(--line);color:var(--ink-mut);padding:6px 14px;border-radius:100px;cursor:pointer;transition:border-color .2s,color .2s}
+  .tv-ui button:hover{border-color:var(--amber-dim)}
+  .tv-ui button.on{border-color:var(--amber);color:var(--amber)}
+  .tv-ui label{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .tv-ui input[type="checkbox"]{accent-color:var(--amber);width:14px;height:14px;cursor:pointer}
+  .tv-ui input[type="range"]{accent-color:var(--amber);width:150px;cursor:pointer}
+  .tv-ui .num{color:var(--amber);min-width:3ch;text-align:right}
+  .tv-ui .dim{opacity:.35;pointer-events:none}
   .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px;line-height:1.6}
 
   /* 制作について */
@@ -116,7 +128,15 @@
       <div id="tviewer" aria-label="大鯨 3Dキャラクターモデル（ドラッグで回転できます）">
         <div class="spin" id="tv-spin"><div class="ring"></div><div class="spin-txt" id="tv-spin-txt">読み込み中…</div></div>
       </div>
-      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。<br>セルルック（トゥーンシェーディング＋輪郭線）で表示する自作ビューアです。データが大きめのため、読み込みに数秒かかることがあります。</figcaption>
+      <div class="tv-ui">
+        <div class="seg" id="tv-mode">
+          <button data-mode="toon" class="on">トゥーン</button>
+          <button data-mode="normal">ノーマル</button>
+        </div>
+        <label id="tv-trace-w"><input type="checkbox" id="tv-trace" checked> 色トレス線</label>
+        <label id="tv-shadow-w">影の強さ <input type="range" id="tv-shadow" min="0" max="100" value="60"> <span class="num" id="tv-shadow-val">60</span></label>
+      </div>
+      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。<br>セルルック（トゥーンシェーディング＋輪郭線）で表示する自作ビューアです。下のコントロールで、トゥーン／ノーマル（通常シェーディング）の切替、色トレス線、影の強さを比較できます。データが大きめのため、読み込みに数秒かかることがあります。</figcaption>
     </div>
 
     <!-- 制作について -->
@@ -164,16 +184,20 @@
     face:  {level:.92, tint:[1.00,.88,.85], rim:.10, lift:.55},  // 顔：影をかなり弱く
     hair:  {level:.74, tint:[.82,.85,1.00], rim:.34, lift:0},    // 髪：寒色影＋強めリム
     cloth: {level:.78, tint:[.85,.87,1.00], rim:.22, lift:0},    // 服：寒色影
-    dark:  {level:.80, tint:[.88,.90,1.00], rim:.28, lift:0},    // タイツ等の暗部：リムで立たせる
+    dark:  {level:.80, tint:[.88,.90,1.00], rim:.28, lift:0},    // タイツ等の暗部
   };
-  const RIM_COLOR=[.85,.92,1.0];     // リムの色（青白）
-  const THRESHOLD=.46, SOFT=.035;    // セル境界の位置と柔らかさ
+  const RIM_COLOR=[.85,.92,1.0];
+  const SOFT=.035;                     // セル境界の柔らかさ
   const OUTLINE={
-    screen:.0008,   // 画面基準の線の太さ（距離に応じて世界空間の幅を自動調整）
-    maxFrac:.0026,  // 引きで見たときの太さ上限（モデル高比）
-    partCap:.18,    // 小パーツの太さ上限（パーツ半径比）
-    minPart:.055,   // これ未満の小メッシュには線を出さない（モデル高比、髪は除く）
-    color:0x171a26,
+    screen:.0008, maxFrac:.0026, partCap:.18, minPart:.055,
+    color:0x171a26,                    // 色トレスOFF時の線色
+  };
+  const TRACE={                         // 色トレスON時の部位別の線色
+    hair:0x1a1f3d,   // 髪：濃紺
+    skin:0x7a4a3c,   // 肌：赤茶
+    cloth:0x1c2240,  // 服：紺
+    dark:0x14161f,   // タイツ：ほぼ黒
+    shoes:0x2e1d12,  // 靴：焦茶
   };
   // =====================================================================
 
@@ -185,6 +209,10 @@
 
   const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(28,1,0.01,100);
+
+  // ノーマル（通常シェーディング）モード用のライト。自作シェーダーには影響しない
+  scene.add(new THREE.AmbientLight(0xffffff,Math.PI*.5));
+  const dirN=new THREE.DirectionalLight(0xffffff,Math.PI*.55); dirN.position.set(1.5,2.2,2.5); scene.add(dirN);
 
   const controls=new OrbitControls(camera,renderer.domElement);
   controls.enableDamping=true; controls.dampingFactor=.08;
@@ -200,8 +228,6 @@
   window.addEventListener("resize",resize);
 
   // ============ アニメ調カスタムシェーダー ============
-  // テクスチャの色をそのまま基準に、影＝乗算(レベル×色ティント)、
-  // セル境界はわずかにソフト、影側にリムライト。2Dの「乗算レイヤー」と同じ感覚のsRGB空間演算。
   const VERT=`
     varying vec3 vN; varying vec3 vW; varying vec2 vUv;
     void main(){
@@ -220,33 +246,36 @@
       vec4 base=mix(vec4(baseColor,1.0),texture2D(map,vUv),useMap);
       vec3 N=normalize(vN); if(!gl_FrontFacing) N=-N;
       vec3 V=normalize(cameraPosition-vW);
-      float d=dot(N,normalize(uLightDir))*.5+.5;                 // half-Lambert
+      float d=dot(N,normalize(uLightDir))*.5+.5;
       float shade=smoothstep(uThreshold-uSoft,uThreshold+uSoft,d);
-      shade=mix(shade,1.0,uLift);                                 // 顔などは影を持ち上げ
-      vec3 shadowCol=base.rgb*uLevel*uTint;                       // 色付き乗算の影
+      shade=mix(shade,1.0,uLift);
+      vec3 shadowCol=base.rgb*uLevel*uTint;
       vec3 col=mix(shadowCol,base.rgb,shade);
       float fres=pow(1.0-clamp(dot(N,V),0.0,1.0),3.0);
-      col+=uRimColor*(fres*uRim*(0.35+0.65*(1.0-shade)));         // 影側で強いリム
+      col+=uRimColor*(fres*uRim*(0.35+0.65*(1.0-shade)));
       gl_FragColor=vec4(col,base.a);
     }`;
 
-  const toonMats=[];
+  const toonMats=[], outlineMats=[], outlines=[];
+  let modelRef=null;
   const white1x1=new THREE.DataTexture(new Uint8Array([255,255,255,255]),1,1); white1x1.needsUpdate=true;
+
   function makeToon(albedoTex, solidColor, prm){
-    if(albedoTex){ albedoTex.colorSpace=THREE.NoColorSpace; albedoTex.needsUpdate=true; }
+    let tex=null;
+    if(albedoTex){ tex=albedoTex.clone(); tex.colorSpace=THREE.NoColorSpace; tex.needsUpdate=true; } // 元テクスチャは触らない（ノーマルモード用に維持）
     const mat=new THREE.ShaderMaterial({
       vertexShader:VERT, fragmentShader:FRAG, side:THREE.DoubleSide,
       uniforms:{
-        map:{value:albedoTex||white1x1}, useMap:{value:albedoTex?1:0},
+        map:{value:tex||white1x1}, useMap:{value:tex?1:0},
         baseColor:{value:new THREE.Color().fromArray(solidColor||[1,1,1])},
         uLightDir:{value:new THREE.Vector3(0,1,1)},
         uLevel:{value:prm.level}, uTint:{value:new THREE.Color().fromArray(prm.tint)},
         uRim:{value:prm.rim}, uRimColor:{value:new THREE.Color().fromArray(RIM_COLOR)},
-        uLift:{value:prm.lift}, uThreshold:{value:THRESHOLD}, uSoft:{value:SOFT},
+        uLift:{value:prm.lift}, uThreshold:{value:.46}, uSoft:{value:SOFT},
       }});
+    mat.userData.baseLevel=prm.level;
     toonMats.push(mat); return mat;
   }
-  // マテリアル名 → パラメータ種別
   function paramsFor(name){
     if(name==="Face")return TUNE.face;
     if(name==="Body")return TUNE.skin;
@@ -254,6 +283,13 @@
     if(name==="tex_body")return TUNE.dark;
     if(name==="制服"||name==="tex_uniform.001")return TUNE.cloth;
     return TUNE.cloth;
+  }
+  function traceColorFor(name){
+    if(name==="tex_hair")return TRACE.hair;
+    if(name==="Face"||name==="Body")return TRACE.skin;
+    if(name==="tex_body")return TRACE.dark;
+    if(name==="shoes")return TRACE.shoes;
+    return TRACE.cloth;
   }
   function convert(src){
     if(src.name==="highlight") return new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide});
@@ -266,19 +302,17 @@
     return makeToon(albedo, solid, paramsFor(src.name));
   }
 
-  // 背面法アウトライン（自作シェーダー）
-  // 太さは「画面上で一定」：カメラからの距離に比例して世界空間の幅を変える。
-  // 寄ると細く・引くと太くなり過ぎない（oMaxで上限）＝指や顔で太らない。
-  function outlineMat(cap){
-    return new THREE.ShaderMaterial({
+  // 背面法アウトライン（画面上で一定太さ・頂点カラーRで太さマスク）
+  function outlineMat(cap, traceHex){
+    const m=new THREE.ShaderMaterial({
       side:THREE.BackSide,
-      uniforms:{oScreen:{value:OUTLINE.screen},oMax:{value:cap},oColor:{value:new THREE.Color(OUTLINE.color)}},
+      uniforms:{oScreen:{value:OUTLINE.screen},oMax:{value:cap},oColor:{value:new THREE.Color(traceHex)}},
       vertexShader:`
         uniform float oScreen; uniform float oMax;
         void main(){
           float mask=1.0;
           #ifdef USE_COLOR
-            mask=color.r;   // 頂点カラーR＝線の太さ倍率（黒＝線なし）
+            mask=color.r;
           #endif
           vec4 mv=modelViewMatrix*vec4(position,1.0);
           float w=min(oScreen*max(-mv.z,0.0),oMax)*mask;
@@ -289,49 +323,45 @@
         uniform vec3 oColor;
         void main(){ gl_FragColor=vec4(oColor,1.0); }`
     });
+    m.userData.trace=new THREE.Color(traceHex);
+    m.userData.base=new THREE.Color(OUTLINE.color);
+    outlineMats.push(m); return m;
   }
 
   const loader=new GLTFLoader();
   loader.load("Taigei_figure.glb",(gltf)=>{
-    const model=gltf.scene;
+    const model=gltf.scene; modelRef=model;
     const box=new THREE.Box3().setFromObject(model);
     const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
     const maxDim=Math.max(size.x,size.y,size.z);
-    // three.js は読み込み時に名前から「.」等を除去するため（body.001→body001）、
-    // 正規化した名前で、親ノードまで遡って照合する
+
     const normName=(n)=>String(n||"").replace(/[^0-9A-Za-z_ぁ-んァ-ヶ一-龠]/g,"");
-    const NO_OUTLINE=["tongue","body001"]; // 口内・目や眉のオーバーレイには線を出さない
+    const NO_OUTLINE=["tongue","body001"];
     const isExcluded=(o)=>{
-      for(let cur=o;cur;cur=cur.parent){
-        const nn=normName(cur.name);
-        if(NO_OUTLINE.includes(nn))return true;
-      }
+      for(let cur=o;cur;cur=cur.parent){ if(NO_OUTLINE.includes(normName(cur.name)))return true; }
       return false;
     };
     model.updateMatrixWorld(true);
-    const outlines=[];
     const tmpS=new THREE.Vector3();
-    const dbg=[];
     model.traverse((o)=>{
       if(!o.isMesh)return;
-      const matName=(o.material&&o.material.name)||"";
-      o.material=convert(o.material);
+      const orig=o.material, matName=(orig&&orig.name)||"";
+      o.userData.matOrig=orig;
+      o.userData.matToon=convert(orig);
+      o.material=o.userData.matToon;
+      if(matName==="highlight")return;
+      if(matName==="")return;
+      if(isExcluded(o))return;
       if(!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
       o.getWorldScale(tmpS);
       const r=o.geometry.boundingSphere.radius*Math.max(tmpS.x,tmpS.y,tmpS.z);
-      dbg.push(o.name+"("+matName+", r="+r.toFixed(3)+")");
-      if(matName==="highlight")return;      // 瞳ハイライト
-      if(matName==="")return;               // マテリアル無しの装飾片（服の白い破線トリム等）
-      if(isExcluded(o))return;              // 口内・顔パーツのオーバーレイ
-      // 白目など極小の顔パーツには線を出さない（髪の房は対象外）
       if(r<maxDim*OUTLINE.minPart && matName!=="tex_hair")return;
       const cap=Math.min(maxDim*OUTLINE.maxFrac, r*OUTLINE.partCap);
-      const om=outlineMat(cap);
-      if(o.geometry.attributes.color) om.vertexColors=true; // 頂点カラーがあれば太さマスクに使う
+      const om=outlineMat(cap, traceColorFor(matName));
+      if(o.geometry.attributes.color) om.vertexColors=true;
       const ol=new THREE.Mesh(o.geometry,om); ol.renderOrder=-1;
       outlines.push([o,ol]);
     });
-    console.log("[taigei] meshes:",dbg.join(" / "));
     outlines.forEach(([o,ol])=>o.add(ol));
     scene.add(model);
 
@@ -342,6 +372,8 @@
                         center.z+dist*Math.cos(20*Math.PI/180));
     camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
     controls.update();
+
+    applyMode(); applyTrace(); applyShadow();   // UIの現在値を反映
     spin.classList.add("off");
   },(e)=>{
     if(e&&e.total){ spinTxt.textContent="読み込み中 "+Math.round(100*e.loaded/e.total)+"%"; }
@@ -349,18 +381,53 @@
     spinTxt.textContent="読み込みに失敗しました"; console.error(err);
   });
 
-  // ライトはカメラに追従（正面やや右上から）＝どの角度でもフロントが明るいアーケード式
+  // ============ 比較UI ============
+  const modeBtns=[...document.querySelectorAll("#tv-mode button")];
+  const chkTrace=document.getElementById("tv-trace");
+  const rng=document.getElementById("tv-shadow"), rngVal=document.getElementById("tv-shadow-val");
+  const traceW=document.getElementById("tv-trace-w"), shadowW=document.getElementById("tv-shadow-w");
+  let mode="toon";
+
+  function applyMode(){
+    if(modelRef){
+      modelRef.traverse(o=>{ if(o.isMesh&&o.userData.matToon){ o.material=(mode==="toon")?o.userData.matToon:o.userData.matOrig; }});
+      outlines.forEach(([o,ol])=>ol.visible=(mode==="toon"));
+    }
+    modeBtns.forEach(b=>b.classList.toggle("on",b.dataset.mode===mode));
+    traceW.classList.toggle("dim",mode!=="toon");
+    shadowW.classList.toggle("dim",mode!=="toon");
+  }
+  function applyTrace(){
+    const on=chkTrace.checked;
+    for(const m of outlineMats) m.uniforms.oColor.value.copy(on?m.userData.trace:m.userData.base);
+  }
+  function applyShadow(){
+    const v=+rng.value; rngVal.textContent=v;
+    const t=v/100;
+    const th=0.30+0.34*t;                 // 影の面積（しきい値）
+    const sc=Math.min(t*1.7,1.9);         // 影の濃さのスケール
+    for(const m of toonMats){
+      m.uniforms.uThreshold.value=th;
+      const base=m.userData.baseLevel;
+      m.uniforms.uLevel.value=Math.max(.35, 1-(1-base)*sc);
+    }
+  }
+  modeBtns.forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode; applyMode();}));
+  chkTrace.addEventListener("change",applyTrace);
+  rng.addEventListener("input",applyShadow);
+
+  // ライトはカメラに追従（正面やや右上）＝どの角度でもフロントが明るい
   const L=new THREE.Vector3(), R=new THREE.Vector3();
   function updateLight(){
-    L.copy(camera.position).sub(controls.target).normalize();      // 正面方向
-    R.setFromMatrixColumn(camera.matrixWorld,0);                   // カメラの右
-    L.addScaledVector(R,.45).addScaledVector(new THREE.Vector3(0,1,0),.55).normalize();
+    L.copy(camera.position).sub(controls.target).normalize();
+    R.setFromMatrixColumn(camera.matrixWorld,0);
+    L.addScaledVector(R,.6).addScaledVector(new THREE.Vector3(0,1,0),.5).normalize();
     for(const m of toonMats) m.uniforms.uLightDir.value.copy(L);
   }
 
   resize();
   renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-  <div class="buildver">build 2026.07.04 16:40 JST</div>
+  <div class="buildver">build 2026.07.04 21:42 JST</div>
 </body>
 </html>
