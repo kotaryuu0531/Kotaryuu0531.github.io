@@ -76,6 +76,12 @@
   .tv-ui input[type="range"]{accent-color:var(--amber);width:150px;cursor:pointer}
   .tv-ui .num{color:var(--amber);min-width:3ch;text-align:right}
   .tv-ui .dim{opacity:.35;pointer-events:none}
+  .tv-pad{position:relative;width:78px;height:78px;border:1px solid var(--line);border-radius:50%;cursor:grab;touch-action:none;flex:none;
+    background:radial-gradient(closest-side,#161b24 0%,#10141b 100%)}
+  .tv-pad::before,.tv-pad::after{content:"";position:absolute;background:var(--line);pointer-events:none}
+  .tv-pad::before{left:50%;top:8%;bottom:8%;width:1px}
+  .tv-pad::after{top:50%;left:8%;right:8%;height:1px}
+  .tv-pad .dot{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--amber);transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 8px rgba(233,169,76,.5)}
   .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px;line-height:1.6}
 
   /* 制作について */
@@ -132,11 +138,18 @@
         <div class="seg" id="tv-mode">
           <button data-mode="toon" class="on">トゥーン</button>
           <button data-mode="normal">ノーマル</button>
+          <button data-mode="wire">ワイヤー</button>
         </div>
         <label id="tv-trace-w"><input type="checkbox" id="tv-trace" checked> 色トレス線</label>
         <label id="tv-shadow-w">影の強さ <input type="range" id="tv-shadow" min="0" max="100" value="60"> <span class="num" id="tv-shadow-val">60</span></label>
       </div>
-      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。<br>セルルック（トゥーンシェーディング＋輪郭線）で表示する自作ビューアです。下のコントロールで、トゥーン／ノーマル（通常シェーディング）の切替、色トレス線、影の強さを比較できます。データが大きめのため、読み込みに数秒かかることがあります。</figcaption>
+      <div class="tv-ui" id="tv-light-w">
+        <span>ライト（パッドをドラッグ）</span>
+        <div class="tv-pad" id="tv-pad"><div class="dot" id="tv-dot"></div></div>
+        <span>右 <span class="num" id="tv-lx">+0.60</span> ／ 上 <span class="num" id="tv-ly">+0.50</span></span>
+        <label>明るさ <input type="range" id="tv-bright" min="70" max="130" value="100"> <span class="num" id="tv-bright-val">100</span>%</label>
+      </div>
+      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。<br>セルルック（トゥーンシェーディング＋輪郭線）で表示する自作ビューアです。下のコントロールで、トゥーン／ノーマル／ワイヤーの切替、色トレス線、影の強さ、ライトの向き（パッドをドラッグ）と明るさを試せます。データが大きめのため、読み込みに数秒かかることがあります。</figcaption>
     </div>
 
     <!-- 制作について -->
@@ -192,12 +205,12 @@
     screen:.0008, maxFrac:.0026, partCap:.18, minPart:.055,
     color:0x171a26,                    // 色トレスOFF時の線色
   };
-  const TRACE={                         // 色トレスON時の部位別の線色
-    hair:0x1a1f3d,   // 髪：濃紺
-    skin:0x7a4a3c,   // 肌：赤茶
-    cloth:0x1c2240,  // 服：紺
-    dark:0x14161f,   // タイツ：ほぼ黒
-    shoes:0x2e1d12,  // 靴：焦茶
+  const TRACE={                         // 色トレスON時の部位別の線色（はっきり色味を出す）
+    hair:0x232c5e,   // 髪：青紺
+    skin:0xa5654f,   // 肌：明るい赤茶
+    cloth:0x3a4370,  // 服：やわらかい紺
+    dark:0x2b2e40,   // タイツ：青灰
+    shoes:0x6e4326,  // 靴：焦茶
   };
   // =====================================================================
 
@@ -240,7 +253,7 @@
     uniform sampler2D map; uniform float useMap; uniform vec3 baseColor;
     uniform vec3 uLightDir; uniform float uLevel; uniform vec3 uTint;
     uniform float uRim; uniform vec3 uRimColor; uniform float uLift;
-    uniform float uThreshold; uniform float uSoft;
+    uniform float uThreshold; uniform float uSoft; uniform float uBright;
     varying vec3 vN; varying vec3 vW; varying vec2 vUv;
     void main(){
       vec4 base=mix(vec4(baseColor,1.0),texture2D(map,vUv),useMap);
@@ -250,7 +263,7 @@
       float shade=smoothstep(uThreshold-uSoft,uThreshold+uSoft,d);
       shade=mix(shade,1.0,uLift);
       vec3 shadowCol=base.rgb*uLevel*uTint;
-      vec3 col=mix(shadowCol,base.rgb,shade);
+      vec3 col=mix(shadowCol,base.rgb*uBright,shade);
       float fres=pow(1.0-clamp(dot(N,V),0.0,1.0),3.0);
       col+=uRimColor*(fres*uRim*(0.35+0.65*(1.0-shade)));
       gl_FragColor=vec4(col,base.a);
@@ -258,6 +271,7 @@
 
   const toonMats=[], outlineMats=[], outlines=[];
   let modelRef=null;
+  const wireMat=new THREE.MeshBasicMaterial({wireframe:true,color:0xE9A94C}); // ワイヤー表示（琥珀）
   const white1x1=new THREE.DataTexture(new Uint8Array([255,255,255,255]),1,1); white1x1.needsUpdate=true;
 
   function makeToon(albedoTex, solidColor, prm){
@@ -271,7 +285,7 @@
         uLightDir:{value:new THREE.Vector3(0,1,1)},
         uLevel:{value:prm.level}, uTint:{value:new THREE.Color().fromArray(prm.tint)},
         uRim:{value:prm.rim}, uRimColor:{value:new THREE.Color().fromArray(RIM_COLOR)},
-        uLift:{value:prm.lift}, uThreshold:{value:.46}, uSoft:{value:SOFT},
+        uLift:{value:prm.lift}, uThreshold:{value:.46}, uSoft:{value:SOFT}, uBright:{value:1.0},
       }});
     mat.userData.baseLevel=prm.level;
     toonMats.push(mat); return mat;
@@ -373,7 +387,7 @@
     camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
     controls.update();
 
-    applyMode(); applyTrace(); applyShadow();   // UIの現在値を反映
+    applyMode(); applyTrace(); applyShadow(); applyBright();   // UIの現在値を反映
     spin.classList.add("off");
   },(e)=>{
     if(e&&e.total){ spinTxt.textContent="読み込み中 "+Math.round(100*e.loaded/e.total)+"%"; }
@@ -386,16 +400,51 @@
   const chkTrace=document.getElementById("tv-trace");
   const rng=document.getElementById("tv-shadow"), rngVal=document.getElementById("tv-shadow-val");
   const traceW=document.getElementById("tv-trace-w"), shadowW=document.getElementById("tv-shadow-w");
+  const lightW=document.getElementById("tv-light-w");
+  const pad=document.getElementById("tv-pad"), dot=document.getElementById("tv-dot");
+  const lxEl=document.getElementById("tv-lx"), lyEl=document.getElementById("tv-ly");
+  const rngB=document.getElementById("tv-bright"), rngBVal=document.getElementById("tv-bright-val");
   let mode="toon";
+  const lightOff={x:.60,y:.50};   // ライトのオフセット（カメラ基準：右・上）★デフォルトはここ
+  const PAD_RANGE=1.5;
+
+  function updatePadUI(){
+    dot.style.left=((lightOff.x/PAD_RANGE)+1)/2*100+"%";
+    dot.style.top =((-lightOff.y/PAD_RANGE)+1)/2*100+"%";
+    lxEl.textContent=(lightOff.x>=0?"+":"")+lightOff.x.toFixed(2);
+    lyEl.textContent=(lightOff.y>=0?"+":"")+lightOff.y.toFixed(2);
+  }
+  function padFromEvent(e){
+    const r=pad.getBoundingClientRect();
+    let nx=((e.clientX-r.left)/r.width)*2-1, ny=((e.clientY-r.top)/r.height)*2-1;
+    nx=Math.max(-1,Math.min(1,nx)); ny=Math.max(-1,Math.min(1,ny));
+    lightOff.x=+(nx*PAD_RANGE).toFixed(2); lightOff.y=+(-ny*PAD_RANGE).toFixed(2);
+    updatePadUI();
+  }
+  let padDrag=false;
+  pad.addEventListener("pointerdown",e=>{padDrag=true;pad.setPointerCapture(e.pointerId);padFromEvent(e);});
+  pad.addEventListener("pointermove",e=>{if(padDrag)padFromEvent(e);});
+  pad.addEventListener("pointerup",()=>{padDrag=false;});
+  pad.addEventListener("pointercancel",()=>{padDrag=false;});
+
+  function applyBright(){
+    const v=+rngB.value; rngBVal.textContent=v;
+    for(const m of toonMats) m.uniforms.uBright.value=v/100;
+  }
+  rngB.addEventListener("input",applyBright);
+  updatePadUI();
 
   function applyMode(){
     if(modelRef){
-      modelRef.traverse(o=>{ if(o.isMesh&&o.userData.matToon){ o.material=(mode==="toon")?o.userData.matToon:o.userData.matOrig; }});
+      modelRef.traverse(o=>{ if(o.isMesh&&o.userData.matToon){
+        o.material=(mode==="toon")?o.userData.matToon:(mode==="normal")?o.userData.matOrig:wireMat;
+      }});
       outlines.forEach(([o,ol])=>ol.visible=(mode==="toon"));
     }
     modeBtns.forEach(b=>b.classList.toggle("on",b.dataset.mode===mode));
     traceW.classList.toggle("dim",mode!=="toon");
     shadowW.classList.toggle("dim",mode!=="toon");
+    lightW.classList.toggle("dim",mode!=="toon");
   }
   function applyTrace(){
     const on=chkTrace.checked;
@@ -421,13 +470,13 @@
   function updateLight(){
     L.copy(camera.position).sub(controls.target).normalize();
     R.setFromMatrixColumn(camera.matrixWorld,0);
-    L.addScaledVector(R,.6).addScaledVector(new THREE.Vector3(0,1,0),.5).normalize();
+    L.addScaledVector(R,lightOff.x).addScaledVector(new THREE.Vector3(0,1,0),lightOff.y).normalize();
     for(const m of toonMats) m.uniforms.uLightDir.value.copy(L);
   }
 
   resize();
   renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-  <div class="buildver">build 2026.07.04 21:42 JST</div>
+  <div class="buildver">build 2026.07.04 21:58 JST</div>
 </body>
 </html>
