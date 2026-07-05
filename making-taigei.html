@@ -90,6 +90,38 @@
   .about p{color:var(--ink-mut);font-size:15px;line-height:1.7;margin-bottom:14px}
   .about p:last-child{margin-bottom:0}
 
+  /* ヒーロー画像・特集セクション・画像グリッド */
+  .heroimg{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;margin-top:clamp(26px,4vh,42px);
+    border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in}
+  .feature{margin-top:clamp(30px,5vh,48px);border-top:1px solid var(--line);padding-top:clamp(26px,4vh,40px)}
+  .feature .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:12px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(21px,2.8vw,32px);line-height:1.16;margin-bottom:14px}
+  .feature p{color:var(--ink-mut);font-size:15px;line-height:1.7}
+  .feature p+p{margin-top:12px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  .feature a:hover{border-color:var(--amber)}
+  .g{display:grid;gap:12px;margin-top:18px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .g img{width:100%;display:block;border:1px solid var(--line);border-radius:var(--r);background:#0c0f14;cursor:zoom-in;transition:opacity .2s}
+  .g img:hover{opacity:.9}
+  .figcap{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.05em;color:var(--ink-mut);margin-top:10px;line-height:1.6}
+  @media(max-width:680px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:430px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .lightbox{position:fixed;inset:0;z-index:90;background:rgba(5,7,10,.93);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lightbox .lb-cap{position:absolute;left:18px;bottom:14px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-mut)}
+  .lb-nav{position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(10,13,18,.65);
+    color:var(--ink);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+  .lb-nav:hover{border-color:var(--amber);color:var(--amber)}
+  .lb-l{left:14px;top:50%;transform:translateY(-50%)}
+  .lb-r{right:14px;top:50%;transform:translateY(-50%)}
+  .lb-u{top:14px;left:50%;transform:translateX(-50%) rotate(90deg)}
+  .lb-d{bottom:14px;left:50%;transform:translateX(-50%) rotate(-90deg)}
+  .lightbox.plain .lb-nav{display:none}
+
   /* スペック */
   .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
   .spec{margin:0 0 clamp(8px,2vh,16px)}
@@ -122,12 +154,14 @@
   </header>
 
   <main class="wrap">
-    <div class="eyebrow">3D CHARACTER — 非公式ファンアート</div>
+    <div class="eyebrow">FAN 3D — 艦これ「大鯨」/ 2020</div>
     <h1><span class="nb">大鯨（Taigei）</span> <span class="nb">3Dモデル</span></h1>
-    <div class="subtitle">『艦隊これくしょん -艦これ-』のキャラクターを題材にしたファンアート</div>
+    <div class="subtitle">独学で学んだキャラモデリングの、アニメ調の最高到達点</div>
     <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=モデリング">モデリング</a><a class="htag" href="works.html?tags=キャラクター">キャラクター</a></div>
-    <p class="lead">『艦隊これくしょん -艦これ-』のキャラクター「大鯨」を題材に制作した、非公式のファンアート3Dモデルです。モデリングとテクスチャを担当しました。ドラッグで自由に回して見られます。</p>
+    <p class="lead">『艦隊これくしょん -艦これ-』の「大鯨」を題材にした、非公式ファンアートの3Dキャラクターモデルです。高校1年の秋、YouTubeのキャラモデリング講座を視聴しながら独学でキャラモデリングに挑み、モデリングからUV・テクスチャ・リギングまで、一体をまるごと完成させました。アニメ調の制作物としては、いまも自分の最高クオリティの一体です。2026年、ポートフォリオ化にあわせて首より下の胴体の差し替え・リテクスチャ・表示の更新まで改修しています。下のビューアで自由に回せます。</p>
     <div class="disclaimer">本作は個人制作の<strong>非公式ファンアート</strong>です。キャラクター「大鯨」および『艦隊これくしょん -艦これ-』のデザイン・著作権は原作者および運営（DMM GAMES／KADOKAWA 等）に帰属します。キャラクターデザインを自作したものではありません。</div>
+
+    <img class="heroimg rv" src="taigei-hero.jpg" alt="大鯨 3Dモデル トゥーンシェーダーのビューティーレンダー">
 
     <!-- インタラクティブ3Dビューア（自前 three.js トゥーンビューア） -->
     <div class="viewer rv">
@@ -141,32 +175,152 @@
           <button data-mode="wire">ワイヤー</button>
         </div>
         <label id="tv-trace-w"><input type="checkbox" id="tv-trace" checked> 色トレス線</label>
-        <label id="tv-shadow-w">影の強さ <input type="range" id="tv-shadow" min="0" max="100" value="60"> <span class="num" id="tv-shadow-val">60</span></label>
+        <label id="tv-shadow-w">影の強さ <input type="range" id="tv-shadow" min="0" max="100" value="71"> <span class="num" id="tv-shadow-val">71</span></label>
       </div>
       <div class="tv-ui" id="tv-light-w">
         <span>ライト（パッドをドラッグ）</span>
         <div class="tv-pad" id="tv-pad"><div class="dot" id="tv-dot"></div></div>
-        <span>右 <span class="num" id="tv-lx">+0.60</span> ／ 上 <span class="num" id="tv-ly">+0.50</span></span>
+        <span>右 <span class="num" id="tv-lx">+1.04</span> ／ 上 <span class="num" id="tv-ly">+0.48</span></span>
         <label>明るさ <input type="range" id="tv-bright" min="70" max="130" value="100"> <span class="num" id="tv-bright-val">100</span>%</label>
       </div>
-      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。<br>セルルック（トゥーンシェーディング＋輪郭線）で表示する自作ビューアです。下のコントロールで、トゥーン／ノーマル／ワイヤーの切替、色トレス線、影の強さ、ライトの向き（パッドをドラッグ）と明るさを試せます。データが大きめのため、読み込みに数秒かかることがあります。</figcaption>
+      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。<br>ワイヤーフレーム表示は、実際のワイヤーとわずかに異なる場合があります。</figcaption>
     </div>
 
     <!-- 制作について -->
-    <section class="about rv">
-      <h2>このモデルについて</h2>
-      <p>アニメ調のキャラクターを立体に起こす練習として制作したモデルです。髪・顔・ボディ・制服をそれぞれ分けてUV展開し、テクスチャを描き分けています。ビューアは three.js ＋自作シェーダーによるセルルック表示です。肌は暖色・髪や服は寒色と、パーツごとに色味を変えたセル調の影、影側に乗る青白いリムライト、背面法の輪郭線を重ねて、アーケードゲームの立ち絵のような見た目のまま回せるようにしています。</p>
+    <!-- 4アングル -->
+    <section class="feature rv">
+      <div class="lbl">TURNAROUND</div>
+      <h3>基本ポーズ・4アングル</h3>
+      <p>トゥーンシェーダー適用のマテリアルプレビュー。4アングルとも平行投影（オルソ）で撮っています。</p>
+      <div class="g g4">
+        <img src="taigei-new-mat-front.jpg" alt="大鯨 正面" loading="lazy">
+        <img src="taigei-new-mat-34.jpg" alt="大鯨 斜め" loading="lazy">
+        <img src="taigei-new-mat-side.jpg" alt="大鯨 側面" loading="lazy">
+        <img src="taigei-new-mat-back.jpg" alt="大鯨 背面" loading="lazy">
+      </div>
+    </section>
+
+    <!-- 表情 -->
+    <section class="feature rv">
+      <div class="lbl">FACIAL</div>
+      <h3>表情は、すべてボーンで動かす</h3>
+      <p>表情はシェイプキーではなく、すべてボーンで制御しています。まぶたの全開から半目・閉じまでの全域、眉、口の開閉、そしてウインクの左右非対称——リグの可動域を4つの表情で。</p>
+      <div class="g g4">
+        <img src="taigei-face-smile.jpg" alt="笑顔" data-atlas="face" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-face-surprise.jpg" alt="驚き" data-atlas="face" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-face-wink.jpg" alt="ウインク" data-atlas="face" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-face-pout.jpg" alt="むくれ顔" data-atlas="face" data-r="0" data-c="3" loading="lazy">
+      </div>
+      <p class="figcap">笑顔／驚き／ウインク／むくれ顔。拡大中は ←→ で切替。</p>
+    </section>
+
+    <!-- リファレンス -->
+    <section class="feature rv">
+      <div class="lbl">REFERENCE</div>
+      <h3>再現の目標は、アーケードの立ち絵</h3>
+      <p>制作当時に参考にしていたのは、『艦これアーケード』の大鯨です。ゲーム画面を何度も見返しながら、髪の房の流れやセーラー服のシルエットを立体に起こしていきました。上段がリファレンス、下段が自作モデルです。</p>
+      <div class="g g2">
+        <img src="taigei-ref-front.jpg" alt="リファレンス｜正面（『艦これアーケード』ゲーム画面）" data-atlas="ref" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-ref-side.jpg" alt="リファレンス｜側面（『艦これアーケード』ゲーム画面）" data-atlas="ref" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-new-mat-front.jpg" alt="自作モデル｜正面" data-atlas="ref" data-r="1" data-c="0" loading="lazy">
+        <img src="taigei-new-mat-side.jpg" alt="自作モデル｜側面" data-atlas="ref" data-r="1" data-c="1" loading="lazy">
+      </div>
+      <p class="figcap">上段は『艦隊これくしょん -艦これ- アーケード』ゲーム画面より引用（権利は各権利者に帰属します）。下段＝自作モデル。拡大中は ←→＝アングル、↑↓＝リファレンス⇄自作。</p>
+    </section>
+
+    <!-- テクスチャ & UV -->
+    <section class="feature rv">
+      <div class="lbl">TEXTURE / UV</div>
+      <h3>手描きテクスチャと、UV</h3>
+      <p>テクスチャは4枚（顔／体／制服／髪）、マテリアルは5つ——テクスチャ4種に、瞳のハイライト用を加えた構成です。Procreateで手描きし、肌は血色と寒色の影の重ねが見せ場。UVは、テクスチャを手描きする前提で、島の整理と描きやすさを優先して展開しています。</p>
+      <div class="g g3">
+        <img src="taigei-tex-face.jpg" alt="顔｜テクスチャ" data-atlas="tuv" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-uv-face.jpg" alt="顔｜UV" data-atlas="tuv" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-uvtex-face.jpg" alt="顔｜UV重ね" data-atlas="tuv" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-tex-body.jpg" alt="体｜テクスチャ" data-atlas="tuv" data-r="1" data-c="0" loading="lazy">
+        <img src="taigei-uv-body.jpg" alt="体｜UV" data-atlas="tuv" data-r="1" data-c="1" loading="lazy">
+        <img src="taigei-uvtex-body.jpg" alt="体｜UV重ね" data-atlas="tuv" data-r="1" data-c="2" loading="lazy">
+        <img src="taigei-tex-uniform.jpg" alt="制服｜テクスチャ" data-atlas="tuv" data-r="2" data-c="0" loading="lazy">
+        <img src="taigei-uv-uniform.jpg" alt="制服｜UV" data-atlas="tuv" data-r="2" data-c="1" loading="lazy">
+        <img src="taigei-uvtex-uniform.jpg" alt="制服｜UV重ね" data-atlas="tuv" data-r="2" data-c="2" loading="lazy">
+      </div>
+      <p class="figcap">縦＝顔／体／制服、横＝テクスチャ／UV／UV重ね。拡大中は ←→＝表示の切替、↑↓＝パーツの切替（画面のボタンでも操作できます）。</p>
+      <div class="g g3">
+        <img src="taigei-tex-hair.jpg" alt="髪テクスチャ" loading="lazy">
+      </div>
+      <p class="figcap">髪テクスチャ（カーブ由来・共通の正方UV）。</p>
+    </section>
+
+    <!-- トポロジー -->
+    <section class="feature rv">
+      <div class="lbl">TOPOLOGY</div>
+      <h3>ワイヤーフレーム（すべてサブディビジョン適用前のケージ）</h3>
+      <p>ワイヤーはサブディビジョンサーフェスを適用する前のケージで見せています——手で組んだ割りそのものです。着衣の下にも破綻のない土台の人体が通っています。</p>
+      <div class="g g3">
+        <img src="taigei-cloth-wire-front.jpg" alt="着衣｜正面" data-atlas="wire" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-cloth-wire-side.jpg" alt="着衣｜側面" data-atlas="wire" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-cloth-wire-back.jpg" alt="着衣｜背面" data-atlas="wire" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-wire-front.jpg" alt="土台ボディ｜正面" data-atlas="wire" data-r="1" data-c="0" loading="lazy">
+        <img src="taigei-wire-side.jpg" alt="土台ボディ｜側面" data-atlas="wire" data-r="1" data-c="1" loading="lazy">
+        <img src="taigei-wire-back.jpg" alt="土台ボディ｜背面" data-atlas="wire" data-r="1" data-c="2" loading="lazy">
+        <img src="taigei-face-wire.jpg" alt="顔のループ（平たい眼球方式）" data-atlas="wire" data-r="2" data-c="0" loading="lazy">
+        <img src="taigei-hand-wire-back.jpg" alt="手の甲" data-atlas="wire" data-r="2" data-c="1" loading="lazy">
+        <img src="taigei-hand-wire-palm.jpg" alt="手のひら" data-atlas="wire" data-r="2" data-c="2" loading="lazy">
+      </div>
+      <p class="figcap">上段＝着衣、中段＝土台ボディ（各 正面／側面／背面）、下段＝顔・手の甲・手のひら。拡大中は ←→↑↓ で切替。</p>
+    </section>
+
+    <!-- Before/After -->
+    <section class="feature rv">
+      <div class="lbl">BEFORE / AFTER</div>
+      <h3>2026年の、ブラッシュアップ</h3>
+      <p>本体はあくまで2020年の作品ですが、ポートフォリオ化にあたって2026年に改修しました。差し替えた胴体（首より下の素体メッシュ）v2は、2024年に別のキャラクターを作った際、大鯨の素体を元に改良して作ったもの。<strong>首の接続頂点数を変えずに</strong>作ってあったため、今回そのまま差し替えることができました——接続部の規格を揃えておくと、胴体が資産として使い回せる、という設計の恩恵です。あわせてテクスチャも描き直しています。</p>
+      <div class="g g2">
+        <img src="taigei-old-wire-front.jpg" alt="素体v1 ワイヤー（Before）" loading="lazy">
+        <img src="taigei-wire-front.jpg" alt="素体v2 ワイヤー（After）" loading="lazy">
+      </div>
+      <p class="figcap">素体ワイヤー：左＝v1（2020）／右＝v2（2024）。トポロジーの整理。</p>
+      <div class="g g2">
+        <img src="taigei-old-flat-front.jpg" alt="旧フラット表示（Before）" loading="lazy">
+        <img src="taigei-new-flat-front.jpg" alt="新フラット表示（After）" loading="lazy">
+      </div>
+      <p class="figcap">フラット表示：左＝旧／右＝新。塗り（テクスチャ）の進化。</p>
+      <div class="g g4">
+        <img src="taigei-old-mat-front.jpg" alt="旧｜正面" data-atlas="ba" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-old-mat-34.jpg" alt="旧｜斜め" data-atlas="ba" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-old-mat-side.jpg" alt="旧｜側面" data-atlas="ba" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-old-mat-back.jpg" alt="旧｜背面" data-atlas="ba" data-r="0" data-c="3" loading="lazy">
+        <img src="taigei-new-mat-front.jpg" alt="新｜正面" data-atlas="ba" data-r="1" data-c="0" loading="lazy">
+        <img src="taigei-new-mat-34.jpg" alt="新｜斜め" data-atlas="ba" data-r="1" data-c="1" loading="lazy">
+        <img src="taigei-new-mat-side.jpg" alt="新｜側面" data-atlas="ba" data-r="1" data-c="2" loading="lazy">
+        <img src="taigei-new-mat-back.jpg" alt="新｜背面" data-atlas="ba" data-r="1" data-c="3" loading="lazy">
+      </div>
+      <p class="figcap">マテリアルプレビュー：上段＝旧、下段＝新（トゥーンシェーダー適用）。横＝正面／斜め／側面／背面。拡大中は ←→＝アングル、↑↓＝新旧。</p>
     </section>
 
     <!-- スペック -->
     <div class="spec-head">SPEC</div>
     <dl class="spec">
-      <div class="spec-row"><dt>種別</dt><dd>3Dキャラクターモデル（非公式ファンアート）</dd></div>
-      <div class="spec-row"><dt>題材</dt><dd>『艦隊これくしょん -艦これ-』／大鯨 ※デザイン・著作権は原作に帰属</dd></div>
-      <div class="spec-row"><dt>ポリゴン</dt><dd>約6万ポリゴン（三角面換算 78,130）</dd></div>
-      <div class="spec-row"><dt>マテリアル</dt><dd>8</dd></div>
-      <div class="spec-row"><dt>テクスチャ</dt><dd>5枚（髪 1K ／ 顔・ボディ・制服 各2K ／ 制服・追加 4K）</dd></div>
-      <div class="spec-row"><dt>使用ソフト</dt><dd>Blender</dd></div>
+      <div class="spec-row"><dt>種別</dt><dd>3Dキャラクターモデル（非公式ファンアート・二次創作）</dd></div>
+      <div class="spec-row"><dt>キャラクター原案</dt><dd>『艦隊これくしょん -艦これ-』大鯨 ※デザイン・著作権は原作（DMM GAMES／KADOKAWA 等）に帰属</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>モデリング・テクスチャ・リギング・ルックデベロップメント</dd></div>
+      <div class="spec-row"><dt>頂点数／三角面</dt><dd>合計 34,671 / 68,234（サブディビジョン適用後）<br>ボディ 17,522 / 34,916<br>制服 11,011 / 21,298<br>髪 3,028 / 5,932<br>顔パーツ（目・眉・まつ毛・歯・舌）3,110 / 6,088</dd></div>
+      <div class="spec-row"><dt>リグ</dt><dd>ボーン315本（Blender上。目・口・表情もシェイプキーではなくボーンで制御／髪は物理演算用に本数多め）。ビューア用GLBはポーズを固定した静的メッシュ</dd></div>
+      <div class="spec-row"><dt>テクスチャ</dt><dd>4枚（顔・体・制服＝各2048px ／ 髪＝1024px）・マテリアル5（テクスチャ4種＋瞳のハイライト用）</dd></div>
+      <div class="spec-row"><dt>ビューア用GLB</dt><dd>28,077頂点 / 54,722三角面（服で隠れる面を削除した軽量版・アンリット）</dd></div>
+      <div class="spec-row"><dt>使用ソフト</dt><dd>Blender ／ Procreate 5.4.11</dd></div>
+      <div class="spec-row"><dt>制作期間</dt><dd>本制作 2020年9月〜2021年1月 ／ 2026年7月にポートフォリオ用へ改修（下のタイムライン参照）</dd></div>
+      <div class="spec-row"><dt>クレジット</dt><dd><a href="https://youtu.be/BBtgjTiL1XQ" target="_blank" rel="noopener">YouTubeのキャラモデリング講座</a>をベースに学習・制作。素体v2への作り直し・平たい眼球方式・UVレイアウト・肌の寒色影・アンリット運用は自分の判断による改善</dd></div>
+    </dl>
+
+    <div class="spec-head">TIMELINE</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>2020/9/14〜12/20</dt><dd>モデリング（YouTubeのキャラモデリング講座を視聴しながら学習）</dd></div>
+      <div class="spec-row"><dt>2020/12/20〜2021/1/1</dt><dd>シェーディング・UV編集・テクスチャペイント</dd></div>
+      <div class="spec-row"><dt>2021/1/2〜1/7</dt><dd>リギング</dd></div>
+      <div class="spec-row"><dt>2024/1/7〜1/8</dt><dd>胴体（首より下の素体）メッシュ v2 作成（別キャラ制作時に大鯨の素体を元に改良。首の接続頂点数は据え置き）</dd></div>
+      <div class="spec-row"><dt>2026/7/1</dt><dd>ポージング</dd></div>
+      <div class="spec-row"><dt>2026/7/3</dt><dd>テクスチャ更新・胴体を v2 へ差し替え（ポートフォリオ化のためのブラッシュアップ）</dd></div>
     </dl>
 
     <footer>
@@ -175,11 +329,61 @@
     </footer>
   </main>
 
+  <div class="lightbox" id="lightbox">
+    <img src="" alt="拡大表示">
+    <div class="lb-cap" id="lb-cap"></div>
+    <button class="lb-nav lb-l" id="lb-l" aria-label="左へ">‹</button>
+    <button class="lb-nav lb-r" id="lb-r" aria-label="右へ">›</button>
+    <button class="lb-nav lb-u" id="lb-u" aria-label="上へ">‹</button>
+    <button class="lb-nav lb-d" id="lb-d" aria-label="下へ">›</button>
+  </div>
+
 <script>
   window.addEventListener("load",()=>document.body.classList.add("ready"));
   document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
   const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
   document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // 画像のタップ拡大（data-atlas付きは縦横ナビ対応）
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img"), lbCap=document.getElementById("lb-cap");
+  const atlases={};
+  document.querySelectorAll("[data-atlas]").forEach(img=>{
+    const a=img.dataset.atlas, r=+img.dataset.r, c=+img.dataset.c;
+    if(!atlases[a])atlases[a]=[];
+    if(!atlases[a][r])atlases[a][r]=[];
+    atlases[a][r][c]=img;
+    img.addEventListener("click",()=>openAtlas(a,r,c));
+  });
+  let cur=null;
+  function showCell(){
+    const cell=atlases[cur.a][cur.r][cur.c];
+    lbImg.src=cell.src; lbCap.textContent=cell.alt||"";
+  }
+  function openAtlas(a,r,c){cur={a:a,r:r,c:c};lb.classList.remove("plain");lb.classList.add("open");showCell();}
+  function openPlain(img){cur=null;lbImg.src=img.src;lbCap.textContent=img.alt||"";lb.classList.add("open","plain");}
+  document.querySelectorAll(".g img:not([data-atlas]), .heroimg").forEach(img=>{
+    img.addEventListener("click",()=>openPlain(img));
+  });
+  function closeLb(){lb.classList.remove("open");}
+  function move(dr,dc){
+    if(!cur)return;
+    const rows=atlases[cur.a], R=rows.length;
+    let r=cur.r, c=cur.c;
+    if(dr){ do{ r=(r+dr+R)%R; }while(!rows[r]); while(!rows[r][c]&&c>0)c--; }
+    if(dc){ const C=rows[r].length; do{ c=(c+dc+C)%C; }while(!rows[r][c]); }
+    cur.r=r; cur.c=c; showCell();
+  }
+  const nav=(id,dr,dc)=>{const b=document.getElementById(id); b.addEventListener("click",e=>{e.stopPropagation();move(dr,dc);});};
+  nav("lb-l",0,-1); nav("lb-r",0,1); nav("lb-u",-1,0); nav("lb-d",1,0);
+  lb.addEventListener("click",closeLb);
+  document.addEventListener("keydown",e=>{
+    if(!lb.classList.contains("open"))return;
+    if(e.key==="Escape")closeLb();
+    else if(e.key==="ArrowLeft"){e.preventDefault();move(0,-1);}
+    else if(e.key==="ArrowRight"){e.preventDefault();move(0,1);}
+    else if(e.key==="ArrowUp"){e.preventDefault();move(-1,0);}
+    else if(e.key==="ArrowDown"){e.preventDefault();move(1,0);}
+  });
 
 </script>
 
@@ -453,7 +657,7 @@
   const lxEl=document.getElementById("tv-lx"), lyEl=document.getElementById("tv-ly");
   const rngB=document.getElementById("tv-bright"), rngBVal=document.getElementById("tv-bright-val");
   let mode="toon";
-  const lightOff={x:.60,y:.50};   // ライトのオフセット（カメラ基準：右・上）★デフォルトはここ
+  const lightOff={x:1.04,y:.48};  // ライトのオフセット（カメラ基準：右・上）★確定した既定値
   const PAD_RANGE=1.5;
 
   function updatePadUI(){
@@ -527,6 +731,6 @@
   resize();
   renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-  <div class="buildver">build 2026.07.04 22:37 JST</div>
+  <div class="buildver">build 2026.07.05 22:15 JST</div>
 </body>
 </html>
