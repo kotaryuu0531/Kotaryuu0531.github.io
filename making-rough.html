@@ -101,10 +101,16 @@
   /* 機材リスト画像・クルー写真 */
   .listimg{display:block;width:100%;margin-top:22px;border:1px solid var(--line);border-radius:var(--r);background:#fff;cursor:zoom-in}
   .fig-cap{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.05em;color:var(--ink-mut);margin-top:10px;line-height:1.5}
-  .crew{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
-  .crew img{width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in;transition:opacity .2s}
-  .crew img:hover{opacity:.9}
-  @media(max-width:560px){.crew{grid-template-columns:1fr}}
+  .crew{position:relative;margin-top:24px}
+  .crew img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in}
+  .crew .cnav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;
+    border:1px solid var(--line);background:rgba(10,13,18,.65);color:var(--ink);font-size:18px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s;z-index:2}
+  .crew .cnav:hover{border-color:var(--amber);color:var(--amber)}
+  .crew .cprev{left:12px}
+  .crew .cnext{right:12px}
+  .crew .ccount{position:absolute;right:14px;bottom:12px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;
+    color:var(--ink);background:rgba(10,13,18,.6);border:1px solid var(--line);padding:3px 10px;border-radius:100px;pointer-events:none}
   .lightbox{position:fixed;inset:0;z-index:80;background:rgba(5,7,10,.93);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
   .lightbox.open{display:flex}
   .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
@@ -157,12 +163,12 @@
       <p>機材は公演前日からレンタルし、rough の前日リハーサルに合わせて、こちらも機材チェックとリハを実施。カメラマンの動きと機材の動線を事前に細かく組み、当日は大学の友人や rough メンバーにも搬入を手伝ってもらいました。前のステージプログラムが終わってから rough の公演が始まるまで、セッティングに使える時間はわずか50分。その中で7カメを立てきり、冒頭からしっかり撮影に入ることができました。</p>
       <p>私自身はセンター後方の FX6 に B4レンズを付けたカメラで、ステージ上の「寄り」を担当。事前にもらった練習映像や前日リハの映像を何度も見返してすべてのショーケースの流れを暗記し、シミュレートしておいた“いちばんかっこいい画”を撮り続けました。自分のカメラだけでなく、各カメラマンに「ここだけは押さえてほしい」を事前ミーティングで共有したうえで、本番中も無線で指示を出しながら撮影を回しました。</p>
       <div class="crew">
-        <img src="rough-crew1.jpg" alt="三脚に立てた放送カメラで撮影するクルー" loading="lazy">
-        <img src="rough-crew4.jpg" alt="ジンバルで動きのある画を狙うクルー" loading="lazy">
-        <img src="rough-crew2.jpg" alt="ステージのダンスを撮影するクルー" loading="lazy">
-        <img src="rough-crew5.jpg" alt="本番のステージと撮影クルー" loading="lazy">
+        <img id="crew-img" src="rough-crew1.jpg" alt="三脚に立てた放送カメラで撮影するクルー">
+        <button class="cnav cprev" id="crew-prev" aria-label="前の写真">‹</button>
+        <button class="cnav cnext" id="crew-next" aria-label="次の写真">›</button>
+        <span class="ccount" id="crew-count">1 / 5</span>
       </div>
-      <p class="fig-cap">本番の撮影チーム。定点の放送カメラからジンバルまで、複数の機材でステージを多角的に捉えました。（タップで拡大）</p>
+      <p class="fig-cap">本番の撮影チーム（全5枚・左右ボタンで切替）。定点の放送カメラからジンバルまで、複数の機材でステージを多角的に捉えました。（タップで拡大）</p>
     </section>
 
     <!-- 編集 -->
@@ -215,6 +221,23 @@
   document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
   const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
   document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // 撮影クルーのカルーセル（1枚表示・左右で切替）
+  const CREW=[
+    ["rough-crew1.jpg","三脚に立てた放送カメラで撮影するクルー"],
+    ["rough-crew2.jpg","ステージのダンスを撮影するクルー"],
+    ["rough-crew3.jpg","観客越しにステージを狙う2台の放送カメラ"],
+    ["rough-crew4.jpg","ジンバルで動きのある画を狙うクルー"],
+    ["rough-crew5.jpg","本番のステージと撮影クルー"],
+  ];
+  let crewI=0;
+  const crewImg=document.getElementById("crew-img"), crewCount=document.getElementById("crew-count");
+  function crewShow(){
+    crewImg.src=CREW[crewI][0]; crewImg.alt=CREW[crewI][1];
+    crewCount.textContent=(crewI+1)+" / "+CREW.length;
+  }
+  document.getElementById("crew-prev").addEventListener("click",e=>{e.stopPropagation();crewI=(crewI-1+CREW.length)%CREW.length;crewShow();});
+  document.getElementById("crew-next").addEventListener("click",e=>{e.stopPropagation();crewI=(crewI+1)%CREW.length;crewShow();});
 
   // 機材リスト・クルー写真: タップで拡大
   const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img");

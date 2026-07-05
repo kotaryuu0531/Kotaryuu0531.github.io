@@ -7,7 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js"></script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
 <style>
   :root{
     --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
@@ -48,9 +50,21 @@
 
   /* インタラクティブ3Dビューア */
   .viewer{margin-top:clamp(26px,4vh,42px)}
-  .viewer model-viewer{width:100%;height:min(68vh,560px);display:block;touch-action:none;
-    background:radial-gradient(130% 110% at 50% 26%, #1b212a 0%, #0c0f14 72%);
-    border:1px solid var(--line);border-radius:var(--r);--poster-color:#0c0f14}
+  #gviewer{position:relative;width:100%;height:min(68vh,560px);touch-action:none;overflow:hidden;
+    background:radial-gradient(130% 110% at 50% 30%, #1b212a 0%, #0c0f14 72%);
+    border:1px solid var(--line);border-radius:var(--r)}
+  #gviewer canvas{display:block;width:100%;height:100%;outline:none}
+  #gviewer .spin{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;
+    background:rgba(10,13,18,.55);z-index:3;transition:opacity .35s}
+  #gviewer .spin.off{opacity:0;pointer-events:none}
+  #gviewer .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:gvspin 1s linear infinite}
+  #gviewer .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
+  @keyframes gvspin{to{transform:rotate(360deg)}}
+  .gv-ui{display:flex;gap:6px;margin-top:12px}
+  .gv-ui button{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;background:none;
+    border:1px solid var(--line);color:var(--ink-mut);padding:6px 14px;border-radius:100px;cursor:pointer;transition:border-color .2s,color .2s}
+  .gv-ui button:hover{border-color:var(--amber-dim)}
+  .gv-ui button.on{border-color:var(--amber);color:var(--amber)}
   .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
 
   /* 制作について */
@@ -131,11 +145,14 @@
 
     <!-- インタラクティブ3Dビューア（ヒーロー） -->
     <div class="viewer rv">
-      <model-viewer src="first3d.glb" poster="first3d-render.jpg" alt="初めてのモデリング・3Dモデル（ドラッグで回転できます）"
-        camera-controls auto-rotate auto-rotate-delay="2500" interaction-prompt="auto"
-        camera-orbit="-15deg 80deg auto" field-of-view="30deg"
-        shadow-intensity="0.7" exposure="1.05" environment-image="neutral" loading="eager"></model-viewer>
-      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。※このビューアはリグ無しの状態を表示しています。</figcaption>
+      <div id="gviewer" data-glb="first3d.glb" data-poster="first3d-render.jpg" data-angle="-15" data-fov="30" data-exposure="1.05" aria-label="初めてのモデリング・3Dモデル（ドラッグで回転できます）">
+        <div class="spin" id="gv-spin"><div class="ring"></div><div class="spin-txt" id="gv-spin-txt">読み込み中…</div></div>
+      </div>
+      <div class="gv-ui" id="gv-mode">
+        <button data-mode="normal" class="on">ノーマル</button>
+        <button data-mode="wire">ワイヤー</button>
+      </div>
+      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。※このビューアはリグ無しの状態を表示しています。ワイヤーフレーム表示は、実際のワイヤーとわずかに異なる場合があります。</figcaption>
     </div>
 
     <!-- 制作背景 -->
@@ -208,17 +225,8 @@
   lb.addEventListener("click",()=>lb.classList.remove("open"));
   document.addEventListener("keydown",e=>{if(e.key==="Escape")lb.classList.remove("open");});
 
-  // 3Dビューア：標準ズームは維持し、ホイール時のページスクロールだけ抑止（Safari対策・C方式）
-  function attachScrollGuard(el){
-    el.addEventListener("wheel",function(e){ e.preventDefault(); },{passive:false});
-  }
-  if(window.customElements){
-    customElements.whenDefined("model-viewer").then(()=>{
-      const hero=document.querySelector(".viewer model-viewer");
-      if(hero) attachScrollGuard(hero);
-    });
-  }
 
 </script>
+<script type="module" src="viewer3d.js"></script>
 </body>
 </html>
