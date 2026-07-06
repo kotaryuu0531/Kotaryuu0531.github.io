@@ -9,6 +9,7 @@ import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
 
 // ============ 大鯨トゥーンの確定既定値（making-taigei.html と同一） ============
 const TUNE={
+  generic:{level:.80, tint:[1.00,.84,.72], rim:.22, lift:0},   // 名前不一致時の既定（暖色）
   skin:  {level:.88, tint:[1.00,.87,.83], rim:.18, lift:.15},
   face:  {level:.92, tint:[1.00,.88,.85], rim:.10, lift:.55},
   hair:  {level:.74, tint:[.82,.85,1.00], rim:.34, lift:0},
@@ -23,11 +24,19 @@ const TRACE={hair:0x232c5e, skin:0xa5654f, cloth:0x3a4370, dark:0x2b2e40, shoes:
 const LIGHT_OFF={x:1.04, y:.48};      // ライトのカメラ基準オフセット（確定既定値）
 
 const VERT=`
+  #include <common>
+  #include <skinning_pars_vertex>
   varying vec3 vN; varying vec3 vW; varying vec2 vUv;
   void main(){
-    vN=normalize(mat3(modelMatrix)*normal);
-    vec4 wp=modelMatrix*vec4(position,1.0);
-    vW=wp.xyz; vUv=uv;
+    vUv=uv;
+    #include <skinbase_vertex>
+    #include <beginnormal_vertex>
+    #include <skinnormal_vertex>
+    #include <begin_vertex>
+    #include <skinning_vertex>
+    vec4 wp=modelMatrix*vec4(transformed,1.0);
+    vW=wp.xyz;
+    vN=normalize(mat3(modelMatrix)*objectNormal);
     gl_Position=projectionMatrix*viewMatrix*wp;
   }`;
 const FRAG=`
@@ -133,29 +142,37 @@ function paramsFor(name){
   if(name==="tex_hair")return TUNE.hair;
   if(name==="tex_body")return TUNE.dark;
   if(name==="制服"||name==="tex_uniform.001")return TUNE.cloth;
-  return TUNE.cloth;
+  return TUNE.generic;
 }
 function traceColorFor(name){
   if(name==="tex_hair")return TRACE.hair;
   if(name==="Face"||name==="Body")return TRACE.skin;
   if(name==="tex_body")return TRACE.dark;
   if(name==="shoes")return TRACE.shoes;
-  return TRACE.cloth;
+  if(name==="tex_uniform.001"||name==="制服")return TRACE.cloth;
+  return 0x9a4f22;   // 汎用は暗いオレンジ茶
 }
 function outlineMat(cap, traceHex){
   return new THREE.ShaderMaterial({
     side:THREE.BackSide,
     uniforms:{oScreen:{value:OUTLINE.screen},oMax:{value:cap},oColor:{value:new THREE.Color(traceHex)}},
     vertexShader:`
+      #include <common>
+      #include <skinning_pars_vertex>
       uniform float oScreen; uniform float oMax;
       void main(){
         float mask=1.0;
         #ifdef USE_COLOR
           mask=color.r;
         #endif
-        vec4 mv=modelViewMatrix*vec4(position,1.0);
+        #include <skinbase_vertex>
+        #include <beginnormal_vertex>
+        #include <skinnormal_vertex>
+        #include <begin_vertex>
+        #include <skinning_vertex>
+        vec4 mv=modelViewMatrix*vec4(transformed,1.0);
         float w=min(oScreen*max(-mv.z,0.0),oMax)*mask;
-        vec3 p=position+normalize(normal)*w;
+        vec3 p=transformed+normalize(objectNormal)*w;
         gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
       }`,
     fragmentShader:`
@@ -177,6 +194,7 @@ function toonify(model, box, list){
     if(!o.isMesh)return;
     const src=o.material, matName=(src&&src.name)||"";
     if(matName==="highlight"){ o.material=new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide}); return; }
+    if(o.isSkinnedMesh) o.frustumCulled=false;
     const albedo=src.emissiveMap||src.map||null;
     let solid=null;
     if(!albedo){
@@ -192,7 +210,10 @@ function toonify(model, box, list){
     const cap=Math.min(maxDim*OUTLINE.maxFrac, r*OUTLINE.partCap);
     const om=outlineMat(cap, traceColorFor(matName));
     if(o.geometry.attributes.color) om.vertexColors=true;
-    const ol=new THREE.Mesh(o.geometry,om); ol.renderOrder=-1;
+    let ol;
+    if(o.isSkinnedMesh){ ol=new THREE.SkinnedMesh(o.geometry,om); ol.bind(o.skeleton,o.bindMatrix); ol.frustumCulled=false; }
+    else ol=new THREE.Mesh(o.geometry,om);
+    ol.renderOrder=-1; ol.userData.isOutline=true;
     outlines.push([o,ol]);
   });
   outlines.forEach(([o,ol])=>o.add(ol));
@@ -254,12 +275,25 @@ export function open(opts){
   loader.load(opts.glb,(gltf)=>{
     const group=gltf.scene;
     const list=[];
-    const box=new THREE.Box3().setFromObject(group);
+    let box=new THREE.Box3().setFromObject(group);
     if(opts.toon) toonify(group, box, list);
     let mixer=null;
     if(gltf.animations&&gltf.animations.length){
       mixer=new THREE.AnimationMixer(group);
       mixer.clipAction(gltf.animations[0]).play();
+      // スキン変形後の実ポーズをサンプリングして動き全体を収める
+      const sampled=new THREE.Box3(), tmp=new THREE.Box3();
+      const dur=gltf.animations[0].duration;
+      for(const t of [0,.25,.5,.75,.999]){
+        mixer.setTime(t*dur); group.updateMatrixWorld(true);
+        group.traverse(o=>{
+          if(o.userData.isOutline)return;
+          if(o.isSkinnedMesh){ o.computeBoundingBox(); tmp.copy(o.boundingBox).applyMatrix4(o.matrixWorld); sampled.union(tmp); }
+          else if(o.isMesh){ if(!o.geometry.boundingBox)o.geometry.computeBoundingBox(); tmp.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); sampled.union(tmp); }
+        });
+      }
+      mixer.setTime(0);
+      box=sampled;
     }
     const entry={group, toonMats:list, isToon:!!opts.toon, box, mixer};
     cache.set(key, entry);
