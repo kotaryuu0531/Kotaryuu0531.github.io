@@ -156,7 +156,7 @@
     <h1><span class="nb">マジンザハンド</span> <span class="nb">再現してみた</span></h1>
     <div class="subtitle">『イナズマイレブン』の必殺技をBlender×実写合成で再現（非公式・ファン制作）</div>
     <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=VFX合成">VFX合成</a><a class="htag" href="works.html?tags=キャラクター">キャラクター</a></div>
-    <p class="lead">高校2年の秋に公開した、『イナズマイレブン』の必殺技「マジンザハンド」の再現VFXです。技の主役である魔神のキャラクターをBlenderでモデリングし、アニメーションを付けて、実写映像に合成しました。</p>
+    <p class="lead">高校2年の秋に公開した、『イナズマイレブン』の必殺技「マジンザハンド」の再現VFXです。技の主役であるマジンのキャラクターをBlenderでモデリングし、アニメーションを付けて、実写映像に合成しました。</p>
 
     <!-- 本編 -->
     <div class="hero-video rv" data-yt="VXNRS9tfQ_c" tabindex="0" role="button" aria-label="本編を再生">
@@ -167,7 +167,7 @@
 
     <!-- 3Dビューア -->
     <div class="viewer rv">
-      <div id="gviewer" data-glb="mazin.glb" data-poster="mazin-mat-front.jpg" data-angle="-20" data-fov="30" data-exposure="1.05" aria-label="マジンザハンドの魔神 3DCGモデル（ドラッグで回転できます）">
+      <div id="gviewer" data-glb="mazin.glb" data-poster="mazin-mat-front.jpg" data-angle="-20" data-fov="30" data-toon="1" data-elev="0.12" aria-label="マジンザハンドのマジン 3DCGモデル（ドラッグで回転できます）">
         <div class="spin" id="gv-spin"><div class="ring"></div><div class="spin-txt" id="gv-spin-txt">読み込み中…</div></div>
       </div>
       <div class="gv-ui" id="gv-mode">
@@ -181,14 +181,14 @@
     <section class="feature rv">
       <div class="lbl">SUBJECT</div>
       <h3>「マジンザハンド」を、実写で</h3>
-      <p>題材は『イナズマイレブン』の必殺キャッチ技「マジンザハンド」。ゴールキーパーの背後に巨大な魔神が現れ、その手でシュートを受け止める——あの画を、アニメの中ではなく実写の映像でやってみたい、という発想から始まった一本です（非公式・ファン制作）。</p>
+      <p>題材は『イナズマイレブン』で円堂守が使う必殺キャッチ技「マジン・ザ・ハンド」。ゴールキーパーの背後に巨大なマジンが現れ、その手でシュートを受け止める——あの画を、アニメの中ではなく実写の映像でやってみたい、という発想から始まった一本です（非公式・ファン制作）。</p>
     </section>
 
     <!-- モデリング -->
     <section class="feature rv">
       <div class="lbl">MODELING · WIREFRAME</div>
       <h3>合成カットに映る範囲を、作り切る</h3>
-      <p>魔神はゼロからのフルスクラッチ。逆立つ髪、牙を剥いた咆哮の表情、筋肉質な上半身までを、合成カットに映る範囲に絞ってモデリングしました。頂点数は39,807／三角面数は79,480。当時はサブディビジョンをレベル2で適用して書き出していたため大きめで、レベル1なら10,269／20,464に収まります。</p>
+      <p>マジンはゼロからのフルスクラッチ。逆立つ髪、牙を剥いた咆哮の表情、筋肉質な上半身までを、合成カットに映る範囲に絞ってモデリングしました。頂点数は39,807／三角面数は79,480。当時はサブディビジョンをレベル2で適用して書き出していたため大きめで、レベル1なら10,269／20,464に収まります。</p>
       <div class="grid3">
         <figure><div class="imgbox"><img src="mazin-wire-front.jpg" data-gal="wire" alt="ワイヤーフレーム・正面"></div><figcaption>FRONT</figcaption></figure>
         <figure><div class="imgbox"><img src="mazin-wire-side.jpg" data-gal="wire" alt="ワイヤーフレーム・側面"></div><figcaption>SIDE</figcaption></figure>
@@ -208,7 +208,7 @@
       <h3>1枚のテクスチャに、全身を収める</h3>
       <p>テクスチャは顔・体・髪をまとめた1枚構成。ベースの体色に、陰影と模様を直接描き込んでいます。マテリアルプレビューの3アングルで、塗りが立体にどう乗っているかを確認できます。</p>
       <div class="grid3">
-        <figure><div class="imgbox"><img src="mazin-tex.jpg" alt="魔神のテクスチャシート"></div><figcaption>TEXTURE SHEET</figcaption></figure>
+        <figure><div class="imgbox"><img src="mazin-tex.jpg" alt="マジンのテクスチャシート"></div><figcaption>TEXTURE SHEET</figcaption></figure>
       </div>
       <div class="grid3">
         <figure><div class="imgbox"><img src="mazin-mat-front.jpg" data-gal="mat" alt="マテリアルプレビュー・正面"></div><figcaption>FRONT</figcaption></figure>
@@ -221,7 +221,7 @@
     <section class="feature rv">
       <div class="lbl">ANIMATION · COMPOSITE</div>
       <h3>動かして、実写に重ねる</h3>
-      <p>モデルには29.97fps・183フレーム（約6秒）のアニメーションを付けました。魔神が技を繰り出す動きをカットに合わせて作り、実写映像に合成して1本の映像に仕上げています。</p>
+      <p>モデルには29.97fps・183フレーム（約6秒）のアニメーションを付けました。マジンが技を繰り出す動きをカットに合わせて作り、実写映像に合成して1本の映像に仕上げています。</p>
     </section>
 
     <!-- スペック -->
@@ -230,7 +230,7 @@
       <div class="spec-row"><dt>公開</dt><dd>2021年11月17日</dd></div>
       <div class="spec-row"><dt>形式</dt><dd>3DCGキャラクター＋実写合成VFX</dd></div>
       <div class="spec-row"><dt>担当</dt><dd>モデリング・テクスチャ・アニメーション・合成（個人制作）</dd></div>
-      <div class="spec-row"><dt>題材</dt><dd>『イナズマイレブン』の必殺技「マジンザハンド」の再現（非公式・ファン制作。原作の権利は各権利者に帰属します）</dd></div>
+      <div class="spec-row"><dt>題材</dt><dd>『イナズマイレブン』の必殺技「マジン・ザ・ハンド」の再現（非公式・ファン制作。原作の権利は各権利者に帰属します）</dd></div>
       <div class="spec-row"><dt>頂点数／三角面数</dt><dd>39,807 ／ 79,480（サブディビジョン Lv2 適用時。Lv1では 10,269 ／ 20,464）</dd></div>
       <div class="spec-row"><dt>アニメーション</dt><dd>29.97fps・1〜183フレーム</dd></div>
       <div class="spec-row"><dt>テクスチャ</dt><dd>1枚</dd></div>
