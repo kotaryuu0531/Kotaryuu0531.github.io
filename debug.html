@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>DEBUG — 3Dビューア（虎 walk/dash テスト）</title>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<style>
+  :root{
+    --bg-cool:#0A0D12; --surface:#14181E; --ink:#ECE7DF; --ink-mut:#8C887F;
+    --line:#262A30; --amber:#E9A94C; --amber-dim:#6b5430; --r:2px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg-cool);color:var(--ink);
+    font-family:"Archivo",system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(20px,4vw,44px)}
+  .eyebrow{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--amber);margin:0 0 6px}
+  h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-weight:600;letter-spacing:.01em;
+    font-size:clamp(20px,3vw,28px);margin:0 0 4px;line-height:1.15}
+  .sub{color:var(--ink-mut);font-size:13px;margin:0 0 22px}
+
+  /* ビューア（本番 making-*.html と同じ枠） */
+  #gviewer{position:relative;width:100%;height:min(68vh,560px);touch-action:none;overflow:hidden;
+    background:radial-gradient(130% 110% at 50% 30%, #1b212a 0%, #0c0f14 72%);
+    border:1px solid var(--line);border-radius:var(--r)}
+  #gviewer canvas{display:block;width:100%;height:100%;outline:none}
+  #gviewer .spin{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;
+    background:rgba(10,13,18,.55);z-index:3;transition:opacity .35s}
+  #gviewer .spin.off{opacity:0;pointer-events:none}
+  #gviewer .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:gvspin 1s linear infinite}
+  #gviewer .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
+  @keyframes gvspin{to{transform:rotate(360deg)}}
+
+  .gv-ui{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+  .gv-ui button{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;background:none;
+    border:1px solid var(--line);color:var(--ink-mut);padding:7px 18px;border-radius:100px;cursor:pointer;transition:border-color .2s,color .2s}
+  .gv-ui button:hover{border-color:var(--amber-dim)}
+  .gv-ui button.on{border-color:var(--amber);color:var(--amber)}
+  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
+
+  /* デバッグ調整パネル（本番には持っていかない。ここで数値を決める用） */
+  .panel{margin-top:26px;border:1px dashed var(--line);border-radius:var(--r);padding:18px 18px 8px}
+  .panel h2{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut);margin:0 0 14px;text-transform:uppercase}
+  .row{display:grid;grid-template-columns:120px 1fr 64px;align-items:center;gap:12px;margin-bottom:12px}
+  .row label{font-family:"Space Mono",monospace;font-size:12px;color:var(--ink-mut)}
+  .row input[type=range]{width:100%;accent-color:var(--amber)}
+  .row .val{font-family:"Space Mono",monospace;font-size:12px;color:var(--ink);text-align:right}
+  .out{margin-top:8px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    font-family:"Space Mono",monospace;font-size:12px;color:var(--amber);word-break:break-all;line-height:1.7}
+  .out .k{color:var(--ink-mut)}
+  .hint{font-size:12px;color:var(--ink-mut);margin:14px 0 0;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">DEBUG / VIEWER TEST</div>
+  <h1>虎モデル — walk / dash 切替テスト</h1>
+  <p class="sub">リアル寄りPBR（RoomEnvironment＋ACES）。下のパネルでライティングとカメラを調整し、決まった値を本番ページに焼き込みます。</p>
+
+  <div id="gviewer"
+       data-glb="tiger.glb"
+       data-angle="-28" data-fov="30" data-exposure="1.05"
+       data-dir="0.75" data-amb="0.7" data-elev="0.16"
+       aria-label="虎の3DCGモデル（ドラッグで回転できます）">
+    <div class="spin" id="gv-spin"><div class="ring"></div><div class="spin-txt" id="gv-spin-txt">読み込み中…</div></div>
+  </div>
+
+  <div class="gv-ui" id="gv-clip">
+    <button data-clip="walk" class="on">歩行 / walk</button>
+    <button data-clip="dash">ダッシュ / dash</button>
+  </div>
+  <div class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ＝平行移動</div>
+
+  <div class="panel">
+    <h2>Lighting &amp; Camera — 調整して数値を決める</h2>
+    <div class="row"><label>exposure</label><input id="s-exp" type="range" min="0.5" max="1.8" step="0.01" value="1.05"><span class="val" id="v-exp">1.05</span></div>
+    <div class="row"><label>dir（陰影の強さ）</label><input id="s-dir" type="range" min="0" max="1.5" step="0.025" value="0.75"><span class="val" id="v-dir">0.75</span></div>
+    <div class="row"><label>amb（持ち上げ）</label><input id="s-amb" type="range" min="0" max="1.5" step="0.025" value="0.70"><span class="val" id="v-amb">0.70</span></div>
+    <div class="row"><label>angle（初期角°）</label><input id="s-ang" type="range" min="-180" max="180" step="1" value="-28"><span class="val" id="v-ang">-28</span></div>
+    <div class="row"><label>elev（カメラ高さ）</label><input id="s-elev" type="range" min="-0.2" max="0.8" step="0.01" value="0.16"><span class="val" id="v-elev">0.16</span></div>
+    <div class="out" id="out"></div>
+    <p class="hint">この <span style="color:var(--amber)">data-*</span> 文字列を本番 <code>#gviewer</code> に貼れば同じ見た目になります。angle/elev はスライダーを離すとカメラを再配置します。</p>
+  </div>
+
+  <p class="hint" style="margin-top:22px">
+    ※これは単体テスト用ページ（<code>debug.html</code>）です。<code>tiger.glb</code> と同じフォルダに置いて開いてください。<br>
+    ※three.js は CDN 読み込みのため、ローカルの <code>file://</code> や本番URLで開くのが確実です（chat内プレビューでは読めないことがあります）。
+  </p>
+</div>
+
+<script type="module">
+import * as THREE from "three";
+import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
+
+const holder=document.getElementById("gviewer");
+const spin=document.getElementById("gv-spin"), spinTxt=document.getElementById("gv-spin-txt");
+const GLB=holder.dataset.glb;
+let ANGLE=parseFloat(holder.dataset.angle||"-28");
+const FOV=parseFloat(holder.dataset.fov||"30");
+let EXPOSURE=parseFloat(holder.dataset.exposure||"1.0");
+let DIRF=parseFloat(holder.dataset.dir||"0.55");
+let AMBF=parseFloat(holder.dataset.amb||"0.75");
+let ELEV=parseFloat(holder.dataset.elev||"0.28");
+
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=EXPOSURE;
+holder.appendChild(renderer.domElement);
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(FOV,1,0.01,100);
+
+const pmrem=new THREE.PMREMGenerator(renderer);
+scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+const dir=new THREE.DirectionalLight(0xffffff,Math.PI*.4*DIRF); dir.position.set(1.5,2.2,2.5); scene.add(dir);
+const amb=new THREE.AmbientLight(0xffffff,Math.PI*.4*AMBF); scene.add(amb);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true; controls.dampingFactor=.08;
+controls.autoRotate=true; controls.autoRotateSpeed=1.1;
+let resumeT=null;
+controls.addEventListener("start",()=>{controls.autoRotate=false; if(resumeT)clearTimeout(resumeT);});
+controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{controls.autoRotate=true;},3000);});
+
+function resize(){
+  const w=holder.clientWidth,h=holder.clientHeight;
+  renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
+}
+window.addEventListener("resize",resize);
+
+// スキン変形後の実頂点からバウンディング（バインドT字ではなく実ポーズ基準）
+function computeBounds(root){
+  const box=new THREE.Box3(), tmp=new THREE.Box3();
+  root.updateMatrixWorld(true);
+  root.traverse(o=>{
+    if(o.isSkinnedMesh){ o.computeBoundingBox(); tmp.copy(o.boundingBox).applyMatrix4(o.matrixWorld); box.union(tmp); }
+    else if(o.isMesh){ if(!o.geometry.boundingBox)o.geometry.computeBoundingBox(); tmp.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); box.union(tmp); }
+  });
+  return box;
+}
+
+let mixer=null; const clock=new THREE.Clock();
+const actions={}; let active=null; let frameCenter=null, frameDist=1;
+const loader=new GLTFLoader();
+
+loader.load(GLB,(gltf)=>{
+  const model=gltf.scene;
+  model.traverse(o=>{ if(o.isSkinnedMesh)o.frustumCulled=false; });
+  scene.add(model);
+
+  const clips=gltf.animations||[];
+  spinTxt.textContent = clips.length ? "" : "アニメーションが見つかりません";
+
+  // フレーミング：全クリップを数点サンプリングして、両方が見切れない箱を作る
+  const box=new THREE.Box3();
+  if(clips.length){
+    mixer=new THREE.AnimationMixer(model);
+    clips.forEach(clip=>{
+      mixer.stopAllAction();
+      const a=mixer.clipAction(clip); a.reset(); a.play();
+      const dur=clip.duration||1;
+      for(const t of [0,.2,.4,.6,.8,.999]){ mixer.setTime(t*dur); box.union(computeBounds(model)); }
+    });
+    mixer.stopAllAction();
+    mixer.setTime(0);
+    // 実行用アクション（クリップ名で引けるように）
+    clips.forEach(clip=>{ actions[clip.name]=mixer.clipAction(clip); });
+  }else{
+    box.copy(computeBounds(model));
+  }
+
+  const size=box.getSize(new THREE.Vector3());
+  frameCenter=box.getCenter(new THREE.Vector3());
+  const maxDim=Math.max(size.x,size.y,size.z);
+  frameDist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2)*1.3;
+  camera.near=maxDim/100; camera.far=maxDim*20;
+  placeCamera();
+
+  // 初期クリップ（walk 優先。無ければ先頭）
+  if(clips.length){
+    const first = actions["walk"] ? "walk" : clips[0].name;
+    activate(first, 0);
+    // ボタン名がGLBのクリップ名と食い違っても動くよう、ボタンにフォールバック割当
+    fixClipButtons(clips.map(c=>c.name));
+  }
+
+  holder.querySelector(".spin").classList.add("off");
+},(e)=>{
+  if(e&&e.total){ spinTxt.textContent="読み込み中 "+Math.round(100*e.loaded/e.total)+"%"; }
+},(err)=>{ spinTxt.textContent="読み込みに失敗しました"; console.error(err); });
+
+function placeCamera(){
+  if(!frameCenter)return;
+  controls.target.copy(frameCenter);
+  const a=ANGLE*Math.PI/180;
+  camera.position.set(
+    frameCenter.x+frameDist*Math.sin(a),
+    frameCenter.y+frameDist*ELEV,
+    frameCenter.z+frameDist*Math.cos(a));
+  camera.updateProjectionMatrix();
+  controls.update();
+}
+
+// walk⇄dash クロスフェード切替
+function activate(name,fade=0.35){
+  const next=actions[name]; if(!next||next===active)return;
+  next.reset(); next.setEffectiveTimeScale(1); next.setEffectiveWeight(1); next.play();
+  if(active) active.crossFadeTo(next,fade,false);
+  active=next;
+  setClipButtons(name);
+}
+
+// ===== クリップ切替UI =====
+const clipBtns=[...document.querySelectorAll("#gv-clip button")];
+function setClipButtons(name){ clipBtns.forEach(b=>b.classList.toggle("on", (b.dataset.mappedClip||b.dataset.clip)===name)); }
+function fixClipButtons(names){
+  // ボタンの data-clip が実クリップ名に無ければ、順番で割り当てる
+  clipBtns.forEach((b,i)=>{
+    b.dataset.mappedClip = names.includes(b.dataset.clip) ? b.dataset.clip : (names[i]||names[0]);
+  });
+  setClipButtons(active ? Object.keys(actions).find(k=>actions[k]===active) : names[0]);
+}
+clipBtns.forEach(b=>b.addEventListener("click",()=>activate(b.dataset.mappedClip||b.dataset.clip)));
+
+// ===== 調整パネル =====
+const out=document.getElementById("out");
+function refreshOut(){
+  out.innerHTML =
+    '<span class="k">data-exposure=</span>"'+EXPOSURE.toFixed(2)+'" '+
+    '<span class="k">data-dir=</span>"'+DIRF.toFixed(3)+'" '+
+    '<span class="k">data-amb=</span>"'+AMBF.toFixed(3)+'" '+
+    '<span class="k">data-angle=</span>"'+ANGLE.toFixed(0)+'" '+
+    '<span class="k">data-elev=</span>"'+ELEV.toFixed(2)+'"';
+}
+function bind(id,valId,apply,fmt){
+  const s=document.getElementById(id), v=document.getElementById(valId);
+  s.addEventListener("input",()=>{ const val=parseFloat(s.value); v.textContent=fmt?fmt(val):val; apply(val); refreshOut(); });
+}
+bind("s-exp","v-exp",val=>{EXPOSURE=val; renderer.toneMappingExposure=val;},v=>v.toFixed(2));
+bind("s-dir","v-dir",val=>{DIRF=val; dir.intensity=Math.PI*.4*val;},v=>v.toFixed(3));
+bind("s-amb","v-amb",val=>{AMBF=val; amb.intensity=Math.PI*.4*val;},v=>v.toFixed(3));
+// angle/elev は離したときにカメラ再配置（回転中に飛ばない）
+const sAng=document.getElementById("s-ang"), vAng=document.getElementById("v-ang");
+sAng.addEventListener("input",()=>{ANGLE=parseFloat(sAng.value); vAng.textContent=ANGLE.toFixed(0); refreshOut();});
+sAng.addEventListener("change",placeCamera);
+const sElev=document.getElementById("s-elev"), vElev=document.getElementById("v-elev");
+sElev.addEventListener("input",()=>{ELEV=parseFloat(sElev.value); vElev.textContent=ELEV.toFixed(2); refreshOut();});
+sElev.addEventListener("change",placeCamera);
+refreshOut();
+
+resize();
+renderer.setAnimationLoop(()=>{
+  controls.update();
+  if(mixer)mixer.update(clock.getDelta());
+  renderer.render(scene,camera);
+});
+</script>
+</body>
+</html>
