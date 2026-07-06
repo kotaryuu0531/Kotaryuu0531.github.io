@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WORKS — 全作品 / RYUNOSUKE KOTAKE</title>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -119,7 +122,8 @@
   /* 3Dビューア・モーダル */
   .v3d{position:fixed;inset:0;z-index:80;background:rgba(5,7,10,.94);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
   .v3d.open{display:flex}
-  .v3d model-viewer{width:min(92vw,900px);height:min(82vh,680px);background:radial-gradient(130% 110% at 50% 26%,#1b212a 0%,#0c0f14 72%);border:1px solid var(--line);border-radius:var(--r);touch-action:none}
+  .v3d .v3d-stage{width:min(92vw,900px);height:min(82vh,680px);background:radial-gradient(130% 110% at 50% 26%,#1b212a 0%,#0c0f14 72%);border:1px solid var(--line);border-radius:var(--r);touch-action:none;overflow:hidden}
+  .v3d .v3d-stage canvas{display:block;width:100%;height:100%;outline:none}
   .v3d-close{position:absolute;top:18px;right:20px;z-index:2;background:rgba(0,0,0,.5);color:var(--ink);border:1px solid var(--line);border-radius:100px;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;padding:9px 15px;cursor:pointer}
   .v3d-close:hover{border-color:var(--amber);color:var(--amber)}
   .v3d-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);text-align:center;pointer-events:none;padding:0 16px}
@@ -188,13 +192,23 @@
   ========================================================= */
   const WORKS = [
     {
+      title:"マジンザハンド再現してみた",
+      tags:["CG","VFX合成","キャラクター"],
+      period:"2021年11月", date:"2021-11-17",
+      url:"https://youtu.be/VXNRS9tfQ_c",
+      making:"making-mazin.html",
+      thumb:"https://img.youtube.com/vi/VXNRS9tfQ_c/maxresdefault.jpg",
+      is3d:true, glb:"mazin.glb",
+      ov:{eyebrow:"FAN VFX — CG×実写合成 / 2021", sub:"『イナズマイレブン』必殺技の実写再現", text:"『イナズマイレブン』の必殺技「マジンザハンド」を再現したVFX。魔神のキャラクターをBlenderでモデリング・テクスチャ・アニメーションまで制作し、実写映像に合成しました（非公式・ファン制作）。"}
+    },
+    {
       title:"大鯨（Taigei）3Dキャラクターモデル",
       tags:["CG","キャラクター","モデリング"],
       period:"2020年（2026年 改修）", date:"2026-07-03",
       url:"",
       making:"making-taigei.html",
       thumb:"taigei-hero.jpg",
-      is3d:true, glb:"Taigei_figure.glb",
+      is3d:true, glb:"Taigei_figure.glb", toon:true,
       ov:{eyebrow:"FAN 3D — 艦これ「大鯨」/ 2020", sub:"独学キャラモデリングの到達点", text:"高1の秋、YouTube講座を視聴しながら独学でキャラモデリングに挑み、一体をまるごと完成させた『艦これ』大鯨の二次創作。アニメ調では自己最高クオリティ。2026年、ポートフォリオ用に素体差し替え・リテクスチャ・自作トゥーンビューアで改修しました。"}
     },
     {
@@ -232,7 +246,7 @@
       making:"making-rx7.html",
       thumb:"rx7-render.jpg",
       is3d:true,
-      glb:"rx7.glb",
+      glb:"rx7.glb", contrast:"strong",
       ov:{eyebrow:"3DCG MODELING — RX-7 VEILSIDE仕様 / 2021", sub:"“ハンのRX-7”の再現（非公式・ファン制作）", text:"高2の夏『1日1モデリングチャレンジ』の締めくくり。『ワイルド・スピード』のハンのRX-7（VEILSIDE仕様）を3面図から起こし、映画『カーズ』冒頭を再現する動画にした習作です。"}
     },
     {
@@ -505,7 +519,7 @@
       card.innerHTML =
         '<div class="thumb'+(vid?' playable':'')+'"'+(vid?' data-yt="'+vid+'" role="button" tabindex="0" aria-label="再生"':'')+'>'+
           thumbInner +
-          (w.is3d?'<div class="badge3d" data-glb="'+(w.glb||"")+'" data-poster="'+(w.thumb||"")+'">3D</div>':'')+
+          (w.is3d?'<div class="badge3d" data-glb="'+(w.glb||"")+'"'+(w.toon?' data-toon="1"':'')+(w.contrast?' data-contrast="'+w.contrast+'"':'')+'>3D</div>':'')+
           (vid?'<div class="play"></div>':'')+
         '</div>'+
         '<div class="wbody">'+
@@ -586,62 +600,30 @@
     <div class="v3d-spin"><div class="ring"></div><div class="txt">読み込み中…</div></div>
     <div class="v3d-hint">ドラッグ＝回転 ／ スクロール＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動</div>
   </div>
-  <script>
+  <script type="module">
+  // 3Dバッジ → 自前モーダルビューア（modal3d.js を初回クリック時に遅延ロード）
   (function(){
     const v3d=document.getElementById("v3d"); if(!v3d) return;
-    const hint=v3d.querySelector(".v3d-hint");
-    let mv=null, loading=false;
-    // 3Dビューア：標準ズームは維持し、ホイール時のページスクロールだけ抑止（Safari対策・C方式）
-    function attachScrollGuard(el){
-      el.addEventListener("wheel",function(e){ e.preventDefault(); },{passive:false});
-    }
-    function ensureLib(cb){
-      if(window.customElements && customElements.get("model-viewer")) return cb();
-      const wait=()=>{ customElements.get("model-viewer") ? cb() : setTimeout(wait,120); };
-      if(loading){ wait(); return; }
-      loading=true;
-      const s=document.createElement("script"); s.type="module";
-      s.src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js";
-      s.onload=wait; document.head.appendChild(s);
-    }
-    const spinTxt=v3d.querySelector(".v3d-spin .txt");
-    function openV(glb,poster){
-      v3d.classList.add("open","loading"); v3d.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden";
-      if(spinTxt) spinTxt.textContent="読み込み中…";
-      ensureLib(()=>{
-        if(!mv){
-          mv=document.createElement("model-viewer");
-          mv.setAttribute("camera-controls","");mv.setAttribute("auto-rotate","");
-          mv.setAttribute("auto-rotate-delay","2500");mv.setAttribute("interaction-prompt","auto");
-          mv.setAttribute("shadow-intensity","0.7");mv.setAttribute("exposure","1.05");
-          mv.setAttribute("environment-image","neutral");
-          mv.setAttribute("camera-orbit","-28deg 74deg auto");mv.setAttribute("field-of-view","30deg");
-          mv.addEventListener("load",()=>v3d.classList.remove("loading"));
-          mv.addEventListener("progress",e=>{
-            const p=Math.round((e.detail.totalProgress||0)*100);
-            if(spinTxt) spinTxt.textContent="読み込み中 "+p+"%";
-            // ダウンロード100%でも、モデルが実際に表示可能になる（loadイベント）まではスピナー継続
-          });
-          mv.addEventListener("error",()=>{ v3d.classList.remove("loading"); if(spinTxt) spinTxt.textContent="読み込みに失敗しました"; });
-          v3d.insertBefore(mv, hint);
-          attachScrollGuard(mv);
-        }
-        const alreadyLoaded = (mv.getAttribute("src")===glb && mv.loaded);
-        if(poster) mv.setAttribute("poster",poster);
-        if(mv.getAttribute("src")!==glb){ mv.cameraOrbit="-28deg 74deg auto"; mv.setAttribute("src",glb); }
-        if(alreadyLoaded) v3d.classList.remove("loading");
-      });
-    }
+    let mod=null, loading=false;
     function closeV(){ v3d.classList.remove("open"); v3d.setAttribute("aria-hidden","true"); document.body.style.overflow=""; }
     v3d.querySelector(".v3d-close").addEventListener("click",closeV);
     v3d.addEventListener("click",e=>{ if(e.target===v3d) closeV(); });
     document.addEventListener("keydown",e=>{ if(e.key==="Escape" && v3d.classList.contains("open")) closeV(); });
-    document.addEventListener("click",e=>{
+    document.addEventListener("click",async e=>{
       const b=e.target.closest(".badge3d[data-glb]"); if(!b) return;
-      e.preventDefault(); e.stopPropagation(); openV(b.dataset.glb, b.dataset.poster);
+      e.preventDefault(); e.stopPropagation();
+      if(!mod){
+        if(loading) return;
+        loading=true;
+        v3d.classList.add("open","loading"); v3d.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden";
+        try{ mod=await import("./modal3d.js"); }
+        catch(err){ console.error(err); const t=v3d.querySelector(".v3d-spin .txt"); if(t)t.textContent="読み込みに失敗しました"; return; }
+        finally{ loading=false; }
+      }
+      mod.open({glb:b.dataset.glb, toon:b.dataset.toon==="1", contrast:b.dataset.contrast||"soft"});
     });
   })();
   </script>
-  <div class="buildver">build 2026.07.05 22:15 JST</div>
+  <div class="buildver">build 2026.07.06 11:07 JST</div>
 </body>
 </html>

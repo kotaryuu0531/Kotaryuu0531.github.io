@@ -121,6 +121,8 @@
   .lb-u{top:14px;left:50%;transform:translateX(-50%) rotate(90deg)}
   .lb-d{bottom:14px;left:50%;transform:translateX(-50%) rotate(-90deg)}
   .lightbox.plain .lb-nav{display:none}
+  .lightbox.no-v .lb-u,.lightbox.no-v .lb-d{display:none}
+  .lightbox.no-h .lb-l,.lightbox.no-h .lb-r{display:none}
 
   /* スペック */
   .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
@@ -193,11 +195,12 @@
       <h3>基本ポーズ・4アングル</h3>
       <p>トゥーンシェーダー適用のマテリアルプレビュー。4アングルとも平行投影（オルソ）で撮っています。</p>
       <div class="g g4">
-        <img src="taigei-new-mat-front.jpg" alt="大鯨 正面" loading="lazy">
-        <img src="taigei-new-mat-34.jpg" alt="大鯨 斜め" loading="lazy">
-        <img src="taigei-new-mat-side.jpg" alt="大鯨 側面" loading="lazy">
-        <img src="taigei-new-mat-back.jpg" alt="大鯨 背面" loading="lazy">
+        <img src="taigei-new-mat-front.jpg" alt="大鯨 正面" data-atlas="turn" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-new-mat-34.jpg" alt="大鯨 斜め" data-atlas="turn" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-new-mat-side.jpg" alt="大鯨 側面" data-atlas="turn" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-new-mat-back.jpg" alt="大鯨 背面" data-atlas="turn" data-r="0" data-c="3" loading="lazy">
       </div>
+      <p class="figcap">正面／斜め／側面／背面。拡大中は ←→ で切替。</p>
     </section>
 
     <!-- 表情 -->
@@ -218,14 +221,12 @@
     <section class="feature rv">
       <div class="lbl">REFERENCE</div>
       <h3>再現の目標は、アーケードの立ち絵</h3>
-      <p>制作当時に参考にしていたのは、『艦これアーケード』の大鯨です。ゲーム画面を何度も見返しながら、髪の房の流れやセーラー服のシルエットを立体に起こしていきました。上段がリファレンス、下段が自作モデルです。</p>
+      <p>制作当時に参考にしていたのは、『艦これアーケード』の大鯨です。ゲーム画面を何度も見返しながら、髪の房の流れやセーラー服のシルエットを立体に起こしていきました。</p>
       <div class="g g2">
         <img src="taigei-ref-front.jpg" alt="リファレンス｜正面（『艦これアーケード』ゲーム画面）" data-atlas="ref" data-r="0" data-c="0" loading="lazy">
         <img src="taigei-ref-side.jpg" alt="リファレンス｜側面（『艦これアーケード』ゲーム画面）" data-atlas="ref" data-r="0" data-c="1" loading="lazy">
-        <img src="taigei-new-mat-front.jpg" alt="自作モデル｜正面" data-atlas="ref" data-r="1" data-c="0" loading="lazy">
-        <img src="taigei-new-mat-side.jpg" alt="自作モデル｜側面" data-atlas="ref" data-r="1" data-c="1" loading="lazy">
       </div>
-      <p class="figcap">上段は『艦隊これくしょん -艦これ- アーケード』ゲーム画面より引用（権利は各権利者に帰属します）。下段＝自作モデル。拡大中は ←→＝アングル、↑↓＝リファレンス⇄自作。</p>
+      <p class="figcap">『艦隊これくしょん -艦これ- アーケード』ゲーム画面より引用（権利は各権利者に帰属します）。拡大中は ←→ で切替。</p>
     </section>
 
     <!-- テクスチャ & UV -->
@@ -276,15 +277,10 @@
       <h3>2026年の、ブラッシュアップ</h3>
       <p>本体はあくまで2020年の作品ですが、ポートフォリオ化にあたって2026年に改修しました。差し替えた胴体（首より下の素体メッシュ）v2は、2024年に別のキャラクターを作った際、大鯨の素体を元に改良して作ったもの。<strong>首の接続頂点数を変えずに</strong>作ってあったため、今回そのまま差し替えることができました——接続部の規格を揃えておくと、胴体が資産として使い回せる、という設計の恩恵です。あわせてテクスチャも描き直しています。</p>
       <div class="g g2">
-        <img src="taigei-old-wire-front.jpg" alt="素体v1 ワイヤー（Before）" loading="lazy">
-        <img src="taigei-wire-front.jpg" alt="素体v2 ワイヤー（After）" loading="lazy">
+        <img src="taigei-old-wire-front.jpg" alt="素体v1 ワイヤー（Before）" data-atlas="bw" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-wire-front.jpg" alt="素体v2 ワイヤー（After）" data-atlas="bw" data-r="0" data-c="1" loading="lazy">
       </div>
-      <p class="figcap">素体ワイヤー：左＝v1（2020）／右＝v2（2024）。トポロジーの整理。</p>
-      <div class="g g2">
-        <img src="taigei-old-flat-front.jpg" alt="旧フラット表示（Before）" loading="lazy">
-        <img src="taigei-new-flat-front.jpg" alt="新フラット表示（After）" loading="lazy">
-      </div>
-      <p class="figcap">フラット表示：左＝旧／右＝新。塗り（テクスチャ）の進化。</p>
+      <p class="figcap">素体ワイヤー：左＝v1（2020）／右＝v2（2024）。トポロジーの整理。拡大中は ←→ で切替。</p>
       <div class="g g4">
         <img src="taigei-old-mat-front.jpg" alt="旧｜正面" data-atlas="ba" data-r="0" data-c="0" loading="lazy">
         <img src="taigei-old-mat-34.jpg" alt="旧｜斜め" data-atlas="ba" data-r="0" data-c="1" loading="lazy">
@@ -359,7 +355,14 @@
     const cell=atlases[cur.a][cur.r][cur.c];
     lbImg.src=cell.src; lbCap.textContent=cell.alt||"";
   }
-  function openAtlas(a,r,c){cur={a:a,r:r,c:c};lb.classList.remove("plain");lb.classList.add("open");showCell();}
+  function openAtlas(a,r,c){
+    cur={a:a,r:r,c:c};
+    const rows=atlases[a].filter(Boolean);
+    const maxC=Math.max(...rows.map(row=>row.filter(Boolean).length));
+    lb.classList.toggle("no-v",rows.length<2);   // 行が1つ→縦ナビを出さない
+    lb.classList.toggle("no-h",maxC<2);          // 列が1つ→横ナビを出さない
+    lb.classList.remove("plain");lb.classList.add("open");showCell();
+  }
   function openPlain(img){cur=null;lbImg.src=img.src;lbCap.textContent=img.alt||"";lb.classList.add("open","plain");}
   document.querySelectorAll(".g img:not([data-atlas]), .heroimg").forEach(img=>{
     img.addEventListener("click",()=>openPlain(img));
@@ -731,6 +734,6 @@
   resize();
   renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-  <div class="buildver">build 2026.07.05 22:15 JST</div>
+  <div class="buildver">build 2026.07.06 11:07 JST</div>
 </body>
 </html>

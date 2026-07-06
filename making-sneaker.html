@@ -110,6 +110,13 @@
     align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
   .lightbox.open{display:flex}
   .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lb-nav{position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(10,13,18,.65);
+    color:var(--ink);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+  .lb-nav:hover{border-color:var(--amber);color:var(--amber)}
+  .lb-l{left:14px;top:50%;transform:translateY(-50%)}
+  .lb-r{right:14px;top:50%;transform:translateY(-50%)}
+  .lightbox.plain .lb-nav{display:none}
+
 
   footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
     display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
@@ -164,11 +171,11 @@
       <h3>テクスチャ適用後のターンアラウンド</h3>
       <p>テクスチャを適用した状態を、正面・側面・背面・天面・底面から確認できるように並べました。</p>
       <div class="grid3">
-        <figure><div class="imgbox"><img src="sneaker-mat-front.jpg" alt="マテリアル適用・正面"></div><figcaption>FRONT</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-mat-side.jpg" alt="マテリアル適用・側面"></div><figcaption>SIDE</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-mat-back.jpg" alt="マテリアル適用・背面"></div><figcaption>BACK</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-mat-top.jpg" alt="マテリアル適用・天面"></div><figcaption>TOP</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-mat-bottom.jpg" alt="マテリアル適用・底面"></div><figcaption>BOTTOM</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-mat-front.jpg" data-gal="mat" alt="マテリアル適用・正面"></div><figcaption>FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-mat-side.jpg" data-gal="mat" alt="マテリアル適用・側面"></div><figcaption>SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-mat-back.jpg" data-gal="mat" alt="マテリアル適用・背面"></div><figcaption>BACK</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-mat-top.jpg" data-gal="mat" alt="マテリアル適用・天面"></div><figcaption>TOP</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-mat-bottom.jpg" data-gal="mat" alt="マテリアル適用・底面"></div><figcaption>BOTTOM</figcaption></figure>
       </div>
     </section>
 
@@ -178,11 +185,11 @@
       <h3>ワイヤーフレーム（サブディビジョン適用前）</h3>
       <p>トポロジーが見えるよう、サブディビジョンサーフェス適用前のベースメッシュ（コントロールケージ）を掲載しています。曲面はサブディビジョンで生成するため、土台は四角ポリゴンを基本に組んでいます。</p>
       <div class="grid3">
-        <figure><div class="imgbox"><img src="sneaker-wire-front.jpg" alt="ワイヤーフレーム・正面"></div><figcaption>FRONT</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-wire-side.jpg" alt="ワイヤーフレーム・側面"></div><figcaption>SIDE</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-wire-back.jpg" alt="ワイヤーフレーム・背面"></div><figcaption>BACK</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-wire-top.jpg" alt="ワイヤーフレーム・天面"></div><figcaption>TOP</figcaption></figure>
-        <figure><div class="imgbox"><img src="sneaker-wire-bottom.jpg" alt="ワイヤーフレーム・底面"></div><figcaption>BOTTOM</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-wire-front.jpg" data-gal="wire" alt="ワイヤーフレーム・正面"></div><figcaption>FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-wire-side.jpg" data-gal="wire" alt="ワイヤーフレーム・側面"></div><figcaption>SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-wire-back.jpg" data-gal="wire" alt="ワイヤーフレーム・背面"></div><figcaption>BACK</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-wire-top.jpg" data-gal="wire" alt="ワイヤーフレーム・天面"></div><figcaption>TOP</figcaption></figure>
+        <figure><div class="imgbox"><img src="sneaker-wire-bottom.jpg" data-gal="wire" alt="ワイヤーフレーム・底面"></div><figcaption>BOTTOM</figcaption></figure>
       </div>
     </section>
 
@@ -216,7 +223,11 @@
     </footer>
   </main>
 
-  <div class="lightbox" id="lightbox"><img src="" alt="拡大表示"></div>
+  <div class="lightbox" id="lightbox">
+    <img src="" alt="拡大表示">
+    <button class="lb-nav lb-l" id="lb-l" aria-label="前へ">‹</button>
+    <button class="lb-nav lb-r" id="lb-r" aria-label="次へ">›</button>
+  </div>
 
 <script>
   window.addEventListener("load",()=>document.body.classList.add("ready"));
@@ -224,13 +235,28 @@
   const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
   document.querySelectorAll(".rv").forEach(el=>io.observe(el));
 
-  // ライトボックス（画像タップで拡大）
+  // ライトボックス（画像タップで拡大。data-gal付きの画像群は拡大中に←→で切替）
   const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img");
-  document.querySelectorAll(".hero-img img,.grid3 img,.figm img").forEach(img=>{
-    img.addEventListener("click",()=>{lbImg.src=img.src;lb.classList.add("open");});
+  const gals={}; let cur=null;
+  document.querySelectorAll("[data-gal]").forEach(img=>{
+    const g=img.dataset.gal; (gals[g]=gals[g]||[]).push(img);
+    img.addEventListener("click",()=>{cur={g:g,i:gals[g].indexOf(img)};lb.classList.remove("plain");lb.classList.add("open");galShow();});
   });
+  function galShow(){const im=gals[cur.g][cur.i];lbImg.src=im.src;lbImg.alt=im.alt||"拡大表示";}
+  function galMove(d){if(!cur)return;const L=gals[cur.g].length;cur.i=(cur.i+d+L)%L;galShow();}
+  document.querySelectorAll(".hero-img img,.grid3 img,.figm img").forEach(img=>{
+    if(img.dataset.gal)return;
+    img.addEventListener("click",()=>{cur=null;lbImg.src=img.src;lbImg.alt=img.alt||"拡大表示";lb.classList.add("open","plain");});
+  });
+  document.getElementById("lb-l").addEventListener("click",e=>{e.stopPropagation();galMove(-1);});
+  document.getElementById("lb-r").addEventListener("click",e=>{e.stopPropagation();galMove(1);});
   lb.addEventListener("click",()=>lb.classList.remove("open"));
-  document.addEventListener("keydown",e=>{if(e.key==="Escape")lb.classList.remove("open");});
+  document.addEventListener("keydown",e=>{
+    if(!lb.classList.contains("open"))return;
+    if(e.key==="Escape")lb.classList.remove("open");
+    else if(e.key==="ArrowLeft"){e.preventDefault();galMove(-1);}
+    else if(e.key==="ArrowRight"){e.preventDefault();galMove(1);}
+  });
 
 
 </script>

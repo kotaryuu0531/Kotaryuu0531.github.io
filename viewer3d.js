@@ -12,6 +12,10 @@ const GLB=holder.dataset.glb;
 const ANGLE=parseFloat(holder.dataset.angle||"-28");
 const FOV=parseFloat(holder.dataset.fov||"30");
 const EXPOSURE=parseFloat(holder.dataset.exposure||"1.0");
+// コントラスト調整：方向光（陰影の強さ）と環境光（持ち上げ）の係数。
+// 既定はソフト（model-viewer寄り）。強コントラストにしたいモデルは data-dir="1.0" data-amb="0.375" を指定。
+const DIRF=parseFloat(holder.dataset.dir||"0.55");
+const AMBF=parseFloat(holder.dataset.amb||"0.75");
 if(holder.dataset.poster){
   holder.style.backgroundImage="url('"+holder.dataset.poster+"')";
   holder.style.backgroundSize="cover"; holder.style.backgroundPosition="center";
@@ -30,8 +34,8 @@ const camera=new THREE.PerspectiveCamera(FOV,1,0.01,100);
 // PBR用の環境光（model-viewerのneutral相当）＋クレイ用の方向光
 const pmrem=new THREE.PMREMGenerator(renderer);
 scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
-const dir=new THREE.DirectionalLight(0xffffff,Math.PI*.4); dir.position.set(1.5,2.2,2.5); scene.add(dir);
-scene.add(new THREE.AmbientLight(0xffffff,Math.PI*.15));
+const dir=new THREE.DirectionalLight(0xffffff,Math.PI*.4*DIRF); dir.position.set(1.5,2.2,2.5); scene.add(dir);
+scene.add(new THREE.AmbientLight(0xffffff,Math.PI*.4*AMBF));
 
 const controls=new OrbitControls(camera,renderer.domElement);
 controls.enableDamping=true; controls.dampingFactor=.08;
@@ -95,11 +99,18 @@ function buildWires(){
 }
 
 // ===== 読み込み =====
+let mixer=null, clipAction=null; const clock=new THREE.Clock();
 const loader=new GLTFLoader();
 loader.load(GLB,(gltf)=>{
   const model=gltf.scene; modelRef=model;
   model.traverse(o=>{ if(o.isMesh){ o.userData.matOrig=o.material; } });
   scene.add(model);
+  // アニメーション：入っていれば先頭クリップをループ再生
+  if(gltf.animations&&gltf.animations.length){
+    mixer=new THREE.AnimationMixer(model);
+    clipAction=mixer.clipAction(gltf.animations[0]);
+    clipAction.play();
+  }
 
   const box=new THREE.Box3().setFromObject(model);
   const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
@@ -125,7 +136,10 @@ const modeBtns=[...document.querySelectorAll("#gv-mode button")];
 let mode="normal";
 function applyMode(){
   if(modelRef){
-    if(mode==="wire") buildWires();
+    if(mode==="wire"){
+      buildWires();
+      if(mixer){ mixer.stopAllAction(); modelRef.traverse(o=>{ if(o.isSkinnedMesh) o.skeleton.pose(); }); }
+    }else if(clipAction){ clipAction.play(); }
     modelRef.traverse(o=>{ if(o.isMesh&&o.userData.matOrig){
       o.material=(mode==="wire")?clayMat:o.userData.matOrig;
     }});
@@ -136,4 +150,4 @@ function applyMode(){
 modeBtns.forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode; applyMode();}));
 
 resize();
-renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera);});
+renderer.setAnimationLoop(()=>{controls.update();if(mixer&&mode!=="wire")mixer.update(clock.getDelta());renderer.render(scene,camera);});

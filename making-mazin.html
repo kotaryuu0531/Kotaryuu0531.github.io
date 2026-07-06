@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RX-7 VEILSIDE仕様 3DCGモデル / RYUNOSUKE KOTAKE</title>
+<title>マジンザハンド再現 — CG×実写合成 / RYUNOSUKE KOTAKE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -152,85 +152,88 @@
   </header>
 
   <main class="wrap">
-    <div class="eyebrow">3DCG MODELING — RX-7 VEILSIDE仕様 / 2021</div>
-    <h1><span class="nb">RX-7</span> <span class="nb">VEILSIDE仕様</span></h1>
-    <div class="subtitle">映画『ワイルド・スピード』の“ハンのRX-7”を3DCGで再現（非公式・ファン制作）</div>
-    <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=車">車</a><a class="htag" href="works.html?tags=モデリング">モデリング</a></div>
-    <p class="lead">高校2年の夏休み、自主的に続けていた「1日1モデリングチャレンジ」の締めくくりとして作った3DCGモデルです。題材は、映画『ワイルド・スピード』に登場する“ハンのRX-7”（VEILSIDE仕様）。さらに、このモデルを動かして、映画『カーズ』冒頭のマックイーン登場シーンを再現した動画に仕立てました。</p>
+    <div class="eyebrow">FAN VFX — CG×実写合成 / 2021</div>
+    <h1><span class="nb">マジンザハンド</span> <span class="nb">再現してみた</span></h1>
+    <div class="subtitle">『イナズマイレブン』の必殺技をBlender×実写合成で再現（非公式・ファン制作）</div>
+    <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=VFX合成">VFX合成</a><a class="htag" href="works.html?tags=キャラクター">キャラクター</a></div>
+    <p class="lead">高校2年の秋に公開した、『イナズマイレブン』の必殺技「マジンザハンド」の再現VFXです。技の主役である魔神のキャラクターをBlenderでモデリングし、アニメーションを付けて、実写映像に合成しました。</p>
 
-    <!-- インタラクティブ3Dビューア（ヒーロー） -->
+    <!-- 本編 -->
+    <div class="hero-video rv" data-yt="VXNRS9tfQ_c" tabindex="0" role="button" aria-label="本編を再生">
+      <img class="poster" src="https://img.youtube.com/vi/VXNRS9tfQ_c/maxresdefault.jpg"
+           onerror="this.onerror=null;this.src='https://img.youtube.com/vi/VXNRS9tfQ_c/hqdefault.jpg'" alt="マジンザハンド再現VFXのサムネイル">
+      <div class="play"></div>
+    </div>
+
+    <!-- 3Dビューア -->
     <div class="viewer rv">
-      <div id="gviewer" data-glb="rx7.glb" data-poster="rx7-render.jpg" data-angle="-32" data-fov="30" data-exposure="1.05" data-dir="1.0" data-amb="0.375" aria-label="RX-7 VEILSIDE仕様 3DCGモデル（ドラッグで回転できます）">
+      <div id="gviewer" data-glb="mazin.glb" data-poster="mazin-mat-front.jpg" data-angle="-20" data-fov="30" data-exposure="1.05" aria-label="マジンザハンドの魔神 3DCGモデル（ドラッグで回転できます）">
         <div class="spin" id="gv-spin"><div class="ring"></div><div class="spin-txt" id="gv-spin-txt">読み込み中…</div></div>
       </div>
       <div class="gv-ui" id="gv-mode">
         <button data-mode="normal" class="on">ノーマル</button>
         <button data-mode="wire">ワイヤー</button>
       </div>
-      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。表示を軽くするため、Web用に軽量化したモデルを使用しています。ワイヤーフレーム表示は、実際のワイヤーとわずかに異なる場合があります。</figcaption>
+      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小。当時のアニメーションをループ再生しています。ワイヤーフレーム表示中はポーズを静止します。</figcaption>
     </div>
-
-    <!-- きっかけ -->
-    <section class="about rv">
-      <h2>1日1モデリングチャレンジの、締めくくり</h2>
-      <p>高校2年の夏休み、誰に言われたわけでもなく<a href="making-challenge.html">「1日1モデリングチャレンジ」</a>を自分に課していました。毎日ひとつ、何かをモデリングして手を動かし続ける——その締めくくりに選んだのが、いちばん作りたかったこのRX-7です。さらに、ただ静止画で終わらせず、作ったモデルを実際に動かすところまでやり切りました。</p>
-      <p>はじめてBlenderに触れた<a href="making-first3d.html">初めてのモデリング</a>がチュートリアルをなぞる学習だったのに対し、こちらは3面図を頼りに自力で形を起こした一台。毎日の積み重ねが、ここまでの規模に挑む土台になっていました。</p>
-    </section>
 
     <!-- 題材 -->
     <section class="feature rv">
       <div class="lbl">SUBJECT</div>
-      <h3>“ハンのRX-7”を、再現する</h3>
-      <p>題材に選んだのは、映画『ワイルド・スピード』シリーズに登場する“ハンのRX-7”。マツダ RX-7（FD3S）にVEILSIDEのエアロを組んだ、あの印象的な一台です。あくまで個人的な再現（非公式・ファン制作）であり、好きな車を自分の手で立体に起こしてみたい、という気持ちから作りました。</p>
+      <h3>「マジンザハンド」を、実写で</h3>
+      <p>題材は『イナズマイレブン』の必殺キャッチ技「マジンザハンド」。ゴールキーパーの背後に巨大な魔神が現れ、その手でシュートを受け止める——あの画を、アニメの中ではなく実写の映像でやってみたい、という発想から始まった一本です（非公式・ファン制作）。</p>
     </section>
 
     <!-- モデリング -->
     <section class="feature rv">
       <div class="lbl">MODELING · WIREFRAME</div>
-      <h3>一枚の平面から、車一台へ</h3>
-      <p>ネット上にあったRX-7 VEILSIDE仕様の3面図を下絵に、たった一枚の平面からスタート。ループカットと押し出しを繰り返し、面を貼り広げながら少しずつ車の形に近づけていきました。色分けはテクスチャではなく、マテリアルを部位ごとに切り替えているだけ（マテリアル7種）です。</p>
-      <p>正直に言えば、これはゲーム用に最適化したモデルではありません。三角面はおよそ58万。毎日モデリングを続ける中で、最適化より「とにかく好きな車を1台、最後まで形にする」ことを優先した習作です。それでも、3面図というリファレンスからここまでの曲面と情報量を立ち上げられたことは、当時の自分にとって大きな手応えでした。</p>
+      <h3>合成カットに映る範囲を、作り切る</h3>
+      <p>魔神はゼロからのフルスクラッチ。逆立つ髪、牙を剥いた咆哮の表情、筋肉質な上半身までを、合成カットに映る範囲に絞ってモデリングしました。頂点数は39,807／三角面数は79,480。当時はサブディビジョンをレベル2で適用して書き出していたため大きめで、レベル1なら10,269／20,464に収まります。</p>
       <div class="grid3">
-        <figure><div class="imgbox"><img src="rx7-wire-front.jpg" data-gal="wire" alt="ワイヤーフレーム・正面"></div><figcaption>FRONT</figcaption></figure>
-        <figure><div class="imgbox"><img src="rx7-wire-side.jpg" data-gal="wire" alt="ワイヤーフレーム・側面"></div><figcaption>SIDE</figcaption></figure>
-        <figure><div class="imgbox"><img src="rx7-wire-top.jpg" data-gal="wire" alt="ワイヤーフレーム・天面"></div><figcaption>TOP</figcaption></figure>
+        <figure><div class="imgbox"><img src="mazin-wire-front.jpg" data-gal="wire" alt="ワイヤーフレーム・正面"></div><figcaption>FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mazin-wire-side.jpg" data-gal="wire" alt="ワイヤーフレーム・側面"></div><figcaption>SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mazin-wire-back.jpg" data-gal="wire" alt="ワイヤーフレーム・背面"></div><figcaption>BACK</figcaption></figure>
+      </div>
+      <div class="grid3">
+        <figure><div class="imgbox"><img src="mazin-face-wire.jpg" data-gal="detail" alt="ワイヤーフレーム・顔のアップ"></div><figcaption>FACE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mazin-hand-wire-palm.jpg" data-gal="detail" alt="ワイヤーフレーム・手のひら"></div><figcaption>HAND / PALM</figcaption></figure>
+        <figure><div class="imgbox"><img src="mazin-hand-wire-back.jpg" data-gal="detail" alt="ワイヤーフレーム・手の甲"></div><figcaption>HAND / BACK</figcaption></figure>
+      </div>
+      <p class="cap" style="margin-top:8px">拡大中は ←→ で切替。技名のとおり「手」が主役なので、手は爪・関節まで独立に作り込んでいます。</p>
+    </section>
+
+    <!-- テクスチャ -->
+    <section class="feature rv">
+      <div class="lbl">TEXTURE · LOOK</div>
+      <h3>1枚のテクスチャに、全身を収める</h3>
+      <p>テクスチャは顔・体・髪をまとめた1枚構成。ベースの体色に、陰影と模様を直接描き込んでいます。マテリアルプレビューの3アングルで、塗りが立体にどう乗っているかを確認できます。</p>
+      <div class="grid3">
+        <figure><div class="imgbox"><img src="mazin-tex.jpg" alt="魔神のテクスチャシート"></div><figcaption>TEXTURE SHEET</figcaption></figure>
+      </div>
+      <div class="grid3">
+        <figure><div class="imgbox"><img src="mazin-mat-front.jpg" data-gal="mat" alt="マテリアルプレビュー・正面"></div><figcaption>FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mazin-mat-side.jpg" data-gal="mat" alt="マテリアルプレビュー・側面"></div><figcaption>SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mazin-mat-back.jpg" data-gal="mat" alt="マテリアルプレビュー・背面"></div><figcaption>BACK</figcaption></figure>
       </div>
     </section>
 
-    <!-- 動かす -->
+    <!-- アニメーション・合成 -->
     <section class="feature rv">
-      <div class="lbl">ANIMATION</div>
-      <h3>映画『カーズ』の冒頭を、RX-7で</h3>
-      <p>作ったモデルは、動かしてこそ。チャレンジの締めくくりとして、このRX-7を映画『カーズ』の冒頭——主人公マックイーンが暗闇から走り出していく、あの登場シーン——に当てはめて再現しました（カーズへのオマージュ／ファン制作です）。静止したモデルではなく、走る車として見せるところまで持っていった一本です。</p>
-      <div class="hero-video" data-yt="2Xtg3e1T2Xs" tabindex="0" role="button" aria-label="本編を再生">
-        <img class="poster" src="https://img.youtube.com/vi/2Xtg3e1T2Xs/maxresdefault.jpg"
-             onerror="this.onerror=null;this.src='https://img.youtube.com/vi/2Xtg3e1T2Xs/hqdefault.jpg'" alt="カーズ冒頭の再現動画">
-        <div class="play"></div>
-      </div>
-    </section>
-
-    <!-- リグ -->
-    <section class="feature rv">
-      <div class="lbl">RIG</div>
-      <h3>タイヤが地面をグリップする仕掛け</h3>
-      <p>動かす段でこだわったのが、タイヤの転がりです。車体全体を前進させる root ボーンのY軸方向の移動量を、タイヤ用ボーンの回転にコンストレイントで連動させました。進んだ距離に応じてタイヤがちょうど回るので、地面を滑らずにグリップして走っているように見えます。移動と回転を手付けで合わせるのではなく、移動量からタイヤの回転を自動で導く——シンプルなリグですが、走りの説得力がぐっと増しました。</p>
-      <video class="rigvid" autoplay loop muted playsinline preload="metadata">
-        <source src="rx7-rig.webm" type="video/webm">
-        <source src="rx7-rig.mp4" type="video/mp4">
-      </video>
-      <p class="cap">root ボーンのY軸移動に、タイヤの回転をコンストレイントで連動（メイキング）。</p>
+      <div class="lbl">ANIMATION · COMPOSITE</div>
+      <h3>動かして、実写に重ねる</h3>
+      <p>モデルには29.97fps・183フレーム（約6秒）のアニメーションを付けました。魔神が技を繰り出す動きをカットに合わせて作り、実写映像に合成して1本の映像に仕上げています。</p>
     </section>
 
     <!-- スペック -->
     <div class="spec-head">SPEC</div>
     <dl class="spec">
-      <div class="spec-row"><dt>公開</dt><dd>2021年8月17日</dd></div>
-      <div class="spec-row"><dt>形式</dt><dd>3DCGモデル＋アニメーション</dd></div>
-      <div class="spec-row"><dt>担当</dt><dd>モデリング・マテリアル・アニメーション（個人制作）</dd></div>
-      <div class="spec-row"><dt>題材・参考</dt><dd>『ワイルド・スピード』“ハンのRX-7”（VEILSIDE仕様）の再現／下絵はネット上の3面図／動画は映画『カーズ』冒頭の再現（いずれも非公式・ファン制作）</dd></div>
-      <div class="spec-row"><dt>マテリアル</dt><dd>7（テクスチャ無し・色分けのみ）</dd></div>
-      <div class="spec-row"><dt>頂点数</dt><dd>292,026</dd></div>
-      <div class="spec-row"><dt>三角面数</dt><dd>583,496</dd></div>
+      <div class="spec-row"><dt>公開</dt><dd>2021年11月17日</dd></div>
+      <div class="spec-row"><dt>形式</dt><dd>3DCGキャラクター＋実写合成VFX</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>モデリング・テクスチャ・アニメーション・合成（個人制作）</dd></div>
+      <div class="spec-row"><dt>題材</dt><dd>『イナズマイレブン』の必殺技「マジンザハンド」の再現（非公式・ファン制作。原作の権利は各権利者に帰属します）</dd></div>
+      <div class="spec-row"><dt>頂点数／三角面数</dt><dd>39,807 ／ 79,480（サブディビジョン Lv2 適用時。Lv1では 10,269 ／ 20,464）</dd></div>
+      <div class="spec-row"><dt>アニメーション</dt><dd>29.97fps・1〜183フレーム</dd></div>
+      <div class="spec-row"><dt>テクスチャ</dt><dd>1枚</dd></div>
       <div class="spec-row"><dt>ツール</dt><dd>Blender</dd></div>
     </dl>
 
