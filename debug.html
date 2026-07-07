@@ -83,7 +83,8 @@
     <div class="row"><label>angle（初期角°）</label><input id="s-ang" type="range" min="-180" max="180" step="1"><span class="val" id="v-ang"></span></div>
     <div class="row"><label>elev（高さ）</label><input id="s-elev" type="range" min="-0.3" max="0.8" step="0.01"><span class="val" id="v-elev"></span></div>
     <div class="row"><label>zoom（距離）</label><input id="s-zoom" type="range" min="0.5" max="1.8" step="0.02"><span class="val" id="v-zoom"></span></div>
-    <div class="toggle-row"><input type="checkbox" id="c-emis"><label for="c-emis">発光（emissive）を抑える ※ステイサムの緑目の確認用</label></div>
+    <div class="toggle-row"><input type="checkbox" id="c-emis"><label for="c-emis">発光（emissive）を抑える ※ステイサムの緑目確認</label></div>
+    <div class="toggle-row"><input type="checkbox" id="c-hideeye"><label for="c-hideeye">緑目の球（human_eye）を隠す ※消して下に目があるか確認</label></div>
     <div class="out" id="out"></div>
     <p class="hint">この <span style="color:var(--amber)">data-*</span> 文字列を本番 <code>#gviewer</code> に貼れば同じ見た目になります。angle/elev/zoom はスライダーを離すとカメラ再配置。</p>
   </div>
@@ -147,11 +148,11 @@ function computeBounds(root){
 const loader=new GLTFLoader();
 const clock=new THREE.Clock();
 let modelRoot=null, mixer=null, actions={}, active=null, frameCenter=null, frameDist=1;
-let emissiveStore=[];
+let emissiveStore=[]; let glowEyeNodes=[];
 
 function clearModel(){
   if(modelRoot){ scene.remove(modelRoot); modelRoot.traverse(o=>{ if(o.geometry&&o.geometry.dispose)o.geometry.dispose(); }); }
-  modelRoot=null; mixer=null; actions={}; active=null; emissiveStore=[];
+  modelRoot=null; mixer=null; actions={}; active=null; emissiveStore=[]; glowEyeNodes=[];
   document.getElementById("gv-clip").innerHTML="";
 }
 
@@ -166,12 +167,13 @@ function loadModel(name){
     modelRoot=gltf.scene;
     modelRoot.traverse(o=>{
       if(o.isSkinnedMesh)o.frustumCulled=false;
+      if(o.name && o.name.indexOf("human_eye")>=0) glowEyeNodes.push(o);
       if(o.isMesh&&o.material&&o.material.emissive){
         emissiveStore.push({mat:o.material, factor:(o.material.emissiveIntensity==null?1:o.material.emissiveIntensity)});
       }
     });
     scene.add(modelRoot);
-    applyEmissive();
+    applyEmissive(); applyHideEye();
 
     const clips=gltf.animations||[];
     const box=new THREE.Box3();
@@ -225,6 +227,10 @@ function applyEmissive(){
   const suppress=document.getElementById("c-emis").checked;
   emissiveStore.forEach(e=>{ e.mat.emissiveIntensity = suppress ? 0 : e.factor; });
 }
+function applyHideEye(){
+  const hide=document.getElementById("c-hideeye").checked;
+  glowEyeNodes.forEach(n=>{ n.visible = !hide; });
+}
 
 const out=document.getElementById("out");
 function refreshOut(){
@@ -252,6 +258,7 @@ const sAng=document.getElementById("s-ang"); sAng.addEventListener("input",e=>{P
 const sElev=document.getElementById("s-elev"); sElev.addEventListener("input",e=>{P.elev=+e.target.value; document.getElementById("v-elev").textContent=P.elev.toFixed(2); refreshOut();}); sElev.addEventListener("change",placeCamera);
 const sZoom=document.getElementById("s-zoom"); sZoom.addEventListener("input",e=>{P.zoom=+e.target.value; document.getElementById("v-zoom").textContent=P.zoom.toFixed(2); refreshOut();}); sZoom.addEventListener("change",placeCamera);
 document.getElementById("c-emis").addEventListener("change",applyEmissive);
+document.getElementById("c-hideeye").addEventListener("change",applyHideEye);
 
 [...document.querySelectorAll("#model-sw button")].forEach(b=>b.addEventListener("click",()=>{
   if(b.dataset.model===cur)return;
@@ -267,6 +274,6 @@ renderer.setAnimationLoop(()=>{
   renderer.render(scene,camera);
 });
 </script>
-<div class="buildver">build 2026.07.07 16:20 JST</div>
+<div class="buildver">build 2026.07.07 16:40 JST</div>
 </body>
 </html>
