@@ -73,6 +73,9 @@
   </div>
 
   <div class="gv-ui" id="gv-clip"></div>
+  <div class="gv-ui" id="gv-opts">
+    <button id="btn-rotate" class="on">オートターン: ON</button>
+  </div>
   <div class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ＝平行移動</div>
 
   <div class="panel">
@@ -128,9 +131,10 @@ const ambL=new THREE.AmbientLight(0xffffff,1); scene.add(ambL);
 const controls=new OrbitControls(camera,renderer.domElement);
 controls.enableDamping=true; controls.dampingFactor=.08;
 controls.autoRotate=true; controls.autoRotateSpeed=1.1;
+let rotateWanted=true;   // 手動トグルの状態（OFFなら放置しても再開しない）
 let resumeT=null;
 controls.addEventListener("start",()=>{controls.autoRotate=false; if(resumeT)clearTimeout(resumeT);});
-controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{controls.autoRotate=true;},3000);});
+controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{ if(rotateWanted)controls.autoRotate=true; },3000);});
 
 function resize(){ const w=holder.clientWidth,h=holder.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
 window.addEventListener("resize",resize);
@@ -259,6 +263,14 @@ const sElev=document.getElementById("s-elev"); sElev.addEventListener("input",e=
 const sZoom=document.getElementById("s-zoom"); sZoom.addEventListener("input",e=>{P.zoom=+e.target.value; document.getElementById("v-zoom").textContent=P.zoom.toFixed(2); refreshOut();}); sZoom.addEventListener("change",placeCamera);
 document.getElementById("c-emis").addEventListener("change",applyEmissive);
 document.getElementById("c-hideeye").addEventListener("change",applyHideEye);
+const btnRot=document.getElementById("btn-rotate");
+btnRot.addEventListener("click",()=>{
+  rotateWanted=!rotateWanted;
+  controls.autoRotate=rotateWanted;
+  if(!rotateWanted&&resumeT)clearTimeout(resumeT);
+  btnRot.classList.toggle("on",rotateWanted);
+  btnRot.textContent="オートターン: "+(rotateWanted?"ON":"OFF");
+});
 
 [...document.querySelectorAll("#model-sw button")].forEach(b=>b.addEventListener("click",()=>{
   if(b.dataset.model===cur)return;
@@ -274,6 +286,6 @@ renderer.setAnimationLoop(()=>{
   renderer.render(scene,camera);
 });
 </script>
-<div class="buildver">build 2026.07.07 16:40 JST</div>
+<div class="buildver">build 2026.07.07 17:00 JST</div>
 </body>
 </html>
