@@ -207,7 +207,21 @@
   }
 
   /* archive CTA */
-  .archive-cta{padding:clamp(64px,10vh,120px) clamp(20px,5vw,56px);border-top:1px solid var(--line);text-align:center}
+  .archive-cta{position:relative;min-height:92vh;display:flex;align-items:center;justify-content:center;
+    overflow:hidden;padding:clamp(64px,10vh,120px) 0;border-top:1px solid var(--line);text-align:center}
+  /* 背面：作品サムネイルのマーキー（装飾・操作不可） */
+  .ac-marquee{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:16px;z-index:0;pointer-events:none}
+  .ac-row{display:flex;width:max-content;will-change:transform;animation:ac-slide var(--dur,80s) linear infinite}
+  .ac-row.rev{animation-direction:reverse}
+  .ac-row img{height:clamp(96px,23vh,200px);aspect-ratio:16/9;object-fit:cover;display:block;
+    margin-right:16px;border:1px solid var(--line);border-radius:var(--r);opacity:.4;filter:saturate(.8)}
+  @keyframes ac-slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  /* 中央を暗く落として文字を立たせ、上下は背景に溶かす */
+  .ac-shade{position:absolute;inset:0;z-index:1;background:
+    radial-gradient(60% 54% at 50% 50%, rgba(10,13,18,.9) 0%, rgba(10,13,18,.62) 52%, rgba(10,13,18,.18) 100%),
+    linear-gradient(180deg, var(--bg-cool) 0%, transparent 16%, transparent 84%, var(--bg-cool) 100%)}
+  .ac-inner{position:relative;z-index:2;padding:0 clamp(20px,5vw,56px)}
+  @media (prefers-reduced-motion: reduce){ .ac-row{animation:none} }
   .ac-eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);margin-bottom:18px}
   .ac-title{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(30px,5.5vw,60px);line-height:1;letter-spacing:-.015em;margin-bottom:16px}
   .ac-title .light{color:var(--amber);font-style:italic;font-weight:600}
@@ -413,12 +427,20 @@
 
   <!-- ===================== ARCHIVE CTA ===================== -->
   <section class="archive-cta rv">
-    <div class="ac-eyebrow">ARCHIVE & CREDITS</div>
-    <h2 class="ac-title">これまでの、<span class="light">すべて</span>。</h2>
-    <p class="ac-sub">制作年の新しい順に並ぶ全作品群と、外部で公開・放映されている実績。</p>
-    <div class="ac-btns">
-      <a class="ac-btn" href="works.html">過去の作品群をみる <span>→</span></a>
-      <a class="ac-btn ghost" href="credits.html">実績・掲載歴をみる <span>→</span></a>
+    <div class="ac-marquee" id="ac-marquee" aria-hidden="true">
+      <div class="ac-row" style="--dur:84s"></div>
+      <div class="ac-row rev" style="--dur:104s"></div>
+      <div class="ac-row" style="--dur:92s"></div>
+    </div>
+    <div class="ac-shade"></div>
+    <div class="ac-inner">
+      <div class="ac-eyebrow">ARCHIVE & CREDITS</div>
+      <h2 class="ac-title">これまでの、<span class="light">すべて</span>。</h2>
+      <p class="ac-sub">制作年の新しい順に並ぶ全作品群と、外部で公開・放映されている実績。</p>
+      <div class="ac-btns">
+        <a class="ac-btn" href="works.html">過去の作品群をみる <span>→</span></a>
+        <a class="ac-btn ghost" href="credits.html">実績・掲載歴をみる <span>→</span></a>
+      </div>
     </div>
   </section>
 
@@ -552,6 +574,25 @@
     });
   })();
   </script>
-  <div class="buildver">build 2026.07.06 11:30 JST</div>
+
+  <script>
+  // ARCHIVE CTA：作品サムネイルのマーキー（indexで使用中のサムネを流用）
+  (function(){
+    const YT=(id)=>"https://img.youtube.com/vi/"+id+"/hqdefault.jpg";
+    const ROWS=[
+      ["taigei-hero.jpg", YT("0iCX3daaViw"), "rx7-render.jpg", YT("VXNRS9tfQ_c"), YT("9-eVi-qQLWU"), "challenge-thumb.jpg", YT("ruV5QP93_dk"), YT("f8WL1ncrQ3w"), YT("iAjpdrE0gOc")],
+      [YT("b5ba9a8X5Co"), "sneaker-thumb.jpg", YT("gK91lsdb1eA"), YT("zW8uieu_9KI"), "s2.jpg", YT("mXolgUeuSOo"), YT("3SKstS_Puco"), YT("Gv1qoxDBubU")],
+      ["first3d-thumb.jpg", YT("PqgRY7M-S2M"), YT("YvSpcUJSh3o"), YT("0-VZyN4P7eg"), YT("iLv0dK8ZmzU"), YT("J02gmWmfsok"), YT("ehFCFjIPhZY"), YT("Nx8aw06uRGk")]
+    ];
+    document.querySelectorAll("#ac-marquee .ac-row").forEach(function(row,i){
+      const list=ROWS[i%ROWS.length]; const html=[];
+      for(let k=0;k<2;k++) for(const u of list)
+        html.push('<img src="'+u+'" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">');
+      row.innerHTML=html.join("");
+    });
+  })();
+  </script>
+
+  <div class="buildver">build 2026.07.07 09:16 JST</div>
 </body>
 </html>
