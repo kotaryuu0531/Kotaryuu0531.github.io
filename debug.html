@@ -66,6 +66,7 @@
   <div class="model-sw" id="model-sw">
     <button data-model="tiger" class="on">虎 / tiger</button>
     <button data-model="statham">ステイサム / statham</button>
+    <button data-model="can">缶 / can</button>
   </div>
 
   <div id="gviewer" aria-label="3DCGモデルビューア（ドラッグで回転）">
@@ -110,8 +111,9 @@ import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
 
 const MODELS={
-  tiger:{   glb:"tiger.glb",   angle:-162, fov:30, exposure:1.05, dir:0.75, amb:0.70, elev:-0.05, zoom:1.00 },
-  statham:{ glb:"statham.glb", angle:-20,  fov:30, exposure:1.00, dir:0.60, amb:0.80, elev:0.05,  zoom:1.00 },
+  tiger:{   glb:"tiger.glb",   angle:-162, fov:30, exposure:1.05, dir:0.75, amb:0.70, elev:-0.05, zoom:0.70 },
+  statham:{ glb:"statham.glb", angle:42,   fov:30, exposure:1.00, dir:0.60, amb:0.80, elev:0.20,  zoom:1.06 },
+  can:{     glb:"can.glb",     angle:0,    fov:30, exposure:1.05, dir:0.75, amb:0.70, elev:0.05,  zoom:1.00 },
 };
 let cur="tiger";
 let P=Object.assign({},MODELS[cur]);
@@ -354,6 +356,6 @@ renderer.setAnimationLoop(()=>{
   renderer.render(scene,camera);
 });
 </script>
-<div class="buildver">build 2026.07.07 18:10 JST</div>
+<div class="buildver">build 2026.07.09 17:20 JST</div>
 </body>
 </html>
