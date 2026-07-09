@@ -73,10 +73,14 @@
   </div>
 
   <div class="gv-ui" id="gv-clip"></div>
+  <div class="gv-ui" id="gv-mode">
+    <button data-mode="normal" class="on">ノーマル</button>
+    <button data-mode="wire">ワイヤー</button>
+  </div>
   <div class="gv-ui" id="gv-opts">
     <button id="btn-rotate" class="on">オートターン: ON</button>
   </div>
-  <div class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ＝平行移動</div>
+  <div class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ＝平行移動 ／ ワイヤー時はアニメ停止（バインドポーズ）</div>
 
   <div class="panel">
     <h2>Lighting &amp; Camera — 調整して数値を決める（モデルごと）</h2>
@@ -153,9 +157,69 @@ const loader=new GLTFLoader();
 const clock=new THREE.Clock();
 let modelRoot=null, mixer=null, actions={}, active=null, frameCenter=null, frameDist=1;
 let emissiveStore=[]; let glowEyeNodes=[];
+// ===== ワイヤーモード（クレイ＋四角面ワイヤー・viewer3d.js流儀） =====
+const clayMat=new THREE.MeshStandardMaterial({color:0xb6bcc6,roughness:.95,metalness:0,side:THREE.DoubleSide,
+  polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+const lineMat=new THREE.LineBasicMaterial({color:0x14161c});
+let wires=[]; let wiresBuilt=false; let mode="normal";
+
+function buildQuadWire(geo){
+  const pos=geo.attributes.position, idx=geo.index?geo.index.array:null;
+  const triCount=idx?idx.length/3:pos.count/3;
+  const P=new THREE.Vector3(), Q=new THREE.Vector3(), Rv=new THREE.Vector3();
+  const pk=(i)=>{P.fromBufferAttribute(pos,i);return Math.round(P.x*1e4)+","+Math.round(P.y*1e4)+","+Math.round(P.z*1e4);};
+  const map=new Map();
+  const gi=(t,k)=>idx?idx[t*3+k]:t*3+k;
+  for(let t=0;t<triCount;t++){
+    const a=gi(t,0),b=gi(t,1),c=gi(t,2);
+    P.fromBufferAttribute(pos,a);Q.fromBufferAttribute(pos,b);Rv.fromBufferAttribute(pos,c);
+    const lab=P.distanceToSquared(Q),lbc=Q.distanceToSquared(Rv),lca=Rv.distanceToSquared(P);
+    let longest=0; if(lbc>=lab&&lbc>=lca)longest=1; else if(lca>=lab&&lca>=lbc)longest=2;
+    const ka=pk(a),kb=pk(b),kc=pk(c);
+    const edges=[[ka,kb,a,b],[kb,kc,b,c],[kc,ka,c,a]];
+    for(let e=0;e<3;e++){
+      const [k1,k2,i1,i2]=edges[e];
+      const key=k1<k2?k1+"|"+k2:k2+"|"+k1;
+      let rec=map.get(key); if(!rec){rec={n:0,long:0,i1,i2};map.set(key,rec);}
+      rec.n++; if(e===longest)rec.long++;
+    }
+  }
+  const verts=[];
+  for(const rec of map.values()){
+    if(rec.n>=2&&rec.long>=2)continue;
+    P.fromBufferAttribute(pos,rec.i1);Q.fromBufferAttribute(pos,rec.i2);
+    verts.push(P.x,P.y,P.z,Q.x,Q.y,Q.z);
+  }
+  const g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.Float32BufferAttribute(verts,3));
+  return g;
+}
+function buildWires(){
+  if(wiresBuilt||!modelRoot)return; wiresBuilt=true;
+  modelRoot.traverse(o=>{
+    if(!o.isMesh||!o.userData.matOrig)return;
+    const l=new THREE.LineSegments(buildQuadWire(o.geometry),lineMat);
+    l.renderOrder=2; l.visible=false;
+    o.add(l); wires.push(l);
+  });
+}
+function setMode(m){
+  mode=m;
+  if(!modelRoot)return;
+  if(m==="wire"){
+    buildWires();
+    // アニメ停止（ループでmixer.update()を止める）＋バインドポーズに静止
+    modelRoot.traverse(o=>{ if(o.isSkinnedMesh&&o.skeleton)o.skeleton.pose(); });
+  }
+  modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.matOrig) o.material=(m==="wire")?clayMat:o.userData.matOrig; });
+  wires.forEach(w=>w.visible=(m==="wire"));
+  markMode(m);
+}
+function markMode(m){ [...document.querySelectorAll("#gv-mode button")].forEach(b=>b.classList.toggle("on",b.dataset.mode===m)); }
 
 function clearModel(){
   if(modelRoot){ scene.remove(modelRoot); modelRoot.traverse(o=>{ if(o.geometry&&o.geometry.dispose)o.geometry.dispose(); }); }
+  wires=[]; wiresBuilt=false; mode="normal";
   modelRoot=null; mixer=null; actions={}; active=null; emissiveStore=[]; glowEyeNodes=[];
   document.getElementById("gv-clip").innerHTML="";
 }
@@ -172,12 +236,14 @@ function loadModel(name){
     modelRoot.traverse(o=>{
       if(o.isSkinnedMesh)o.frustumCulled=false;
       if(o.name && o.name.indexOf("human_eye")>=0) glowEyeNodes.push(o);
+      if(o.isMesh){ o.userData.matOrig=o.material; }
       if(o.isMesh&&o.material&&o.material.emissive){
         emissiveStore.push({mat:o.material, factor:(o.material.emissiveIntensity==null?1:o.material.emissiveIntensity)});
       }
     });
     scene.add(modelRoot);
     applyEmissive(); applyHideEye();
+    setMode("normal");
 
     const clips=gltf.animations||[];
     const box=new THREE.Box3();
@@ -264,6 +330,7 @@ const sZoom=document.getElementById("s-zoom"); sZoom.addEventListener("input",e=
 document.getElementById("c-emis").addEventListener("change",applyEmissive);
 document.getElementById("c-hideeye").addEventListener("change",applyHideEye);
 const btnRot=document.getElementById("btn-rotate");
+[...document.querySelectorAll("#gv-mode button")].forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
 btnRot.addEventListener("click",()=>{
   rotateWanted=!rotateWanted;
   controls.autoRotate=rotateWanted;
@@ -282,10 +349,11 @@ resize();
 loadModel("tiger");
 renderer.setAnimationLoop(()=>{
   controls.update();
-  if(mixer)mixer.update(clock.getDelta());
+  if(mixer&&mode!=="wire")mixer.update(clock.getDelta());
+  else clock.getDelta();
   renderer.render(scene,camera);
 });
 </script>
-<div class="buildver">build 2026.07.07 17:00 JST</div>
+<div class="buildver">build 2026.07.07 18:10 JST</div>
 </body>
 </html>
