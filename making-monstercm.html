@@ -108,6 +108,13 @@
   .loopvid{width:100%;aspect-ratio:16/9;display:block;margin:18px 0 0;border:1px solid var(--line);border-radius:var(--r);background:#000;object-fit:cover}
   .sevid{width:100%;aspect-ratio:16/9;display:block;border:1px solid var(--line);border-radius:var(--r);background:#000}
 
+  /* モデルデータ（小型スペック） */
+  .mdata{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px 20px;margin-top:16px;
+    padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:rgba(20,24,30,.5)}
+  .mdata>div{display:flex;gap:10px;align-items:baseline}
+  .mdata dt{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--amber);white-space:nowrap}
+  .mdata dd{font-size:13.5px;color:var(--ink)}
+
   /* タイムライン */
   .tl{margin:18px 0 0}
   .tl-row{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:14px 0;border-top:1px solid var(--line)}
@@ -178,21 +185,13 @@
       <div class="play"></div>
     </div>
 
-    <!-- 2026リメイク -->
-    <section class="feature rv">
-      <div class="lbl">2026 REMAKE</div>
-      <h3>「見応えがない」から、作り直す</h3>
-      <p>このCMは2025年10月に一度完成し、公開しています。しかしポートフォリオに載せるために見返したとき、「見応えがない」と判断しました。そこで2026年、アニメーションと背景を作り直してリメイクしたのが、上の完成版です。</p>
-      <p>30秒の構成は変えていません。地下闘技場での対峙→虎の咆哮→キャッチコピー→壁の爪痕からMロゴが現れる→商品カット。全編をBlenderのCyclesでレンダリングし、DaVinci Resolveでグレーディングして仕上げています。以前のバージョンとの比較は、ページ末尾の<a href="#story">STORY</a>に載せています。</p>
-    </section>
-
     <!-- ============ MODELS ============ -->
 
     <!-- 虎 -->
     <section class="feature rv" id="tiger">
       <div class="lbl">MODEL 01 — TIGER</div>
-      <h3>5年育てた主役</h3>
-      <p>2021年11月、寅年の年賀状のために初めて作った動物モデルが、この虎の原点です（→<a href="making-nenga2022.html">2022年 寅年年賀状</a>）。43ボーンのリグは自作。2024年にトポロジーとUVを据え置いたまま顔の頂点位置だけを整形し、2026年に毛（パーティクルとそのマテリアル）を作り直して、いまの姿になりました。下のビューアで、CMで使ったwalk／dashのアニメーションを切り替えながら回せます。</p>
+      <h3>フルスクラッチの主役</h3>
+      <p>主役の虎は、ゼロからモデリングしたフルスクラッチのポリゴンモデルです。下のビューアでは、CMで使ったwalkとdashの2種類のアニメーションを、クロスフェードで切り替えながら回せます。</p>
       <div class="viewer">
         <div class="gv3d" data-glb="tiger.glb" data-angle="-162" data-elev="-0.05" data-zoom="0.70" data-fov="30" data-exposure="1.05" data-dir="0.75" data-amb="0.70" data-env="1.0" aria-label="虎の3DCGモデル（ドラッグで回転できます）">
           <div class="spin"><div class="ring"></div><div class="spin-txt">読み込み中…</div></div>
@@ -205,21 +204,22 @@
           </div>
           <div class="gv-ui"><button type="button" class="gv-rot on">オートターン: ON</button></div>
         </div>
-        <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小。walk／dashはクロスフェードで切り替わります。ワイヤーフレーム表示中はアニメーションの先頭フレームで静止します。</figcaption>
+        <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小。ワイヤーフレーム表示中はアニメーションの先頭フレームで静止します。</figcaption>
       </div>
+      <p style="margin-top:14px">アニメーションは猫の観察から。虎の動きの資料は意外と少ないため、豊富にある猫の動画を大量に観察して、四足の重心移動や体の使い方を研究しました（映像そのものは使わず、観察のみです）。</p>
+      <dl class="mdata">
+        <div><dt>三角面</dt><dd>85,712（Web表示用GLB）</dd></div>
+        <div><dt>リグ</dt><dd>43ボーン（自作）</dd></div>
+        <div><dt>アニメーション</dt><dd>walk 120F ／ dash 41F（60fps）</dd></div>
+      </dl>
 
-      <h3 style="margin-top:clamp(36px,6vh,56px)">Reshape 2024 — トポロジーを変えずに、顔だけ整形</h3>
-      <p>2024年5月、トポロジーとUVは一切変えず、顔の頂点位置だけを動かして整形しました。テクスチャやリグを壊さずに、造形だけを更新するアプローチです。拡大して ←→ で旧・新を直接比較できます。</p>
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Wireframe — 顔と全身</h3>
+      <p>現行モデルのワイヤーフレームです。拡大して ←→ で正面・側面、↑↓ で顔・全身を切り替えられます。</p>
       <div class="grid2">
-        <figure><div class="imgbox"><img src="mc-tiger-facewire-front-old.jpg" alt="顔ワイヤー 正面｜旧（2021）" data-atlas="reshape" data-r="0" data-c="0" loading="lazy"></div><figcaption>FRONT / BEFORE（2021）</figcaption></figure>
-        <figure><div class="imgbox"><img src="mc-tiger-facewire-front.jpg" alt="顔ワイヤー 正面｜新（2024整形後）" data-atlas="reshape" data-r="0" data-c="1" loading="lazy"></div><figcaption>FRONT / AFTER（2024）</figcaption></figure>
-        <figure><div class="imgbox"><img src="mc-tiger-facewire-side-old.jpg" alt="顔ワイヤー 側面｜旧（2021）" data-atlas="reshape" data-r="1" data-c="0" loading="lazy"></div><figcaption>SIDE / BEFORE（2021）</figcaption></figure>
-        <figure><div class="imgbox"><img src="mc-tiger-facewire-side.jpg" alt="顔ワイヤー 側面｜新（2024整形後）" data-atlas="reshape" data-r="1" data-c="1" loading="lazy"></div><figcaption>SIDE / AFTER（2024）</figcaption></figure>
-      </div>
-      <p class="figcap">拡大中は ←→＝旧・新の比較、↑↓＝正面・側面の切替。</p>
-      <div class="grid2">
-        <figure><div class="imgbox"><img src="mc-tiger-wire-front.jpg" alt="全身ワイヤーフレーム 正面" data-gal="twire" loading="lazy"></div><figcaption>FULL BODY / FRONT</figcaption></figure>
-        <figure><div class="imgbox"><img src="mc-tiger-wire-side.jpg" alt="全身ワイヤーフレーム 側面" data-gal="twire" loading="lazy"></div><figcaption>FULL BODY / SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-front.jpg" alt="顔ワイヤーフレーム 正面" data-atlas="twire" data-r="0" data-c="0" loading="lazy"></div><figcaption>FACE / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-side.jpg" alt="顔ワイヤーフレーム 側面" data-atlas="twire" data-r="0" data-c="1" loading="lazy"></div><figcaption>FACE / SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-wire-front.jpg" alt="全身ワイヤーフレーム 正面" data-atlas="twire" data-r="1" data-c="0" loading="lazy"></div><figcaption>FULL BODY / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-wire-side.jpg" alt="全身ワイヤーフレーム 側面" data-atlas="twire" data-r="1" data-c="1" loading="lazy"></div><figcaption>FULL BODY / SIDE</figcaption></figure>
       </div>
 
       <h3 style="margin-top:clamp(36px,6vh,56px)">Rig &amp; Expression — 43ボーンとシェイプキー</h3>
@@ -247,12 +247,11 @@
       </div>
       <p class="figcap">モデリング・テクスチャの見本にした実写リファレンス（Web上で収集した第三者の写真・学習用）。</p>
     </section>
-
     <!-- ステイサム -->
     <section class="feature rv" id="statham">
       <div class="lbl">MODEL 02 — STATHAM</div>
       <h3>対戦相手は、ハリウッド俳優風</h3>
-      <p>2024年6月、虎の対戦相手として制作した、実在俳優に似せたファンアートのキャラクターです。頭部は、FBHeadアドオンの無料期間中に生成したベースのメッシュとテクスチャを、手作業で修正して制作。頭部より下はMetaHumanのメッシュ・テクスチャ・ノーマルマップを利用しています。リグはMetaHumanのボーンをうまく扱えなかったため自作——キャラクターモデル「<a href="making-taigei.html">大鯨</a>」で自作した人型リグを流用し、上半身はボーンを直接操作、下半身はIKで制御する構成です（虎・大鯨と同じく自作リグで統一）。</p>
+      <p>虎の対戦相手として制作した、実在俳優に似せたファンアートのキャラクターです。頭部は、FBHeadアドオンの無料期間中に生成したベースのメッシュとテクスチャを、手作業で修正して制作。頭部より下はMetaHumanのメッシュ・テクスチャ・ノーマルマップを利用しています。リグはMetaHumanのボーンをうまく扱えなかったため自作——キャラクターモデル「<a href="making-taigei.html">大鯨</a>」で自作した人型リグを流用し、上半身はボーンを直接操作、下半身はIKで制御する構成です（虎・大鯨と同じく自作リグで統一）。</p>
       <div class="viewer">
         <div class="gv3d" data-glb="statham.glb" data-angle="42" data-elev="0.20" data-zoom="1.06" data-fov="30" data-exposure="1.00" data-dir="0.60" data-amb="0.80" data-env="1.0" aria-label="ステイサム風キャラクターの3DCGモデル（ドラッグで回転できます）">
           <div class="spin"><div class="ring"></div><div class="spin-txt">読み込み中…</div></div>
@@ -267,6 +266,15 @@
         </div>
         <figcaption class="cap">walkアニメーションをループ再生。Web表示用に78.66MB→10.18MBへ軽量化したGLBです（カラーテクスチャのみ2K化。凹凸のディテールは表示用の割り切りで省略）。</figcaption>
       </div>
+      <dl class="mdata">
+        <div><dt>頂点／三角面</dt><dd>66,065 ／ 129,739（Blender編集時）</dd></div>
+        <div><dt>マテリアル</dt><dd>10（制作時のフル構成）</dd></div>
+        <div><dt>テクスチャ</dt><dd>11（制作時。Web版GLBはカラー4枚に軽量化）</dd></div>
+        <div><dt>リグ</dt><dd>自作（大鯨のリグを流用・上半身FK＋下半身IK）</dd></div>
+      </dl>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Head — レンダーとワイヤー</h3>
+      <p>ワイヤーとUVは、本人が改変した頭部のみ掲載しています（頭部より下はMetaHuman素材）。</p>
       <div class="grid2">
         <figure><div class="imgbox"><img src="mc-statham-render-front.jpg" alt="頭部レンダリング 正面" data-gal="srender" loading="lazy"></div><figcaption>RENDER / FRONT</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-statham-render-side.jpg" alt="頭部レンダリング 側面" data-gal="srender" loading="lazy"></div><figcaption>RENDER / SIDE</figcaption></figure>
@@ -275,18 +283,16 @@
         <figure><div class="imgbox"><img src="mc-statham-wire-front.jpg" alt="頭部ワイヤーフレーム 正面" data-gal="swire" loading="lazy"></div><figcaption>WIREFRAME / FRONT</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-statham-wire-side.jpg" alt="頭部ワイヤーフレーム 側面" data-gal="swire" loading="lazy"></div><figcaption>WIREFRAME / SIDE</figcaption></figure>
       </div>
-      <p class="figcap">ワイヤーとUVは、本人が改変した頭部のみ掲載しています（頭部より下はMetaHuman素材）。</p>
-
-      <h3 style="margin-top:clamp(36px,6vh,56px)">Rig &amp; Expression</h3>
-      <div class="grid3">
-        <figure><div class="imgbox"><img src="mc-statham-rig.jpg" alt="自作リグ（大鯨のリグを流用）" loading="lazy"></div><figcaption>RIG（ポーズ時に動かすボーンのみ表示）</figcaption></figure>
-      </div>
       <p style="margin-top:14px">表情はシェイプキーで制作し、CMでは対峙の演技に使いました。口を開けた表情では口内の作り込みの浅さが出ますが、咆哮はCMの文脈で必要と判断して制作しています。</p>
-      <div class="grid2">
+      <div class="grid3">
         <figure><div class="imgbox"><img src="mc-statham-face-neutral.jpg" alt="表情｜真顔" data-gal="sface" loading="lazy"></div><figcaption>NEUTRAL</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-statham-face-angry.jpg" alt="表情｜怒り" data-gal="sface" loading="lazy"></div><figcaption>ANGRY</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-statham-face-roar.jpg" alt="表情｜咆哮" data-gal="sface" loading="lazy"></div><figcaption>ROAR</figcaption></figure>
-        <figure><div class="imgbox"><img src="mc-statham-face-smile.jpg" alt="表情｜笑顔" data-gal="sface" loading="lazy"></div><figcaption>SMILE</figcaption></figure>
+      </div>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Rig</h3>
+      <div class="grid3">
+        <figure><div class="imgbox"><img src="mc-statham-rig.jpg" alt="自作リグ（大鯨のリグを流用）" loading="lazy"></div><figcaption>RIG（ポーズ時に動かすボーンのみ表示）</figcaption></figure>
       </div>
 
       <h3 style="margin-top:clamp(36px,6vh,56px)">Texture / UV（頭部）</h3>
@@ -296,7 +302,6 @@
         <figure><div class="imgbox"><img src="mc-statham-uv.jpg" alt="頭部UV展開" data-gal="suv" loading="lazy"></div><figcaption>UV / HEAD</figcaption></figure>
       </div>
     </section>
-
     <!-- 缶 -->
     <section class="feature rv" id="can">
       <div class="lbl">MODEL 03 — CAN</div>
@@ -313,8 +318,12 @@
           </div>
           <div class="gv-ui"><button type="button" class="gv-rot on">オートターン: ON</button></div>
         </div>
-        <figcaption class="cap">頂点 1,090／三角面 2,176 の軽いモデル。金属の質感は環境マップの映り込みで出しています。</figcaption>
+        <figcaption class="cap">金属の質感は環境マップの映り込みで出しています。</figcaption>
       </div>
+      <dl class="mdata">
+        <div><dt>頂点／三角面</dt><dd>1,090 ／ 2,176</dd></div>
+        <div><dt>テクスチャ</dt><dd>1枚（2048px・実物を切り開いた写真から制作）</dd></div>
+      </dl>
       <div class="grid3">
         <figure><div class="imgbox"><img src="mc-can-real.jpg" alt="実物のアルミ缶を切り開いた写真" loading="lazy"></div><figcaption>REAL CAN（切り開いてテクスチャの元に）</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-can-tex.jpg" alt="缶のテクスチャ" data-gal="cuv" loading="lazy"></div><figcaption>TEXTURE</figcaption></figure>
@@ -338,17 +347,6 @@
     </section>
 
     <!-- ============ PROCESS ============ -->
-
-    <section class="feature rv" id="animation">
-      <div class="lbl">PROCESS — ANIMATION</div>
-      <h3>猫を観察して、虎を動かす</h3>
-      <p>アニメーションはwalk／dash（上のビューアで再生しているもの）と、咆哮。虎の動きの資料は意外と少ないため、豊富にある猫の動画を大量に観察して、四足の重心移動や体の使い方を研究しました（映像そのものは使わず、観察のみです）。咆哮は2022年1月に最初のバージョンを制作し、2024年に「正面から見てカッコよくない」と改良を試みた末、2026年リメイクで作り直しています。</p>
-      <video class="loopvid" autoplay loop muted playsinline preload="metadata" aria-label="虎の咆哮アニメーションのレンダリング（往復スロー再生）">
-        <source src="mc-tigerbark.webm" type="video/webm">
-        <source src="mc-tigerbark.mp4" type="video/mp4">
-      </video>
-      <p class="figcap">咆哮アニメーションのレンダリング（10フレームを往復スロー再生でループ表示）。</p>
-    </section>
 
     <section class="feature rv" id="sound">
       <div class="lbl">PROCESS — SOUND / FOLEY</div>
@@ -374,11 +372,12 @@
 
     <!-- ============ STORY ============ -->
     <section class="feature rv" id="story">
-      <div class="lbl">STORY — 2021 → 2026</div>
-      <h3>年賀状の虎が、CMの主役になるまで</h3>
-      <p>この作品のいちばんの中身は、5年間の積み重ねそのものです。1体のモデルを捨てずに育て続け、造形・毛・アニメーションを段階的に更新してきました。</p>
+      <div class="lbl">STORY — 2021 → 2026 / BEFORE &amp; AFTER</div>
+      <h3>「見応えがない」から、作り直す</h3>
+      <p>このCMは2025年10月に一度完成し、公開しています。しかしポートフォリオに載せるために見返したとき、「見応えがない」と判断しました。そこで2026年、アニメーションと背景を作り直してリメイクしたのが、ページ冒頭の本編です。</p>
+      <p>そして、この作品のいちばんの中身は5年間の積み重ねそのものです。2022年の寅年年賀状のために作った虎（→<a href="making-nenga2022.html">2022年 寅年年賀状</a>）を捨てずに育て続け、造形・毛・アニメーションを段階的に更新してきました。ここからは、その変遷をbefore／afterで見せます。</p>
       <dl class="tl">
-        <div class="tl-row"><dt>2021.11–12</dt><dd>寅年の年賀状のために虎を制作（→<a href="making-nenga2022.html">2022年 寅年年賀状</a>）</dd></div>
+        <div class="tl-row"><dt>2021.11–12</dt><dd>寅年の年賀状のために虎を制作</dd></div>
         <div class="tl-row"><dt>2022.01</dt><dd>年賀状を公開。咆哮アニメーションを制作し、モンエナ缶を実物からリメイク。この頃「モンエナCMを虎で作る」というアイデアが芽生える</dd></div>
         <div class="tl-row"><dt>2024.03–04</dt><dd>咆哮アニメの改良を試みるも「正面から見てカッコよくない」と結論</dd></div>
         <div class="tl-row"><dt>2024.05</dt><dd>トポロジー・UVを据え置いたまま顔を整形。CM後半（咆哮→キャッチコピー→爪痕→ロゴ→商品カット）が完成</dd></div>
@@ -387,9 +386,27 @@
         <div class="tl-row"><dt>2026.07</dt><dd>ポートフォリオ用に見返して「見応えがない」と判断。アニメーションと背景を作り直し、リメイク版（ページ冒頭の本編）が完成</dd></div>
       </dl>
 
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Roar — 4年かけた咆哮</h3>
+      <p>咆哮のアニメーションは2022年1月に最初のバージョンを制作。2024年に改良を試みるも「正面から見てカッコよくない」と結論し、2026年のリメイクでようやく作り直しました。下は旧版の咆哮レンダリングです。</p>
+      <video class="loopvid" autoplay loop muted playsinline preload="metadata" aria-label="旧版の咆哮アニメーションのレンダリング（往復スロー再生）">
+        <source src="mc-tigerbark.webm" type="video/webm">
+        <source src="mc-tigerbark.mp4" type="video/mp4">
+      </video>
+      <p class="figcap">旧版の咆哮アニメーション（10フレームを往復スロー再生でループ表示）。</p>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Reshape 2024 — トポロジーを変えずに、顔だけ整形</h3>
+      <p>2024年5月、トポロジーとUVは一切変えず、顔の頂点位置だけを動かして整形しました。テクスチャやリグを壊さずに、造形だけを更新するアプローチです。拡大して ←→ で旧・新を直接比較できます。</p>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-front-old.jpg" alt="顔ワイヤー 正面｜旧（2021）" data-atlas="reshape" data-r="0" data-c="0" loading="lazy"></div><figcaption>FRONT / BEFORE（2021）</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-front.jpg" alt="顔ワイヤー 正面｜新（2024整形後）" data-atlas="reshape" data-r="0" data-c="1" loading="lazy"></div><figcaption>FRONT / AFTER（2024）</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-side-old.jpg" alt="顔ワイヤー 側面｜旧（2021）" data-atlas="reshape" data-r="1" data-c="0" loading="lazy"></div><figcaption>SIDE / BEFORE（2021）</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-side.jpg" alt="顔ワイヤー 側面｜新（2024整形後）" data-atlas="reshape" data-r="1" data-c="1" loading="lazy"></div><figcaption>SIDE / AFTER（2024）</figcaption></figure>
+      </div>
+      <p class="figcap">拡大中は ←→＝旧・新の比較、↑↓＝正面・側面の切替。</p>
+
       <h3 style="margin-top:clamp(36px,6vh,56px)">3 Generations — 同一条件で並べる、5年の進化</h3>
       <p>2022・2025・2026の3世代の虎を、同一ライティング・同一画角でレンダリングして並べました。2022→2025はメッシュの変化（2024年の顔整形）、2025→2026はパーティクルとそのマテリアル——つまり毛の作り直しです。拡大して ←→ で世代を送ると、進化がそのまま見えます。</p>
-      <div class="grid3">
+      <div class="grid3" style="grid-template-columns:repeat(3,1fr)">
         <figure><div class="imgbox"><img src="mc-tiger-2022-front.jpg" alt="虎 2022世代 正面" data-atlas="gen" data-r="0" data-c="0" loading="lazy"></div><figcaption>2022 / FRONT</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-tiger-2025-front.jpg" alt="虎 2025世代 正面" data-atlas="gen" data-r="0" data-c="1" loading="lazy"></div><figcaption>2025 / FRONT</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-tiger-2026-front.jpg" alt="虎 2026世代 正面" data-atlas="gen" data-r="0" data-c="2" loading="lazy"></div><figcaption>2026 / FRONT</figcaption></figure>
@@ -407,7 +424,6 @@
         <div class="play"></div>
       </div>
     </section>
-
     <!-- スペック -->
     <div class="spec-head">SPEC</div>
     <dl class="spec">
