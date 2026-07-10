@@ -1,66 +1,27 @@
-// 汎用3Dビューア（自作・three.js）
-// 使い方：<div id="gviewer" data-glb="model.glb" data-poster="poster.jpg" data-angle="-28" data-fov="30" data-exposure="1.05">
-// モード：ノーマル（元マテリアル＋環境光）／ワイヤー（クレイ＋対角線を除去した四角面ワイヤー）
+// 汎用3Dビューア（自作・three.js）— 複数インスタンス対応版
+// 使い方：<div id="gviewer" data-glb="model.glb" ...> または <div class="gv3d" data-glb="...">
+//   data-angle / data-elev / data-zoom … カメラ初期位置（zoom省略時は1.3）
+//   data-exposure / data-dir / data-amb / data-env … ライティング
+//   data-toon="1" … 暖色トゥーン（スキニング対応・色トレス輪郭）
+// UI（ビューアと同じ .viewer 内に置く・すべて任意）：
+//   #gv-mode / .gv-mode … ノーマル／ワイヤー切替ボタン（data-mode="normal|wire"）
+//   .gv-clip            … アニメクリップ切替ボタンの生成先（クリップが2つ以上のとき）
+//   .gv-rot             … オートターンON/OFFトグルボタン
+// モード：ノーマル（元マテリアル＋環境光）／ワイヤー（クレイ＋対角線を除去した四角面ワイヤー。
+//         アニメ付きは先頭フレーム(0秒)の実ポーズで静止・シェイプキー対応）
+// GLBの読み込みはビューアが画面に近づいてから開始（遅延ロード）。
 import * as THREE from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
 
-const holder=document.getElementById("gviewer");
-const spin=document.getElementById("gv-spin"), spinTxt=document.getElementById("gv-spin-txt");
-const GLB=holder.dataset.glb;
-const ANGLE=parseFloat(holder.dataset.angle||"-28");
-const FOV=parseFloat(holder.dataset.fov||"30");
-const EXPOSURE=parseFloat(holder.dataset.exposure||"1.0");
-// コントラスト調整：方向光（陰影の強さ）と環境光（持ち上げ）の係数。
-// 既定はソフト（model-viewer寄り）。強コントラストにしたいモデルは data-dir="1.0" data-amb="0.375" を指定。
-const DIRF=parseFloat(holder.dataset.dir||"0.55");
-const AMBF=parseFloat(holder.dataset.amb||"0.75");
-const TOON=holder.dataset.toon==="1";
-const ELEV=parseFloat(holder.dataset.elev||"0.28");
-if(holder.dataset.poster){
-  holder.style.backgroundImage="url('"+holder.dataset.poster+"')";
-  holder.style.backgroundSize="cover"; holder.style.backgroundPosition="center";
-}
-
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=EXPOSURE;
-if(TOON) renderer.toneMapping=THREE.NoToneMapping;
-holder.appendChild(renderer.domElement);
-
-const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(FOV,1,0.01,100);
-
-// PBR用の環境光（model-viewerのneutral相当）＋クレイ用の方向光
-const pmrem=new THREE.PMREMGenerator(renderer);
-scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
-const dir=new THREE.DirectionalLight(0xffffff,Math.PI*.4*DIRF); dir.position.set(1.5,2.2,2.5); scene.add(dir);
-scene.add(new THREE.AmbientLight(0xffffff,Math.PI*.4*AMBF));
-
-const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true; controls.dampingFactor=.08;
-controls.autoRotate=true; controls.autoRotateSpeed=1.1;
-let resumeT=null;
-controls.addEventListener("start",()=>{controls.autoRotate=false; if(resumeT)clearTimeout(resumeT);});
-controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{controls.autoRotate=true;},3000);});
-
-function resize(){
-  const w=holder.clientWidth,h=holder.clientHeight;
-  renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
-}
-window.addEventListener("resize",resize);
-
-// ===== 汎用トゥーン（単一パラメータ・スキニング対応） =====
+// ===== 汎用トゥーン定数（単一パラメータ・スキニング対応） =====
 const TOON_PRM={level:.8, tint:[1.0,.84,.72], rim:.22, lift:0};   // 暖色シャドウ
 const TOON_RIM=[1.0,.94,.8];
 const TOON_TRACE=0x9a4f22;   // 色トレス（暗いオレンジ茶）
 const TOON_SHADOW=.71, TOON_SOFT=.035;
 const TOON_OUT={screen:.0008, maxFrac:.0026, partCap:.18};
 const TOON_LIGHT={x:1.04, y:.48};
-const toonMats=[]; const outlines=[];
 const TOON_VERT=`
   #include <common>
   #include <skinning_pars_vertex>
@@ -97,202 +58,346 @@ const TOON_FRAG=`
     gl_FragColor=vec4(col,base.a);
   }`;
 const white1x1=new THREE.DataTexture(new Uint8Array([255,255,255,255]),1,1); white1x1.needsUpdate=true;
-function toonifyModel(model){
-  const box=new THREE.Box3().setFromObject(model);
-  const maxDim=Math.max(...box.getSize(new THREE.Vector3()).toArray());
-  const th=0.30+0.34*TOON_SHADOW, sc=Math.min(TOON_SHADOW*1.7,1.9);
-  const level=Math.max(.35, 1-(1-TOON_PRM.level)*sc);
-  const tmpS=new THREE.Vector3(); const pend=[];
-  model.updateMatrixWorld(true);
-  model.traverse(o=>{
-    if(!o.isMesh||o.userData.isOutline)return;
-    const src=o.material;
-    let tex=null, solid=null;
-    const albedo=(src&&(src.emissiveMap||src.map))||null;
-    if(albedo){ tex=albedo.clone(); tex.colorSpace=THREE.NoColorSpace; tex.needsUpdate=true; }
-    else{ const c=(src&&src.color)||new THREE.Color(1,1,1); solid=[c.r,c.g,c.b]; }
-    o.material=new THREE.ShaderMaterial({
-      vertexShader:TOON_VERT, fragmentShader:TOON_FRAG, side:THREE.DoubleSide,
-      uniforms:{
-        map:{value:tex||white1x1}, useMap:{value:tex?1:0},
-        baseColor:{value:new THREE.Color().fromArray(solid||[1,1,1])},
-        uLightDir:{value:new THREE.Vector3(0,1,1)},
-        uLevel:{value:level}, uTint:{value:new THREE.Color().fromArray(TOON_PRM.tint)},
-        uRim:{value:TOON_PRM.rim}, uRimColor:{value:new THREE.Color().fromArray(TOON_RIM)},
-        uLift:{value:TOON_PRM.lift}, uThreshold:{value:th}, uSoft:{value:TOON_SOFT},
-      }});
-    toonMats.push(o.material);
-    if(o.isSkinnedMesh) o.frustumCulled=false;
-    // 輪郭（バックフェイスハル・スキニング対応）
-    if(!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
-    o.getWorldScale(tmpS);
-    const r=o.geometry.boundingSphere.radius*Math.max(tmpS.x,tmpS.y,tmpS.z);
-    const cap=Math.min(maxDim*TOON_OUT.maxFrac, r*TOON_OUT.partCap);
-    const om=new THREE.ShaderMaterial({
-      side:THREE.BackSide,
-      uniforms:{oScreen:{value:TOON_OUT.screen},oMax:{value:cap},oColor:{value:new THREE.Color(TOON_TRACE)}},
-      vertexShader:`
-        #include <common>
-        #include <skinning_pars_vertex>
-        uniform float oScreen; uniform float oMax;
-        void main(){
-          float mask=1.0;
-          #ifdef USE_COLOR
-            mask=color.r;
-          #endif
-          #include <skinbase_vertex>
-          #include <beginnormal_vertex>
-          #include <skinnormal_vertex>
-          #include <begin_vertex>
-          #include <skinning_vertex>
-          vec4 mv=modelViewMatrix*vec4(transformed,1.0);
-          float w=min(oScreen*max(-mv.z,0.0),oMax)*mask;
-          vec3 p=transformed+normalize(objectNormal)*w;
-          gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
-        }`,
-      fragmentShader:`uniform vec3 oColor; void main(){ gl_FragColor=vec4(oColor,1.0); }`
+
+// ===== 1ビューア分の初期化 =====
+function initViewer(holder){
+  const GLB=holder.dataset.glb;
+  if(!GLB) return;
+  const ANGLE=parseFloat(holder.dataset.angle||"-28");
+  const FOV=parseFloat(holder.dataset.fov||"30");
+  const EXPOSURE=parseFloat(holder.dataset.exposure||"1.0");
+  // コントラスト調整：方向光（陰影の強さ）と環境光（持ち上げ）の係数。既定はソフト。
+  const DIRF=parseFloat(holder.dataset.dir||"0.55");
+  const AMBF=parseFloat(holder.dataset.amb||"0.75");
+  const ENVI=parseFloat(holder.dataset.env||"1.0");
+  const TOON=holder.dataset.toon==="1";
+  const ELEV=parseFloat(holder.dataset.elev||"0.28");
+  const ZOOM=parseFloat(holder.dataset.zoom||"1.3");
+
+  // UIはビューアと同じ .viewer（無ければ親要素）内で探す
+  const root=holder.closest(".viewer")||holder.parentElement||document;
+  const spin=holder.querySelector(".spin");
+  const spinTxt=holder.querySelector(".spin-txt");
+  const modeBox=root.querySelector("#gv-mode, .gv-mode");
+  const clipBox=root.querySelector(".gv-clip");
+  const rotBtn=root.querySelector(".gv-rot");
+
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=TOON?THREE.NoToneMapping:THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=EXPOSURE;
+  holder.appendChild(renderer.domElement);
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(FOV,1,0.01,100);
+
+  // PBR用の環境光（model-viewerのneutral相当）＋方向光
+  const pmrem=new THREE.PMREMGenerator(renderer);
+  scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+  const dir=new THREE.DirectionalLight(0xffffff,Math.PI*.4*DIRF); dir.position.set(1.5,2.2,2.5); scene.add(dir);
+  scene.add(new THREE.AmbientLight(0xffffff,Math.PI*.4*AMBF));
+
+  const controls=new OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true; controls.dampingFactor=.08;
+  controls.autoRotate=true; controls.autoRotateSpeed=1.1;
+  let rotateWanted=true;   // 手動トグルの状態（OFFなら放置しても再開しない）
+  let resumeT=null;
+  controls.addEventListener("start",()=>{controls.autoRotate=false; if(resumeT)clearTimeout(resumeT);});
+  controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{ if(rotateWanted)controls.autoRotate=true; },3000);});
+  if(rotBtn){
+    rotBtn.addEventListener("click",()=>{
+      rotateWanted=!rotateWanted;
+      controls.autoRotate=rotateWanted;
+      if(!rotateWanted&&resumeT)clearTimeout(resumeT);
+      rotBtn.classList.toggle("on",rotateWanted);
+      rotBtn.textContent="オートターン: "+(rotateWanted?"ON":"OFF");
     });
-    if(o.geometry.attributes.color) om.vertexColors=true;
-    let ol;
-    if(o.isSkinnedMesh){ ol=new THREE.SkinnedMesh(o.geometry,om); ol.bind(o.skeleton,o.bindMatrix); ol.frustumCulled=false; }
-    else ol=new THREE.Mesh(o.geometry,om);
-    ol.renderOrder=-1; ol.userData.isOutline=true;
-    pend.push([o,ol]); outlines.push(ol);
-  });
-  pend.forEach(([o,ol])=>o.add(ol));
-}
+  }
 
-// ===== ワイヤーモード（クレイ＋四角面ワイヤー） =====
-const clayMat=new THREE.MeshStandardMaterial({color:0xb6bcc6,roughness:.95,metalness:0,side:THREE.DoubleSide,
-  polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
-const lineMat=new THREE.LineBasicMaterial({color:0x14161c});
-const wires=[]; let wiresBuilt=false; let modelRef=null;
+  function resize(){
+    const w=holder.clientWidth,h=holder.clientHeight;
+    if(!w||!h)return;
+    renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize",resize);
 
-// 三角形化で入った対角線を除去したワイヤー（両側の三角形どちらでも最長辺＝対角線とみなす）
-function buildQuadWire(geo){
-  const pos=geo.attributes.position, idx=geo.index?geo.index.array:null;
-  const triCount=idx?idx.length/3:pos.count/3;
-  const P=new THREE.Vector3(), Q=new THREE.Vector3(), Rv=new THREE.Vector3();
-  const pk=(i)=>{P.fromBufferAttribute(pos,i);return Math.round(P.x*1e4)+","+Math.round(P.y*1e4)+","+Math.round(P.z*1e4);};
-  const map=new Map();
-  const gi=(t,k)=>idx?idx[t*3+k]:t*3+k;
-  for(let t=0;t<triCount;t++){
-    const a=gi(t,0),b=gi(t,1),c=gi(t,2);
-    P.fromBufferAttribute(pos,a);Q.fromBufferAttribute(pos,b);Rv.fromBufferAttribute(pos,c);
-    const lab=P.distanceToSquared(Q),lbc=Q.distanceToSquared(Rv),lca=Rv.distanceToSquared(P);
-    let longest=0; if(lbc>=lab&&lbc>=lca)longest=1; else if(lca>=lab&&lca>=lbc)longest=2;
-    const ka=pk(a),kb=pk(b),kc=pk(c);
-    const edges=[[ka,kb,a,b],[kb,kc,b,c],[kc,ka,c,a]];
-    for(let e=0;e<3;e++){
-      const [k1,k2,i1,i2]=edges[e];
-      const key=k1<k2?k1+"|"+k2:k2+"|"+k1;
-      let rec=map.get(key); if(!rec){rec={n:0,long:0,i1,i2};map.set(key,rec);}
-      rec.n++; if(e===longest)rec.long++;
+  // ---- トゥーン変換 ----
+  const toonMats=[]; const outlines=[];
+  function toonifyModel(model){
+    const box=new THREE.Box3().setFromObject(model);
+    const maxDim=Math.max(...box.getSize(new THREE.Vector3()).toArray());
+    const th=0.30+0.34*TOON_SHADOW, sc=Math.min(TOON_SHADOW*1.7,1.9);
+    const level=Math.max(.35, 1-(1-TOON_PRM.level)*sc);
+    const tmpS=new THREE.Vector3(); const pend=[];
+    model.updateMatrixWorld(true);
+    model.traverse(o=>{
+      if(!o.isMesh||o.userData.isOutline)return;
+      const src=o.material;
+      let tex=null, solid=null;
+      const albedo=(src&&(src.emissiveMap||src.map))||null;
+      if(albedo){ tex=albedo.clone(); tex.colorSpace=THREE.NoColorSpace; tex.needsUpdate=true; }
+      else{ const c=(src&&src.color)||new THREE.Color(1,1,1); solid=[c.r,c.g,c.b]; }
+      o.material=new THREE.ShaderMaterial({
+        vertexShader:TOON_VERT, fragmentShader:TOON_FRAG, side:THREE.DoubleSide,
+        uniforms:{
+          map:{value:tex||white1x1}, useMap:{value:tex?1:0},
+          baseColor:{value:new THREE.Color().fromArray(solid||[1,1,1])},
+          uLightDir:{value:new THREE.Vector3(0,1,1)},
+          uLevel:{value:level}, uTint:{value:new THREE.Color().fromArray(TOON_PRM.tint)},
+          uRim:{value:TOON_PRM.rim}, uRimColor:{value:new THREE.Color().fromArray(TOON_RIM)},
+          uLift:{value:TOON_PRM.lift}, uThreshold:{value:th}, uSoft:{value:TOON_SOFT},
+        }});
+      toonMats.push(o.material);
+      if(o.isSkinnedMesh) o.frustumCulled=false;
+      // 輪郭（バックフェイスハル・スキニング対応）
+      if(!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+      o.getWorldScale(tmpS);
+      const r=o.geometry.boundingSphere.radius*Math.max(tmpS.x,tmpS.y,tmpS.z);
+      const cap=Math.min(maxDim*TOON_OUT.maxFrac, r*TOON_OUT.partCap);
+      const om=new THREE.ShaderMaterial({
+        side:THREE.BackSide,
+        uniforms:{oScreen:{value:TOON_OUT.screen},oMax:{value:cap},oColor:{value:new THREE.Color(TOON_TRACE)}},
+        vertexShader:`
+          #include <common>
+          #include <skinning_pars_vertex>
+          uniform float oScreen; uniform float oMax;
+          void main(){
+            float mask=1.0;
+            #ifdef USE_COLOR
+              mask=color.r;
+            #endif
+            #include <skinbase_vertex>
+            #include <beginnormal_vertex>
+            #include <skinnormal_vertex>
+            #include <begin_vertex>
+            #include <skinning_vertex>
+            vec4 mv=modelViewMatrix*vec4(transformed,1.0);
+            float w=min(oScreen*max(-mv.z,0.0),oMax)*mask;
+            vec3 p=transformed+normalize(objectNormal)*w;
+            gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
+          }`,
+        fragmentShader:`uniform vec3 oColor; void main(){ gl_FragColor=vec4(oColor,1.0); }`
+      });
+      if(o.geometry.attributes.color) om.vertexColors=true;
+      let ol;
+      if(o.isSkinnedMesh){ ol=new THREE.SkinnedMesh(o.geometry,om); ol.bind(o.skeleton,o.bindMatrix); ol.frustumCulled=false; }
+      else ol=new THREE.Mesh(o.geometry,om);
+      ol.renderOrder=-1; ol.userData.isOutline=true;
+      pend.push([o,ol]); outlines.push(ol);
+    });
+    pend.forEach(([o,ol])=>o.add(ol));
+  }
+
+  // ---- ワイヤーモード（クレイ＋四角面ワイヤー・先頭フレーム固定・シェイプキー対応） ----
+  const clayMat=new THREE.MeshStandardMaterial({color:0xb6bcc6,roughness:.95,metalness:0,side:THREE.DoubleSide,
+    polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+  const lineMat=new THREE.LineBasicMaterial({color:0x14161c});
+  let wires=[]; let wiresKey=null; let modelRef=null;
+
+  // 三角形化で入った対角線を除去したワイヤー（両側の三角形どちらでも最長辺＝対角線とみなす）
+  function buildQuadWire(geo,dpos){
+    const idx=geo.index?geo.index.array:null;
+    const count=dpos.length/3;
+    const triCount=idx?idx.length/3:count/3;
+    const P=new THREE.Vector3(), Q=new THREE.Vector3(), Rv=new THREE.Vector3();
+    const gp=(i,t)=>t.set(dpos[i*3],dpos[i*3+1],dpos[i*3+2]);
+    const pk=(i)=>{gp(i,P);return Math.round(P.x*1e4)+","+Math.round(P.y*1e4)+","+Math.round(P.z*1e4);};
+    const map=new Map();
+    const gi=(t,k)=>idx?idx[t*3+k]:t*3+k;
+    for(let t=0;t<triCount;t++){
+      const a=gi(t,0),b=gi(t,1),c=gi(t,2);
+      gp(a,P);gp(b,Q);gp(c,Rv);
+      const lab=P.distanceToSquared(Q),lbc=Q.distanceToSquared(Rv),lca=Rv.distanceToSquared(P);
+      let longest=0; if(lbc>=lab&&lbc>=lca)longest=1; else if(lca>=lab&&lca>=lbc)longest=2;
+      const ka=pk(a),kb=pk(b),kc=pk(c);
+      const edges=[[ka,kb,a,b],[kb,kc,b,c],[kc,ka,c,a]];
+      for(let e=0;e<3;e++){
+        const [k1,k2,i1,i2]=edges[e];
+        const key=k1<k2?k1+"|"+k2:k2+"|"+k1;
+        let rec=map.get(key); if(!rec){rec={n:0,long:0,i1,i2};map.set(key,rec);}
+        rec.n++; if(e===longest)rec.long++;
+      }
     }
+    const verts=[];
+    for(const rec of map.values()){
+      if(rec.n>=2&&rec.long>=2)continue;
+      gp(rec.i1,P);gp(rec.i2,Q);
+      verts.push(P.x,P.y,P.z,Q.x,Q.y,Q.z);
+    }
+    const g=new THREE.BufferGeometry();
+    g.setAttribute("position",new THREE.Float32BufferAttribute(verts,3));
+    return g;
   }
-  const verts=[];
-  for(const rec of map.values()){
-    if(rec.n>=2&&rec.long>=2)continue;
-    P.fromBufferAttribute(pos,rec.i1);Q.fromBufferAttribute(pos,rec.i2);
-    verts.push(P.x,P.y,P.z,Q.x,Q.y,Q.z);
+  // スキン変形＋シェイプキー適用後（現在の姿勢）の頂点位置。ワイヤーをメッシュにピッタリ合わせる用。
+  function deformedPositions(mesh){
+    const geo=mesh.geometry, pos=geo.attributes.position, n=pos.count;
+    const out=new Float32Array(n*3), v=new THREE.Vector3(), t=new THREE.Vector3();
+    const morphPos=geo.morphAttributes && geo.morphAttributes.position;
+    const infl=mesh.morphTargetInfluences;
+    const skinned=mesh.isSkinnedMesh;
+    const bt=skinned ? (mesh.applyBoneTransform?mesh.applyBoneTransform.bind(mesh):mesh.boneTransform.bind(mesh)) : null;
+    for(let i=0;i<n;i++){
+      v.fromBufferAttribute(pos,i);
+      // glTFのモーフは相対値なので base + Σ w*delta
+      if(morphPos&&infl){
+        for(let m=0;m<morphPos.length;m++){
+          const w=infl[m]; if(!w)continue;
+          t.fromBufferAttribute(morphPos[m],i); v.addScaledVector(t,w);
+        }
+      }
+      if(bt) bt(i,v);   // スキン変形（ボーン）
+      out[i*3]=v.x; out[i*3+1]=v.y; out[i*3+2]=v.z;
+    }
+    return out;
   }
-  const g=new THREE.BufferGeometry();
-  g.setAttribute("position",new THREE.Float32BufferAttribute(verts,3));
-  return g;
-}
-function buildWires(){
-  if(wiresBuilt||!modelRef)return; wiresBuilt=true;
-  modelRef.traverse(o=>{
-    if(!o.isMesh||!o.userData.matOrig||o.userData.isOutline)return;
-    const l=new THREE.LineSegments(buildQuadWire(o.geometry),lineMat);
-    l.renderOrder=2; l.visible=false;
-    o.add(l); wires.push(l);
-  });
-}
-
-// ===== 読み込み =====
-let mixer=null, clipAction=null; const clock=new THREE.Clock();
-const loader=new GLTFLoader();
-// スキン変形後の実頂点からバウンディングを計算（バインドポーズのT字と実ポーズのズレを防ぐ）
-function computeBounds(root){
-  const box=new THREE.Box3(), tmp=new THREE.Box3();
-  root.updateMatrixWorld(true);
-  root.traverse(o=>{
-    if(o.userData.isOutline)return;
-    if(o.isSkinnedMesh){ o.computeBoundingBox(); tmp.copy(o.boundingBox).applyMatrix4(o.matrixWorld); box.union(tmp); }
-    else if(o.isMesh){ if(!o.geometry.boundingBox)o.geometry.computeBoundingBox(); tmp.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); box.union(tmp); }
-  });
-  return box;
-}
-loader.load(GLB,(gltf)=>{
-  const model=gltf.scene; modelRef=model;
-  if(TOON) toonifyModel(model);
-  model.traverse(o=>{ if(o.isMesh&&!o.userData.isOutline){ o.userData.matOrig=o.material; if(o.isSkinnedMesh)o.frustumCulled=false; } });
-  scene.add(model);
-  // アニメーション：入っていれば先頭クリップをループ再生
-  if(gltf.animations&&gltf.animations.length){
-    mixer=new THREE.AnimationMixer(model);
-    clipAction=mixer.clipAction(gltf.animations[0]);
-    clipAction.play();
+  function disposeWires(){ wires.forEach(w=>{ if(w.parent)w.parent.remove(w); if(w.geometry)w.geometry.dispose(); }); wires=[]; wiresKey=null; }
+  function buildWires(key){
+    if(!modelRef)return;
+    if(wiresKey===key){ return; }
+    disposeWires();
+    modelRef.updateMatrixWorld(true);
+    modelRef.traverse(o=>{
+      if(!o.isMesh||!o.userData.matOrig||o.userData.isOutline)return;
+      const l=new THREE.LineSegments(buildQuadWire(o.geometry,deformedPositions(o)),lineMat);
+      l.renderOrder=2; l.visible=false;
+      o.add(l); wires.push(l);
+    });
+    wiresKey=key;
   }
 
-  // フレーミング：アニメがあれば数ポーズをサンプリングして動き全体を収める
-  let box;
-  if(mixer){
-    box=new THREE.Box3();
-    const dur=gltf.animations[0].duration;
-    for(const t of [0,.25,.5,.75,.999]){ mixer.setTime(t*dur); box.union(computeBounds(model)); }
-    mixer.setTime(0);
-  }else{
-    box=computeBounds(model);
+  // ---- 読み込み ----
+  let mixer=null, actions={}, active=null, activeName=""; const clock=new THREE.Clock();
+  let mode="normal";
+  const loader=new GLTFLoader();
+  // スキン変形後の実頂点からバウンディングを計算（バインドポーズのT字と実ポーズのズレを防ぐ）
+  function computeBounds(root){
+    const box=new THREE.Box3(), tmp=new THREE.Box3();
+    root.updateMatrixWorld(true);
+    root.traverse(o=>{
+      if(o.userData.isOutline)return;
+      if(o.isSkinnedMesh){ o.computeBoundingBox(); tmp.copy(o.boundingBox).applyMatrix4(o.matrixWorld); box.union(tmp); }
+      else if(o.isMesh){ if(!o.geometry.boundingBox)o.geometry.computeBoundingBox(); tmp.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); box.union(tmp); }
+    });
+    return box;
   }
-  const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
-  const maxDim=Math.max(size.x,size.y,size.z);
-  controls.target.copy(center);
-  const dist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2)*1.3;
-  const a=ANGLE*Math.PI/180;
-  camera.position.set(center.x+dist*Math.sin(a), center.y+dist*ELEV, center.z+dist*Math.cos(a));
-  camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
-  controls.update();
-
-  applyMode();
-  holder.style.backgroundImage="";
-  spin.classList.add("off");
-},(e)=>{
-  if(e&&e.total){ spinTxt.textContent="読み込み中 "+Math.round(100*e.loaded/e.total)+"%"; }
-},(err)=>{
-  spinTxt.textContent="読み込みに失敗しました"; console.error(err);
-});
-
-// ===== モードUI =====
-const modeBtns=[...document.querySelectorAll("#gv-mode button")];
-let mode="normal";
-function applyMode(){
-  if(modelRef){
-    if(mode==="wire"){
-      buildWires();
-      if(mixer){ mixer.stopAllAction(); modelRef.traverse(o=>{ if(o.isSkinnedMesh) o.skeleton.pose(); }); }
-    }else if(clipAction){ clipAction.play(); }
-    modelRef.traverse(o=>{ if(o.isMesh&&o.userData.matOrig){
-      o.material=(mode==="wire")?clayMat:o.userData.matOrig;
+  function activate(name,fade){
+    const next=actions[name]; if(!next||next===active)return;
+    next.reset(); next.setEffectiveTimeScale(1); next.setEffectiveWeight(1); next.play();
+    if(active&&fade) active.crossFadeTo(next,fade,false);
+    else if(active) active.stop();
+    active=next; activeName=name;
+    if(clipBox)[...clipBox.querySelectorAll("button")].forEach(b=>b.classList.toggle("on",b.dataset.clip===name));
+  }
+  loader.load(GLB,(gltf)=>{
+    const model=gltf.scene; modelRef=model;
+    if(TOON) toonifyModel(model);
+    model.traverse(o=>{ if(o.isMesh&&!o.userData.isOutline){
+      o.userData.matOrig=o.material;
+      if(o.isSkinnedMesh)o.frustumCulled=false;
+      if(!TOON&&o.material&&o.material.envMapIntensity!=null)o.material.envMapIntensity=ENVI;
+      if(o.morphTargetInfluences)o.userData.morphOrig=o.morphTargetInfluences.slice();
     }});
-    wires.forEach(w=>w.visible=(mode==="wire"));
-    outlines.forEach(ol=>ol.visible=(mode!=="wire"));
-  }
-  modeBtns.forEach(b=>b.classList.toggle("on",b.dataset.mode===mode));
-}
-modeBtns.forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode; applyMode();}));
+    scene.add(model);
 
-resize();
-const _L=new THREE.Vector3(), _R=new THREE.Vector3(), _UP=new THREE.Vector3(0,1,0);
-renderer.setAnimationLoop(()=>{
-  controls.update();
-  if(mixer&&mode!=="wire")mixer.update(clock.getDelta());
-  if(TOON&&toonMats.length){
-    _L.copy(camera.position).sub(controls.target).normalize();
-    _R.setFromMatrixColumn(camera.matrixWorld,0);
-    _L.addScaledVector(_R,TOON_LIGHT.x).addScaledVector(_UP,TOON_LIGHT.y).normalize();
-    for(const m of toonMats) m.uniforms.uLightDir.value.copy(_L);
+    // アニメーション：全クリップを登録（先頭を再生）。フレーミングは全クリップの実ポーズを収める
+    const clips=gltf.animations||[];
+    let box;
+    if(clips.length){
+      mixer=new THREE.AnimationMixer(model);
+      box=new THREE.Box3();
+      clips.forEach(clip=>{
+        mixer.stopAllAction();
+        const a=mixer.clipAction(clip); a.reset(); a.play();
+        const dur=clip.duration||1;
+        for(const t of [0,.2,.4,.6,.8,.999]){ mixer.setTime(t*dur); box.union(computeBounds(model)); }
+      });
+      mixer.stopAllAction(); mixer.setTime(0);
+      clips.forEach(clip=>{ actions[clip.name]=mixer.clipAction(clip); });
+      if(clipBox&&clips.length>1){
+        clipBox.innerHTML="";
+        clips.forEach(c=>{
+          const b=document.createElement("button"); b.type="button"; b.dataset.clip=c.name; b.textContent=c.name;
+          b.addEventListener("click",()=>{ if(mode!=="wire")activate(c.name,0.35); });
+          clipBox.appendChild(b);
+        });
+      }
+      activate(clips[0].name,0);
+    }else{
+      box=computeBounds(model);
+    }
+
+    const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
+    const maxDim=Math.max(size.x,size.y,size.z);
+    controls.target.copy(center);
+    const dist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2)*ZOOM;
+    const a=ANGLE*Math.PI/180;
+    camera.position.set(center.x+dist*Math.sin(a), center.y+dist*ELEV, center.z+dist*Math.cos(a));
+    camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
+    controls.update();
+
+    applyMode();
+    holder.style.backgroundImage="";
+    if(spin)spin.classList.add("off");
+  },(e)=>{
+    if(e&&e.total&&spinTxt){ spinTxt.textContent="読み込み中 "+Math.round(100*e.loaded/e.total)+"%"; }
+  },(err)=>{
+    if(spinTxt)spinTxt.textContent="読み込みに失敗しました"; console.error(err);
+  });
+
+  // ---- モードUI ----
+  const modeBtns=modeBox?[...modeBox.querySelectorAll("button")]:[];
+  function applyMode(){
+    if(modelRef){
+      if(mode==="wire"){
+        // 先頭フレーム(0秒)の実ポーズで静止し、その変形後頂点からワイヤーを生成
+        if(mixer&&active){ mixer.stopAllAction(); active.reset(); active.play(); mixer.setTime(0); }
+        modelRef.updateMatrixWorld(true);
+        buildWires(activeName||"static");
+      }else{
+        // ノーマル復帰：元のシェイプキー値に戻す（以降はmixerが動かす）
+        modelRef.traverse(o=>{ if(o.isMesh&&o.userData.morphOrig&&o.morphTargetInfluences){
+          const mo=o.userData.morphOrig; for(let i=0;i<mo.length;i++)o.morphTargetInfluences[i]=mo[i];
+        }});
+      }
+      modelRef.traverse(o=>{ if(o.isMesh&&o.userData.matOrig&&!o.userData.isOutline){
+        o.material=(mode==="wire")?clayMat:o.userData.matOrig;
+      }});
+      wires.forEach(w=>w.visible=(mode==="wire"));
+      outlines.forEach(ol=>ol.visible=(mode!=="wire"));
+    }
+    modeBtns.forEach(b=>b.classList.toggle("on",b.dataset.mode===mode));
   }
-  renderer.render(scene,camera);
+  modeBtns.forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode; applyMode();}));
+
+  resize();
+  const _L=new THREE.Vector3(), _R=new THREE.Vector3(), _UP=new THREE.Vector3(0,1,0);
+  renderer.setAnimationLoop(()=>{
+    controls.update();
+    if(mixer&&mode!=="wire")mixer.update(clock.getDelta());
+    else clock.getDelta();
+    if(TOON&&toonMats.length){
+      _L.copy(camera.position).sub(controls.target).normalize();
+      _R.setFromMatrixColumn(camera.matrixWorld,0);
+      _L.addScaledVector(_R,TOON_LIGHT.x).addScaledVector(_UP,TOON_LIGHT.y).normalize();
+      for(const m of toonMats) m.uniforms.uLightDir.value.copy(_L);
+    }
+    renderer.render(scene,camera);
+  });
+}
+
+// ===== 全ビューアを検出。ポスターは即時、WebGLとGLBは画面に近づいてから =====
+document.querySelectorAll("#gviewer, .gv3d").forEach(holder=>{
+  if(holder.dataset.poster){
+    holder.style.backgroundImage="url('"+holder.dataset.poster+"')";
+    holder.style.backgroundSize="cover"; holder.style.backgroundPosition="center";
+  }
+  if("IntersectionObserver" in window){
+    const io=new IntersectionObserver((es)=>{
+      es.forEach(e=>{ if(e.isIntersecting){ io.disconnect(); initViewer(holder); } });
+    },{rootMargin:"600px"});
+    io.observe(holder);
+  }else{
+    initViewer(holder);
+  }
 });

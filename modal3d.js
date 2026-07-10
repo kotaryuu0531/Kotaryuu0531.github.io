@@ -242,16 +242,19 @@ function mountEntry(entry, opts){
     ambL.intensity=Math.PI*.4*(strong?0.375:0.75);
   }
 
-  // フレーミング
+  // フレーミング（data-angle / data-elev / data-zoom があれば優先）
   const box=entry.box;
   const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
   const maxDim=Math.max(size.x,size.y,size.z);
   camera.fov=entry.isToon?28:30;
   controls.target.copy(center);
-  const dist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2)*(entry.isToon?1.25:1.3);
-  const a=(entry.isToon?20:-28)*Math.PI/180;
+  const zoom=(opts.zoom!=null&&!isNaN(parseFloat(opts.zoom)))?parseFloat(opts.zoom):(entry.isToon?1.25:1.3);
+  const angDeg=(opts.angle!=null&&!isNaN(parseFloat(opts.angle)))?parseFloat(opts.angle):(entry.isToon?20:-28);
+  const elev=(opts.elev!=null&&!isNaN(parseFloat(opts.elev)))?parseFloat(opts.elev):(entry.isToon?0.10:0.28);
+  const dist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2)*zoom;
+  const a=angDeg*Math.PI/180;
   camera.position.set(center.x+dist*Math.sin(a),
-                      center.y+dist*(entry.isToon?0.10:0.28),
+                      center.y+dist*elev,
                       center.z+dist*Math.cos(a));
   camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
   controls.update();
@@ -277,6 +280,10 @@ export function open(opts){
     const list=[];
     let box=new THREE.Box3().setFromObject(group);
     if(opts.toon) toonify(group, box, list);
+    else if(opts.env!=null&&!isNaN(parseFloat(opts.env))){
+      const ei=parseFloat(opts.env);
+      group.traverse(o=>{ if(o.isMesh&&o.material&&o.material.envMapIntensity!=null)o.material.envMapIntensity=ei; });
+    }
     let mixer=null;
     if(gltf.animations&&gltf.animations.length){
       mixer=new THREE.AnimationMixer(group);

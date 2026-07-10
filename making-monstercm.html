@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>モンスターエナジー風パロディCM — フルCG30秒 / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-size:clamp(15px,1.9vw,19px);color:var(--ink-mut);margin-bottom:20px;opacity:.92}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+
+  /* 動画フレーム（クリック再生） */
+  .hero-video{position:relative;aspect-ratio:16/9;margin:18px 0 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .hero-video .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;
+    border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .hero-video .play::after{content:"";border-left:17px solid var(--ink);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;transition:border-color .3s}
+  .hero-video:hover{border-color:var(--amber-dim)}
+  .hero-video:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .hero-video:hover .play::after{border-left-color:var(--amber)}
+  .hero-video:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .hero-video.playing{cursor:default}
+  .hero-video.playing .poster,.hero-video.playing .play{display:none}
+  .hero-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+
+  /* インタラクティブ3Dビューア（複数） */
+  .viewer{margin-top:clamp(24px,4vh,40px)}
+  .gv3d{position:relative;width:100%;height:min(62vh,520px);touch-action:none;overflow:hidden;
+    background:radial-gradient(130% 110% at 50% 30%, #1b212a 0%, #0c0f14 72%);
+    border:1px solid var(--line);border-radius:var(--r)}
+  .gv3d canvas{display:block;width:100%;height:100%;outline:none}
+  .gv3d .spin{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;
+    background:rgba(10,13,18,.55);z-index:3;transition:opacity .35s}
+  .gv3d .spin.off{opacity:0;pointer-events:none}
+  .gv3d .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:gvspin 1s linear infinite}
+  .gv3d .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
+  @keyframes gvspin{to{transform:rotate(360deg)}}
+  .gv-row{display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;align-items:center}
+  .gv-ui{display:flex;gap:6px}
+  .gv-ui button{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;background:none;
+    border:1px solid var(--line);color:var(--ink-mut);padding:6px 14px;border-radius:100px;cursor:pointer;transition:border-color .2s,color .2s}
+  .gv-ui button:hover{border-color:var(--amber-dim)}
+  .gv-ui button.on{border-color:var(--amber);color:var(--amber)}
+  .gv-ui.gv-clip:empty{display:none}
+  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
+
+  /* feature */
+  .feature{margin:clamp(40px,7vh,72px) 0 0;padding:clamp(32px,5vh,52px) 0 0;border-top:1px solid var(--line)}
+  .lbl{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--amber);margin-bottom:12px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3.4vw,38px);line-height:1.14;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .feature a:hover{border-color:var(--amber)}
+
+  /* 画像グリッド */
+  .grid2,.grid3{display:grid;gap:14px;margin-top:18px}
+  .grid2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .grid3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .grid2 figure,.grid3 figure{margin:0}
+  .imgbox{position:relative;aspect-ratio:4/3;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface);cursor:zoom-in}
+  .imgbox.wide{aspect-ratio:16/9}
+  .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .grid2 figcaption,.grid3 figcaption,figure>figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:8px}
+  .figcap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:10px}
+
+  /* ループ動画・SE動画 */
+  .loopvid{width:100%;aspect-ratio:16/9;display:block;margin:18px 0 0;border:1px solid var(--line);border-radius:var(--r);background:#000;object-fit:cover}
+  .sevid{width:100%;aspect-ratio:16/9;display:block;border:1px solid var(--line);border-radius:var(--r);background:#000}
+
+  /* タイムライン */
+  .tl{margin:18px 0 0}
+  .tl-row{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:14px 0;border-top:1px solid var(--line)}
+  .tl-row:last-child{border-bottom:1px solid var(--line)}
+  .tl-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber);padding-top:2px}
+  .tl-row dd{font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.tl-row{grid-template-columns:1fr;gap:4px}}
+
+  /* spec */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  /* ライトボックス（アトラス縦横ナビ対応） */
+  .lightbox{position:fixed;inset:0;z-index:60;background:rgba(5,7,10,.93);display:none;
+    align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lightbox .lb-cap{position:absolute;left:18px;bottom:14px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-mut)}
+  .lb-nav{position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(10,13,18,.65);
+    color:var(--ink);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+  .lb-nav:hover{border-color:var(--amber);color:var(--amber)}
+  .lb-l{left:14px;top:50%;transform:translateY(-50%)}
+  .lb-r{right:14px;top:50%;transform:translateY(-50%)}
+  .lb-u{top:14px;left:50%;transform:translateX(-50%) rotate(90deg)}
+  .lb-d{bottom:14px;left:50%;transform:translateX(-50%) rotate(-90deg)}
+  .lightbox.plain .lb-nav{display:none}
+  .lightbox.no-v .lb-u,.lightbox.no-v .lb-d{display:none}
+  .lightbox.no-h .lb-l,.lightbox.no-h .lb-r{display:none}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  p,.lead,.feature p{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-cg">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">PARODY CM — CG個人制作 / 2021–2026</div>
+    <h1><span class="nb">モンスターエナジー風</span> <span class="nb">パロディCM</span></h1>
+    <div class="subtitle">虎とステイサム風キャラクターが対峙する、フルCGの30秒（非公式・ファン制作）</div>
+    <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=シネマティック">シネマティック</a><a class="htag" href="works.html?tags=30秒CM">30秒CM</a></div>
+    <p class="lead">エナジードリンク「モンスターエナジー」のCMを勝手に作った、フルCGの30秒パロディです。地下闘技場で虎とステイサム風のキャラクターが対峙し、虎が吠える→キャッチコピー→壁の爪痕からロゴ→商品カット。モデリング・リグ・アニメーション・ライティング・Cyclesレンダリング・グレーディングまで、全工程を1人で制作しました。始まりは2022年の寅年年賀状のために作った1体の虎。そこから断続的に5年かけて、2026年に完成した一本です。</p>
+
+    <!-- 本編（2026リメイク完成版・クリック再生） -->
+    <div class="hero-video rv" data-yt="oGyDT1T_H4Y" tabindex="0" role="button" aria-label="モンスターエナジー風パロディCM（2026完成版）を再生">
+      <img class="poster" src="https://img.youtube.com/vi/oGyDT1T_H4Y/maxresdefault.jpg"
+           onerror="this.onerror=null;this.src='https://img.youtube.com/vi/oGyDT1T_H4Y/hqdefault.jpg'" alt="モンスターエナジー風パロディCM 本編サムネイル">
+      <div class="play"></div>
+    </div>
+
+    <!-- 2026リメイク -->
+    <section class="feature rv">
+      <div class="lbl">2026 REMAKE</div>
+      <h3>「見応えがない」から、作り直す</h3>
+      <p>このCMは2025年10月に一度完成し、公開しています。しかしポートフォリオに載せるために見返したとき、「見応えがない」と判断しました。そこで2026年、アニメーションと背景を作り直してリメイクしたのが、上の完成版です。</p>
+      <p>30秒の構成は変えていません。地下闘技場での対峙→虎の咆哮→キャッチコピー→壁の爪痕からMロゴが現れる→商品カット。全編をBlenderのCyclesでレンダリングし、DaVinci Resolveでグレーディングして仕上げています。以前のバージョンとの比較は、ページ末尾の<a href="#story">STORY</a>に載せています。</p>
+    </section>
+
+    <!-- ============ MODELS ============ -->
+
+    <!-- 虎 -->
+    <section class="feature rv" id="tiger">
+      <div class="lbl">MODEL 01 — TIGER</div>
+      <h3>5年育てた主役</h3>
+      <p>2021年11月、寅年の年賀状のために初めて作った動物モデルが、この虎の原点です（→<a href="making-nenga2022.html">2022年 寅年年賀状</a>）。43ボーンのリグは自作。2024年にトポロジーとUVを据え置いたまま顔の頂点位置だけを整形し、2026年に毛（パーティクルとそのマテリアル）を作り直して、いまの姿になりました。下のビューアで、CMで使ったwalk／dashのアニメーションを切り替えながら回せます。</p>
+      <div class="viewer">
+        <div class="gv3d" data-glb="tiger.glb" data-angle="-162" data-elev="-0.05" data-zoom="0.70" data-fov="30" data-exposure="1.05" data-dir="0.75" data-amb="0.70" data-env="1.0" aria-label="虎の3DCGモデル（ドラッグで回転できます）">
+          <div class="spin"><div class="ring"></div><div class="spin-txt">読み込み中…</div></div>
+        </div>
+        <div class="gv-row">
+          <div class="gv-ui gv-clip"></div>
+          <div class="gv-ui gv-mode">
+            <button type="button" data-mode="normal" class="on">ノーマル</button>
+            <button type="button" data-mode="wire">ワイヤー</button>
+          </div>
+          <div class="gv-ui"><button type="button" class="gv-rot on">オートターン: ON</button></div>
+        </div>
+        <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小。walk／dashはクロスフェードで切り替わります。ワイヤーフレーム表示中はアニメーションの先頭フレームで静止します。</figcaption>
+      </div>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Reshape 2024 — トポロジーを変えずに、顔だけ整形</h3>
+      <p>2024年5月、トポロジーとUVは一切変えず、顔の頂点位置だけを動かして整形しました。テクスチャやリグを壊さずに、造形だけを更新するアプローチです。拡大して ←→ で旧・新を直接比較できます。</p>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-front-old.jpg" alt="顔ワイヤー 正面｜旧（2021）" data-atlas="reshape" data-r="0" data-c="0" loading="lazy"></div><figcaption>FRONT / BEFORE（2021）</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-front.jpg" alt="顔ワイヤー 正面｜新（2024整形後）" data-atlas="reshape" data-r="0" data-c="1" loading="lazy"></div><figcaption>FRONT / AFTER（2024）</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-side-old.jpg" alt="顔ワイヤー 側面｜旧（2021）" data-atlas="reshape" data-r="1" data-c="0" loading="lazy"></div><figcaption>SIDE / BEFORE（2021）</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-facewire-side.jpg" alt="顔ワイヤー 側面｜新（2024整形後）" data-atlas="reshape" data-r="1" data-c="1" loading="lazy"></div><figcaption>SIDE / AFTER（2024）</figcaption></figure>
+      </div>
+      <p class="figcap">拡大中は ←→＝旧・新の比較、↑↓＝正面・側面の切替。</p>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-tiger-wire-front.jpg" alt="全身ワイヤーフレーム 正面" data-gal="twire" loading="lazy"></div><figcaption>FULL BODY / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-wire-side.jpg" alt="全身ワイヤーフレーム 側面" data-gal="twire" loading="lazy"></div><figcaption>FULL BODY / SIDE</figcaption></figure>
+      </div>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Rig &amp; Expression — 43ボーンとシェイプキー</h3>
+      <p>四足のリグは43ボーンの自作です。表情はシェイプキーで制御し、CMの咆哮カットで使いました。</p>
+      <div class="grid3">
+        <figure><div class="imgbox"><img src="mc-tiger-rig-front.jpg" alt="リグ 正面（43ボーン）" data-gal="trig" loading="lazy"></div><figcaption>RIG / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-rig-side.jpg" alt="リグ 側面" data-gal="trig" loading="lazy"></div><figcaption>RIG / SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-rig-pose.jpg" alt="リグ ポーズ付き" data-gal="trig" loading="lazy"></div><figcaption>RIG / POSED</figcaption></figure>
+      </div>
+      <div class="grid3">
+        <figure><div class="imgbox"><img src="mc-tiger-2026-front.jpg" alt="表情｜デフォルト" data-gal="tface" loading="lazy"></div><figcaption>DEFAULT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-face-bark.jpg" alt="表情｜咆哮" data-gal="tface" loading="lazy"></div><figcaption>ROAR</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-face-smile.jpg" alt="表情｜笑顔" data-gal="tface" loading="lazy"></div><figcaption>SMILE</figcaption></figure>
+      </div>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Texture / UV — 実写の虎を、投影して描く</h3>
+      <p>テクスチャはBlenderのテクスチャペイントで制作しました。ブラシのテクスチャに実写の虎の写真を指定し、モデルへ投影しながら描く方法です。素材はWeb上で収集した実写虎の写真——つまり第三者の著作物を参考・投影して制作した、学習目的・非商用の習作です。</p>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-tiger-tex.jpg" alt="虎のテクスチャ" data-gal="tuv" loading="lazy"></div><figcaption>TEXTURE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-uv.jpg" alt="虎のUV展開" data-gal="tuv" loading="lazy"></div><figcaption>UV</figcaption></figure>
+      </div>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-tiger-ref-front.jpg" alt="実写リファレンス 正面" data-gal="tref" loading="lazy"></div><figcaption>REFERENCE / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-ref-side.jpg" alt="実写リファレンス 側面" data-gal="tref" loading="lazy"></div><figcaption>REFERENCE / SIDE</figcaption></figure>
+      </div>
+      <p class="figcap">モデリング・テクスチャの見本にした実写リファレンス（Web上で収集した第三者の写真・学習用）。</p>
+    </section>
+
+    <!-- ステイサム -->
+    <section class="feature rv" id="statham">
+      <div class="lbl">MODEL 02 — STATHAM</div>
+      <h3>対戦相手は、ハリウッド俳優風</h3>
+      <p>2024年6月、虎の対戦相手として制作した、実在俳優に似せたファンアートのキャラクターです。頭部は、FBHeadアドオンの無料期間中に生成したベースのメッシュとテクスチャを、手作業で修正して制作。頭部より下はMetaHumanのメッシュ・テクスチャ・ノーマルマップを利用しています。リグはMetaHumanのボーンをうまく扱えなかったため自作——キャラクターモデル「<a href="making-taigei.html">大鯨</a>」で自作した人型リグを流用し、上半身はボーンを直接操作、下半身はIKで制御する構成です（虎・大鯨と同じく自作リグで統一）。</p>
+      <div class="viewer">
+        <div class="gv3d" data-glb="statham.glb" data-angle="42" data-elev="0.20" data-zoom="1.06" data-fov="30" data-exposure="1.00" data-dir="0.60" data-amb="0.80" data-env="1.0" aria-label="ステイサム風キャラクターの3DCGモデル（ドラッグで回転できます）">
+          <div class="spin"><div class="ring"></div><div class="spin-txt">読み込み中…</div></div>
+        </div>
+        <div class="gv-row">
+          <div class="gv-ui gv-clip"></div>
+          <div class="gv-ui gv-mode">
+            <button type="button" data-mode="normal" class="on">ノーマル</button>
+            <button type="button" data-mode="wire">ワイヤー</button>
+          </div>
+          <div class="gv-ui"><button type="button" class="gv-rot on">オートターン: ON</button></div>
+        </div>
+        <figcaption class="cap">walkアニメーションをループ再生。Web表示用に78.66MB→10.18MBへ軽量化したGLBです（カラーテクスチャのみ2K化。凹凸のディテールは表示用の割り切りで省略）。</figcaption>
+      </div>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-statham-render-front.jpg" alt="頭部レンダリング 正面" data-gal="srender" loading="lazy"></div><figcaption>RENDER / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-statham-render-side.jpg" alt="頭部レンダリング 側面" data-gal="srender" loading="lazy"></div><figcaption>RENDER / SIDE</figcaption></figure>
+      </div>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-statham-wire-front.jpg" alt="頭部ワイヤーフレーム 正面" data-gal="swire" loading="lazy"></div><figcaption>WIREFRAME / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-statham-wire-side.jpg" alt="頭部ワイヤーフレーム 側面" data-gal="swire" loading="lazy"></div><figcaption>WIREFRAME / SIDE</figcaption></figure>
+      </div>
+      <p class="figcap">ワイヤーとUVは、本人が改変した頭部のみ掲載しています（頭部より下はMetaHuman素材）。</p>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Rig &amp; Expression</h3>
+      <div class="grid3">
+        <figure><div class="imgbox"><img src="mc-statham-rig.jpg" alt="自作リグ（大鯨のリグを流用）" loading="lazy"></div><figcaption>RIG（ポーズ時に動かすボーンのみ表示）</figcaption></figure>
+      </div>
+      <p style="margin-top:14px">表情はシェイプキーで制作し、CMでは対峙の演技に使いました。口を開けた表情では口内の作り込みの浅さが出ますが、咆哮はCMの文脈で必要と判断して制作しています。</p>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-statham-face-neutral.jpg" alt="表情｜真顔" data-gal="sface" loading="lazy"></div><figcaption>NEUTRAL</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-statham-face-angry.jpg" alt="表情｜怒り" data-gal="sface" loading="lazy"></div><figcaption>ANGRY</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-statham-face-roar.jpg" alt="表情｜咆哮" data-gal="sface" loading="lazy"></div><figcaption>ROAR</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-statham-face-smile.jpg" alt="表情｜笑顔" data-gal="sface" loading="lazy"></div><figcaption>SMILE</figcaption></figure>
+      </div>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Texture / UV（頭部）</h3>
+      <p>頭部テクスチャは、実在俳優の顔写真をテクスチャペイントで投影して制作しました。虎と同じく、第三者の写真をベースにした学習目的・非商用の習作です。肖像を扱うファン制作である旨をあわせて明記します。</p>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-statham-tex.jpg" alt="頭部テクスチャ" data-gal="suv" loading="lazy"></div><figcaption>TEXTURE / HEAD</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-statham-uv.jpg" alt="頭部UV展開" data-gal="suv" loading="lazy"></div><figcaption>UV / HEAD</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 缶 -->
+    <section class="feature rv" id="can">
+      <div class="lbl">MODEL 03 — CAN</div>
+      <h3>実物を切り開いて、テクスチャにする</h3>
+      <p>缶の初代は、2021年夏の「<a href="making-challenge.html">1日1モデリング 30日チャレンジ</a>」で作った、円柱にロゴを貼っただけのものでした。2022年1月13日、実物を見ながら採寸して作り直し。ラベルは、実物のアルミ缶をカッターで切り開いて平らに撮影し、そこからテクスチャを制作しています。ブランドやロゴは実在製品のもので、非公式・ファン制作の習作です。</p>
+      <div class="viewer">
+        <div class="gv3d" data-glb="can.glb" data-angle="0" data-elev="0.05" data-zoom="1.22" data-fov="30" data-exposure="1.25" data-dir="0.75" data-amb="0.70" data-env="6.0" aria-label="モンスターエナジー缶の3DCGモデル（ドラッグで回転できます）">
+          <div class="spin"><div class="ring"></div><div class="spin-txt">読み込み中…</div></div>
+        </div>
+        <div class="gv-row">
+          <div class="gv-ui gv-mode">
+            <button type="button" data-mode="normal" class="on">ノーマル</button>
+            <button type="button" data-mode="wire">ワイヤー</button>
+          </div>
+          <div class="gv-ui"><button type="button" class="gv-rot on">オートターン: ON</button></div>
+        </div>
+        <figcaption class="cap">頂点 1,090／三角面 2,176 の軽いモデル。金属の質感は環境マップの映り込みで出しています。</figcaption>
+      </div>
+      <div class="grid3">
+        <figure><div class="imgbox"><img src="mc-can-real.jpg" alt="実物のアルミ缶を切り開いた写真" loading="lazy"></div><figcaption>REAL CAN（切り開いてテクスチャの元に）</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-can-tex.jpg" alt="缶のテクスチャ" data-gal="cuv" loading="lazy"></div><figcaption>TEXTURE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-can-uv.jpg" alt="缶のUV展開" data-gal="cuv" loading="lazy"></div><figcaption>UV</figcaption></figure>
+      </div>
+      <div class="grid2">
+        <figure><div class="imgbox"><img src="mc-can-render.jpg" alt="缶の完成レンダリング" data-gal="cpv" loading="lazy"></div><figcaption>RENDER</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-can-wire.jpg" alt="缶のワイヤーフレーム" data-gal="cpv" loading="lazy"></div><figcaption>WIREFRAME</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 背景 -->
+    <section class="feature rv" id="arena">
+      <div class="lbl">MODEL 04 — ARENA</div>
+      <h3>過去アセットの流用で、闘技場を短時間で組む</h3>
+      <p>舞台の地下闘技場は、2026年リメイクで作り直したパートです。ゼロから作らず、金網とトラスは旧版のこのCMから、照明は「<a href="making-birthday21.html">21歳誕生日予告</a>」のシーンから流用して、短時間で構築しました。過去の自作アセットを管理して再利用する、という制作の効率化です。</p>
+      <p>壁には、Mのロゴを引き裂いたような爪痕を入れています。CM後半、この爪痕からロゴが現れる演出への伏線です。</p>
+      <div class="grid2" style="grid-template-columns:1fr">
+        <figure><div class="imgbox wide"><img src="mc-arena.jpg" alt="地下闘技場の完成レンダリング" loading="lazy"></div><figcaption>UNDERGROUND ARENA / RENDER</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- ============ PROCESS ============ -->
+
+    <section class="feature rv" id="animation">
+      <div class="lbl">PROCESS — ANIMATION</div>
+      <h3>猫を観察して、虎を動かす</h3>
+      <p>アニメーションはwalk／dash（上のビューアで再生しているもの）と、咆哮。虎の動きの資料は意外と少ないため、豊富にある猫の動画を大量に観察して、四足の重心移動や体の使い方を研究しました（映像そのものは使わず、観察のみです）。咆哮は2022年1月に最初のバージョンを制作し、2024年に「正面から見てカッコよくない」と改良を試みた末、2026年リメイクで作り直しています。</p>
+      <video class="loopvid" autoplay loop muted playsinline preload="metadata" aria-label="虎の咆哮アニメーションのレンダリング（往復スロー再生）">
+        <source src="mc-tigerbark.webm" type="video/webm">
+        <source src="mc-tigerbark.mp4" type="video/mp4">
+      </video>
+      <p class="figcap">咆哮アニメーションのレンダリング（10フレームを往復スロー再生でループ表示）。</p>
+    </section>
+
+    <section class="feature rv" id="sound">
+      <div class="lbl">PROCESS — SOUND / FOLEY</div>
+      <h3>炭酸も足音も、自分で録る</h3>
+      <p>音の出典は正直に分けて書きます。虎の鳴き声はPixabayのフリー素材を、ライセンスに基づいて使用しました。それ以外のSEは、自分で録音したフォーリーです。炭酸の弾ける音は、メントスを入れた容器にコーラを注ぎ、コンデンサーマイクで収録。虎が固い地面を走る足音は、硬い床に毛布を敷いて叩いた音を加工して作りました。収録の様子はそのまま動画で残しています——再生すると音が出ます。</p>
+      <div class="grid2">
+        <figure>
+          <video class="sevid" controls preload="none" poster="mc-se-soda-poster.jpg" playsinline>
+            <source src="monstercm-se-soda.webm" type="video/webm">
+            <source src="monstercm-se-soda.mp4" type="video/mp4">
+          </video>
+          <figcaption>FOLEY / 炭酸 — メントス＋コーラをコンデンサーマイクで収録（音が出ます）</figcaption>
+        </figure>
+        <figure>
+          <video class="sevid" controls preload="none" poster="mc-se-footstep-poster.jpg" playsinline>
+            <source src="monstercm-se-footstep.webm" type="video/webm">
+            <source src="monstercm-se-footstep.mp4" type="video/mp4">
+          </video>
+          <figcaption>FOLEY / 足音 — 硬い床に毛布を敷いて叩いた音を加工（音が出ます）</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ============ STORY ============ -->
+    <section class="feature rv" id="story">
+      <div class="lbl">STORY — 2021 → 2026</div>
+      <h3>年賀状の虎が、CMの主役になるまで</h3>
+      <p>この作品のいちばんの中身は、5年間の積み重ねそのものです。1体のモデルを捨てずに育て続け、造形・毛・アニメーションを段階的に更新してきました。</p>
+      <dl class="tl">
+        <div class="tl-row"><dt>2021.11–12</dt><dd>寅年の年賀状のために虎を制作（→<a href="making-nenga2022.html">2022年 寅年年賀状</a>）</dd></div>
+        <div class="tl-row"><dt>2022.01</dt><dd>年賀状を公開。咆哮アニメーションを制作し、モンエナ缶を実物からリメイク。この頃「モンエナCMを虎で作る」というアイデアが芽生える</dd></div>
+        <div class="tl-row"><dt>2024.03–04</dt><dd>咆哮アニメの改良を試みるも「正面から見てカッコよくない」と結論</dd></div>
+        <div class="tl-row"><dt>2024.05</dt><dd>トポロジー・UVを据え置いたまま顔を整形。CM後半（咆哮→キャッチコピー→爪痕→ロゴ→商品カット）が完成</dd></div>
+        <div class="tl-row"><dt>2024.06</dt><dd>対戦相手としてステイサム風キャラクターを制作</dd></div>
+        <div class="tl-row"><dt>2025.09–10</dt><dd>アニメーションをブラッシュアップして残りを制作。全編Cyclesレンダリングを経て、2025版が完成・公開</dd></div>
+        <div class="tl-row"><dt>2026.07</dt><dd>ポートフォリオ用に見返して「見応えがない」と判断。アニメーションと背景を作り直し、リメイク版（ページ冒頭の本編）が完成</dd></div>
+      </dl>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">3 Generations — 同一条件で並べる、5年の進化</h3>
+      <p>2022・2025・2026の3世代の虎を、同一ライティング・同一画角でレンダリングして並べました。2022→2025はメッシュの変化（2024年の顔整形）、2025→2026はパーティクルとそのマテリアル——つまり毛の作り直しです。拡大して ←→ で世代を送ると、進化がそのまま見えます。</p>
+      <div class="grid3">
+        <figure><div class="imgbox"><img src="mc-tiger-2022-front.jpg" alt="虎 2022世代 正面" data-atlas="gen" data-r="0" data-c="0" loading="lazy"></div><figcaption>2022 / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-2025-front.jpg" alt="虎 2025世代 正面" data-atlas="gen" data-r="0" data-c="1" loading="lazy"></div><figcaption>2025 / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-2026-front.jpg" alt="虎 2026世代 正面" data-atlas="gen" data-r="0" data-c="2" loading="lazy"></div><figcaption>2026 / FRONT</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-2022-side.jpg" alt="虎 2022世代 側面" data-atlas="gen" data-r="1" data-c="0" loading="lazy"></div><figcaption>2022 / SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-2025-side.jpg" alt="虎 2025世代 側面" data-atlas="gen" data-r="1" data-c="1" loading="lazy"></div><figcaption>2025 / SIDE</figcaption></figure>
+        <figure><div class="imgbox"><img src="mc-tiger-2026-side.jpg" alt="虎 2026世代 側面" data-atlas="gen" data-r="1" data-c="2" loading="lazy"></div><figcaption>2026 / SIDE</figcaption></figure>
+      </div>
+      <p class="figcap">拡大中は ←→＝世代の切替、↑↓＝正面・側面の切替。3世代とも同一ライティング・同一画角。</p>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Previous Version — 2025版（フル）</h3>
+      <p>作り直す前の2025版も、比較のためにそのまま置いておきます。同じ構成・同じモデルでも、アニメーションと背景でここまで印象が変わる——という記録です。</p>
+      <div class="hero-video" data-yt="9PBba93BHg8" tabindex="0" role="button" aria-label="2025版のCMを再生">
+        <img class="poster" src="https://img.youtube.com/vi/9PBba93BHg8/maxresdefault.jpg"
+             onerror="this.onerror=null;this.src='https://img.youtube.com/vi/9PBba93BHg8/hqdefault.jpg'" alt="2025版CMのサムネイル" loading="lazy">
+        <div class="play"></div>
+      </div>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>公開</dt><dd>2025年10月13日（2025版）／2026年7月（2026リメイク版・本ページ掲載の完成版）</dd></div>
+      <div class="spec-row"><dt>形式</dt><dd>30秒パロディCM（フルCG）</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>モデリング・リグ・アニメーション・ライティング・Cyclesレンダリング・グレーディング・SE収録（個人制作）</dd></div>
+      <div class="spec-row"><dt>題材</dt><dd>エナジードリンク「モンスターエナジー」のCM風パロディ。実在俳優に似せたキャラクターを含む、非公式・ファン制作の習作です。ブランド・ロゴ・肖像等の権利は各権利者に帰属します</dd></div>
+      <div class="spec-row"><dt>モデル</dt><dd>虎（自作リグ43ボーン・三角面 85,712 ※Web表示用GLBの値）／ステイサム風キャラクター（頂点 66,065・三角面 129,739 ※Blender編集時）／モンエナ缶（頂点 1,090・三角面 2,176）／地下闘技場</dd></div>
+      <div class="spec-row"><dt>音</dt><dd>虎の鳴き声＝Pixabayのフリー素材（ライセンスに基づき使用）／炭酸・足音＝本人録音のフォーリー</dd></div>
+      <div class="spec-row"><dt>制作期間</dt><dd>2021年11月〜2026年7月（断続的・約5年）</dd></div>
+      <div class="spec-row"><dt>ツール</dt><dd>Blender（Cyclesレンダリング）、DaVinci Resolve</dd></div>
+    </dl>
+
+    <footer>
+      <a href="index.html#reel-cg">← CGリールに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+  <div class="lightbox" id="lightbox">
+    <img src="" alt="拡大表示">
+    <div class="lb-cap" id="lb-cap"></div>
+    <button class="lb-nav lb-l" id="lb-l" aria-label="左へ">‹</button>
+    <button class="lb-nav lb-r" id="lb-r" aria-label="右へ">›</button>
+    <button class="lb-nav lb-u" id="lb-u" aria-label="上へ">‹</button>
+    <button class="lb-nav lb-d" id="lb-d" aria-label="下へ">›</button>
+  </div>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // ライトボックス（atlas＝縦横ナビ／gal＝横巡回／それ以外＝単発拡大）
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img"), lbCap=document.getElementById("lb-cap");
+  const atlases={}, gals={};
+  let cur=null;   // {kind:"atlas",a,r,c} / {kind:"gal",g,i} / null
+  document.querySelectorAll("[data-atlas]").forEach(img=>{
+    const a=img.dataset.atlas, r=+img.dataset.r, c=+img.dataset.c;
+    if(!atlases[a])atlases[a]=[];
+    if(!atlases[a][r])atlases[a][r]=[];
+    atlases[a][r][c]=img;
+    img.addEventListener("click",()=>openAtlas(a,r,c));
+  });
+  document.querySelectorAll("[data-gal]").forEach(img=>{
+    const g=img.dataset.gal; (gals[g]=gals[g]||[]).push(img);
+    img.addEventListener("click",()=>{
+      cur={kind:"gal",g:g,i:gals[g].indexOf(img)};
+      lb.classList.remove("plain","no-v","no-h");
+      lb.classList.add("open","no-v");
+      showCur();
+    });
+  });
+  document.querySelectorAll(".imgbox img:not([data-atlas]):not([data-gal])").forEach(img=>{
+    img.addEventListener("click",()=>{
+      cur=null; lbImg.src=img.src; lbImg.alt=img.alt||"拡大表示"; lbCap.textContent=img.alt||"";
+      lb.classList.remove("no-v","no-h"); lb.classList.add("open","plain");
+    });
+  });
+  function showCur(){
+    let im=null;
+    if(cur&&cur.kind==="atlas") im=atlases[cur.a][cur.r][cur.c];
+    else if(cur&&cur.kind==="gal") im=gals[cur.g][cur.i];
+    if(!im)return;
+    lbImg.src=im.src; lbImg.alt=im.alt||"拡大表示"; lbCap.textContent=im.alt||"";
+  }
+  function openAtlas(a,r,c){
+    cur={kind:"atlas",a:a,r:r,c:c};
+    const rows=atlases[a].filter(Boolean);
+    const maxC=Math.max(...rows.map(row=>row.filter(Boolean).length));
+    lb.classList.remove("plain");
+    lb.classList.toggle("no-v",rows.length<2);   // 行が1つ→縦ナビを出さない
+    lb.classList.toggle("no-h",maxC<2);          // 列が1つ→横ナビを出さない
+    lb.classList.add("open"); showCur();
+  }
+  function move(dr,dc){
+    if(!cur)return;
+    if(cur.kind==="gal"){
+      if(!dc)return;
+      const L=gals[cur.g].length; cur.i=(cur.i+dc+L)%L; showCur(); return;
+    }
+    const rows=atlases[cur.a], R=rows.length;
+    let r=cur.r, c=cur.c;
+    if(dr){ do{ r=(r+dr+R)%R; }while(!rows[r]); while(!rows[r][c]&&c>0)c--; }
+    if(dc){ const C=rows[r].length; do{ c=(c+dc+C)%C; }while(!rows[r][c]); }
+    cur.r=r; cur.c=c; showCur();
+  }
+  function closeLb(){lb.classList.remove("open");}
+  const nav=(id,dr,dc)=>{const b=document.getElementById(id); b.addEventListener("click",e=>{e.stopPropagation();move(dr,dc);});};
+  nav("lb-l",0,-1); nav("lb-r",0,1); nav("lb-u",-1,0); nav("lb-d",1,0);
+  lb.addEventListener("click",closeLb);
+  document.addEventListener("keydown",e=>{
+    if(!lb.classList.contains("open"))return;
+    if(e.key==="Escape")closeLb();
+    else if(e.key==="ArrowLeft"){e.preventDefault();move(0,-1);}
+    else if(e.key==="ArrowRight"){e.preventDefault();move(0,1);}
+    else if(e.key==="ArrowUp"){e.preventDefault();move(-1,0);}
+    else if(e.key==="ArrowDown"){e.preventDefault();move(1,0);}
+  });
+
+  // 動画: クリック/Enterで再生（YouTubeファサード）
+  document.querySelectorAll(".hero-video[data-yt]").forEach(f=>{
+    const play=()=>{
+      if(f.classList.contains("playing"))return;
+      const ifr=document.createElement("iframe");
+      ifr.src="https://www.youtube.com/embed/"+f.getAttribute("data-yt")+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+      ifr.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";
+      ifr.setAttribute("allowfullscreen","");
+      ifr.title="本編の映像";
+      f.appendChild(ifr); f.classList.add("playing");
+    };
+    f.addEventListener("click",play);
+    f.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
+  });
+</script>
+<script type="module" src="viewer3d.js"></script>
+</body>
+</html>

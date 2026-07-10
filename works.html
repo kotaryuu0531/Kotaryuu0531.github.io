@@ -192,6 +192,43 @@
   ========================================================= */
   const WORKS = [
     {
+      title:"モンスターエナジー風パロディCM",
+      tags:["CG","シネマティック","30秒CM"],
+      period:"2021年11月〜2026年7月（5年がかり）", date:"2026-07-11",
+      url:"https://youtu.be/oGyDT1T_H4Y",
+      making:"making-monstercm.html",
+      thumb:"https://img.youtube.com/vi/oGyDT1T_H4Y/maxresdefault.jpg",
+      is3d:true, glb:"tiger.glb", cam:{angle:-162, elev:-0.05, zoom:0.70, env:1.0},
+      ov:{eyebrow:"PARODY CM — CG個人制作 / 2021–2026", sub:"虎とステイサム風キャラクターが対峙するフルCGの30秒", text:"エナジードリンク「モンスターエナジー」のCMを勝手に作った、フルCGの30秒パロディ（非公式・ファン制作）。モデリングからCyclesレンダリング・グレーディングまで全工程を1人で制作。寅年年賀状の虎から始まり、断続的に5年かけて2026年に完成しました。"}
+    },
+    {
+      title:"2022年 寅年年賀状",
+      tags:["CG","実写合成"],
+      period:"2021年11月〜2022年1月", date:"2022-01-01",
+      url:"",
+      making:"making-nenga2022.html",
+      thumb:"nenga2022-thumb.jpg",
+      ov:{eyebrow:"NEW YEAR CARD — 寅年・実写×CG合成 / 2022", sub:"自作の3DCG虎と実写を合成した年賀状", text:"寅年にあわせて、初めての動物モデリングに挑んだ虎と実写を合成した年賀状。東京駅の夜景に、私と虎のツーショット。この虎がのちに5年かけて育ち、モンスターエナジー風パロディCMの主役になります。"}
+    },
+    {
+      title:"DanceNuts公演 生配信",
+      tags:["ライブ配信","マルチカメラ","スイッチング"],
+      period:"2025年10月（2日間）", date:"2025-10-18",
+      url:"https://youtu.be/a7vpjO1gAPg",
+      making:"making-dancenuts.html",
+      thumb:"https://img.youtube.com/vi/a7vpjO1gAPg/maxresdefault.jpg",
+      ov:{eyebrow:"LIVE SWITCHING — 8カメ生配信 / 2025", sub:"津田塾大学ジャズダンスサークルの学園祭公演", text:"津田塾大学の学園祭で行われたジャズダンスサークル「DanceNuts」公演の生配信。8カメのスイッチングを担当し、リハ映像から全ショーケースのカメラワークを事前設計。幕間には各カメラマンへディレクションしながら、2日間・計3時間20分を配信しました。"}
+    },
+    {
+      title:"ドレミファダンスコンサート2026 生配信",
+      tags:["ライブ配信","マルチカメラ","スイッチング"],
+      period:"2026年6月", date:"2026-06-14",
+      url:"https://youtu.be/niXIBdwd2bA",
+      making:"making-doremifa2026.html",
+      thumb:"https://img.youtube.com/vi/niXIBdwd2bA/maxresdefault.jpg",
+      ov:{eyebrow:"LIVE SWITCHING — 9カメ生配信 / 2026", sub:"東京都障害者ダンス大会の生配信・9カメスイッチング", text:"9台のカメラをリアルタイムで切り替えた、東京都障害者ダンス大会（東京体育館・参加者約4,000人）の5時間半の生配信。特別ゲスト・松平健さんの「マツケンサンバⅡ」をはじめ、参加団体の演技と会場の笑顔をスイッチングで届けました。配信チームの幹部として事前準備から参加。"}
+    },
+    {
       title:"マジンザハンド再現してみた",
       tags:["CG","VFX合成","キャラクター"],
       period:"2021年11月", date:"2021-11-17",
@@ -519,7 +556,7 @@
       card.innerHTML =
         '<div class="thumb'+(vid?' playable':'')+'"'+(vid?' data-yt="'+vid+'" role="button" tabindex="0" aria-label="再生"':'')+'>'+
           thumbInner +
-          (w.is3d?'<div class="badge3d" data-glb="'+(w.glb||"")+'"'+(w.toon?' data-toon="1"':'')+(w.contrast?' data-contrast="'+w.contrast+'"':'')+'>3D</div>':'')+
+          (w.is3d?'<div class="badge3d" data-glb="'+(w.glb||"")+'"'+(w.toon?' data-toon="1"':'')+(w.contrast?' data-contrast="'+w.contrast+'"':'')+(w.cam?' data-angle="'+w.cam.angle+'" data-elev="'+w.cam.elev+'" data-zoom="'+w.cam.zoom+'"'+(w.cam.env!=null?' data-env="'+w.cam.env+'"':''):'')+'>3D</div>':'')+
           (vid?'<div class="play"></div>':'')+
         '</div>'+
         '<div class="wbody">'+
@@ -620,10 +657,10 @@
         catch(err){ console.error(err); const t=v3d.querySelector(".v3d-spin .txt"); if(t)t.textContent="読み込みに失敗しました"; return; }
         finally{ loading=false; }
       }
-      mod.open({glb:b.dataset.glb, toon:b.dataset.toon==="1", contrast:b.dataset.contrast||"soft"});
+      mod.open({glb:b.dataset.glb, toon:b.dataset.toon==="1", contrast:b.dataset.contrast||"soft", angle:b.dataset.angle, elev:b.dataset.elev, zoom:b.dataset.zoom, env:b.dataset.env});
     });
   })();
   </script>
-  <div class="buildver">build 2026.07.10 12:58 JST</div>
+  <div class="buildver">build 2026.07.11 07:39 JST</div>
 </body>
 </html>
