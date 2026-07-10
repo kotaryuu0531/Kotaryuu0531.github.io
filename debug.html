@@ -78,10 +78,6 @@
     <button data-mode="normal" class="on">ノーマル</button>
     <button data-mode="wire">ワイヤー</button>
   </div>
-  <div class="gv-ui" id="gv-wpose">
-    <button data-wpose="rest" class="on">Rest姿勢</button>
-    <button data-wpose="frame0">先頭フレーム</button>
-  </div>
   <div class="gv-ui" id="gv-opts">
     <button id="btn-rotate" class="on">オートターン: ON</button>
   </div>
@@ -168,20 +164,13 @@ let emissiveStore=[]; let glowEyeNodes=[];
 const clayMat=new THREE.MeshStandardMaterial({color:0xb6bcc6,roughness:.95,metalness:0,side:THREE.DoubleSide,
   polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
 const lineMat=new THREE.LineBasicMaterial({color:0x14161c});
-let wires=[]; let mode="normal"; let wirePose="rest";
+let wires=[]; let mode="normal";
 function disposeWires(){ wires.forEach(w=>{ if(w.parent)w.parent.remove(w); if(w.geometry)w.geometry.dispose(); }); wires=[]; }
-// ワイヤーの姿勢：rest=ボーン基本姿勢（Blenderの全トランスフォームClear相当）＋モーフ0／frame0=アニメ先頭
+// ワイヤーはアニメ先頭フレーム(0秒)の姿勢で固定（変形後頂点から生成＝メッシュと一致）
 function applyWirePose(){
   if(!modelRoot)return;
-  if(wirePose==="frame0"){
-    if(active){ active.reset(); active.play(); }
-    if(mixer){ mixer.setTime(0); }
-  }else{ // rest
-    modelRoot.traverse(o=>{
-      if(o.isSkinnedMesh&&o.skeleton)o.skeleton.pose();
-      if(o.isMesh&&o.morphTargetInfluences)o.morphTargetInfluences.fill(0);
-    });
-  }
+  if(active){ active.reset(); active.play(); }
+  if(mixer){ mixer.setTime(0); }
   modelRoot.updateMatrixWorld(true);
 }
 
@@ -383,11 +372,6 @@ document.getElementById("c-emis").addEventListener("change",applyEmissive);
 document.getElementById("c-hideeye").addEventListener("change",applyHideEye);
 const btnRot=document.getElementById("btn-rotate");
 [...document.querySelectorAll("#gv-mode button")].forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
-[...document.querySelectorAll("#gv-wpose button")].forEach(b=>b.addEventListener("click",()=>{
-  wirePose=b.dataset.wpose;
-  [...document.querySelectorAll("#gv-wpose button")].forEach(x=>x.classList.toggle("on",x.dataset.wpose===wirePose));
-  if(mode==="wire"){ applyWirePose(); disposeWires(); buildWires(); wires.forEach(w=>w.visible=true); }
-}));
 btnRot.addEventListener("click",()=>{
   rotateWanted=!rotateWanted;
   controls.autoRotate=rotateWanted;
@@ -411,6 +395,6 @@ renderer.setAnimationLoop(()=>{
   renderer.render(scene,camera);
 });
 </script>
-<div class="buildver">build 2026.07.09 18:35 JST</div>
+<div class="buildver">build 2026.07.09 18:50 JST</div>
 </body>
 </html>

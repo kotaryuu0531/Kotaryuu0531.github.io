@@ -68,6 +68,8 @@
   .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
 
   /* 動画フレーム（クリック再生） */
+  .hero-loop{aspect-ratio:16/9;margin:18px 0 0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#000}
+  .hero-loop video{display:block;width:100%;height:100%;object-fit:cover}
   .hero-video{position:relative;aspect-ratio:16/9;margin:18px 0 0;border:1px solid var(--line);
     border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
   .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
@@ -158,11 +160,12 @@
     <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=VFX合成">VFX合成</a><a class="htag" href="works.html?tags=キャラクター">キャラクター</a></div>
     <p class="lead">高校2年の秋に公開した、『イナズマイレブン』の必殺技「マジンザハンド」の再現VFXです。技の主役であるマジンのキャラクターをBlenderでモデリングし、アニメーションを付けて、実写映像に合成しました。</p>
 
-    <!-- 本編 -->
-    <div class="hero-video rv" data-yt="VXNRS9tfQ_c" tabindex="0" role="button" aria-label="本編を再生">
-      <img class="poster" src="https://img.youtube.com/vi/VXNRS9tfQ_c/maxresdefault.jpg"
-           onerror="this.onerror=null;this.src='https://img.youtube.com/vi/VXNRS9tfQ_c/hqdefault.jpg'" alt="マジンザハンド再現VFXのサムネイル">
-      <div class="play"></div>
+    <!-- 本編（10秒・無音のためページ内でループ再生） -->
+    <div class="hero-loop rv">
+      <video autoplay loop muted playsinline preload="auto" aria-label="マジンザハンド再現VFX本編（10秒・ループ再生）">
+        <source src="mazin-loop.webm" type="video/webm">
+        <source src="mazin-loop.mp4" type="video/mp4">
+      </video>
     </div>
 
     <!-- 3Dビューア -->
@@ -227,7 +230,7 @@
     <!-- スペック -->
     <div class="spec-head">SPEC</div>
     <dl class="spec">
-      <div class="spec-row"><dt>公開</dt><dd>2021年11月17日</dd></div>
+      <div class="spec-row"><dt>公開</dt><dd>2021年11月17日（当時はInstagramで公開。<a href="https://youtu.be/VXNRS9tfQ_c" target="_blank" rel="noopener">YouTube版</a>は本サイト掲載にあたっての再アップロード）</dd></div>
       <div class="spec-row"><dt>形式</dt><dd>3DCGキャラクター＋実写合成VFX</dd></div>
       <div class="spec-row"><dt>担当</dt><dd>モデリング・テクスチャ・アニメーション・合成（個人制作）</dd></div>
       <div class="spec-row"><dt>題材</dt><dd>『イナズマイレブン』の必殺技「マジン・ザ・ハンド」の再現（非公式・ファン制作。原作の権利は各権利者に帰属します）</dd></div>

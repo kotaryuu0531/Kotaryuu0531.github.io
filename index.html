@@ -139,6 +139,8 @@
   .frame.playing{cursor:default}
   .frame.playing .play,.frame.playing .tc,.frame.playing .res,.frame.playing .ph,.frame.playing .thumb{display:none}
   .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5}
+  .frame iframe.preview{pointer-events:none;z-index:2}
+  .frame:has(iframe.preview) .thumb{opacity:0}
 
   .flag-info h3{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(21px,2.8vw,32px);
     line-height:1.1;margin-bottom:12px}
@@ -494,6 +496,7 @@
   document.querySelectorAll(".frame[data-yt]").forEach(f=>{
     const play=()=>{
       if(f.classList.contains("playing"))return;
+      const pv=f.querySelector("iframe.preview"); if(pv)pv.remove();   // 音なしプレビューを止めて最初から音ありで
       const id=f.getAttribute("data-yt");
       const ifr=document.createElement("iframe");
       ifr.src="https://www.youtube.com/embed/"+id+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
@@ -506,6 +509,31 @@
     f.addEventListener("click",play);
     f.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
   });
+
+  // 代表作（flagship）：ビューポートに入ったら音なしで自動再生。クリックで音ありに切替（上のplay）
+  (function(){
+    const targets=document.querySelectorAll(".flagship .frame[data-yt]");
+    if(!targets.length)return;
+    function preview(f){
+      if(f.classList.contains("playing")||f.querySelector("iframe.preview"))return;
+      const id=f.getAttribute("data-yt");
+      const ifr=document.createElement("iframe");
+      ifr.className="preview";
+      ifr.src="https://www.youtube.com/embed/"+id+"?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&loop=1&playlist="+id+"&modestbranding=1&disablekb=1&fs=0&iv_load_policy=3";
+      ifr.allow="autoplay; encrypted-media";
+      ifr.tabIndex=-1;
+      ifr.title="プレビュー（音なし）";
+      f.appendChild(ifr);
+    }
+    if("IntersectionObserver" in window){
+      const io=new IntersectionObserver(es=>{
+        es.forEach(e=>{ if(e.isIntersecting){ preview(e.target); io.unobserve(e.target); } });
+      },{threshold:.35});
+      targets.forEach(f=>io.observe(f));
+    }else{
+      targets.forEach(preview);
+    }
+  })();
 
   // 作品カードのホバー/フォーカスで概要パネルを表示
   (function(){
@@ -587,12 +615,12 @@
     document.querySelectorAll("#ac-marquee .ac-row").forEach(function(row,i){
       const list=ROWS[i%ROWS.length]; const html=[];
       for(let k=0;k<2;k++) for(const u of list)
-        html.push('<img src="'+u+'" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">');
+        html.push('<img src="'+u+'" alt="" decoding="async" onerror="this.style.visibility=\'hidden\'">');
       row.innerHTML=html.join("");
     });
   })();
   </script>
 
-  <div class="buildver">build 2026.07.07 09:16 JST</div>
+  <div class="buildver">build 2026.07.10 12:58 JST</div>
 </body>
 </html>
