@@ -515,6 +515,10 @@
     const targets=document.querySelectorAll(".flagship .frame[data-yt]");
     if(!targets.length)return;
     let apiReady=false, apiRequested=false; const queue=[];
+    // Safariの自動再生ポリシー対策：最初のユーザー操作（クリック/タップ/キー）で未再生のプレビューを一斉に開始
+    const pending=new Set();
+    function nudgeAll(){ pending.forEach(function(pl){ try{ pl.mute(); pl.playVideo(); }catch(_){ pending.delete(pl); } }); }
+    ["pointerdown","touchend","keydown"].forEach(function(ev){ document.addEventListener(ev,nudgeAll,{passive:true}); });
     window.onYouTubeIframeAPIReady=function(){ apiReady=true; queue.splice(0).forEach(build); };
     function loadAPI(){
       if(apiRequested)return; apiRequested=true;
@@ -535,7 +539,7 @@
         events:{
           onReady:function(e){
             e.target.mute(); e.target.playVideo();
-            // Safariは初回のplayVideoを黙殺することがある → PLAYINGになるまで数回リトライ
+            pending.add(e.target);   // ジェスチャー待ちリストへ（再生が始まったら外す）
             let tries=0;
             const iv=setInterval(function(){
               let st=-9; try{ st=e.target.getPlayerState(); }catch(_){ clearInterval(iv); return; }
@@ -543,7 +547,10 @@
               e.target.mute(); e.target.playVideo();
             },400);
           },
-          onStateChange:function(e){ if(e.data===YT.PlayerState.ENDED){ e.target.seekTo(0); e.target.playVideo(); } }
+          onStateChange:function(e){
+            if(e.data===YT.PlayerState.PLAYING){ pending.delete(e.target); if(!wrap.isConnected){ try{e.target.destroy();}catch(_){} } }
+            if(e.data===YT.PlayerState.ENDED){ e.target.seekTo(0); e.target.playVideo(); }
+          }
         }
       });
     }
@@ -661,6 +668,6 @@
   })();
   </script>
 
-  <div class="buildver">build 2026.07.10 13:23 JST</div>
+  <div class="buildver">build 2026.07.10 14:10 JST</div>
 </body>
 </html>
