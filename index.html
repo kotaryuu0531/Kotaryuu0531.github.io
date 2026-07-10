@@ -139,8 +139,8 @@
   .frame.playing{cursor:default}
   .frame.playing .play,.frame.playing .tc,.frame.playing .res,.frame.playing .ph,.frame.playing .thumb{display:none}
   .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5}
-  .frame iframe.preview{pointer-events:none;z-index:2}
-  .frame:has(iframe.preview) .thumb{opacity:0}
+  .frame .preview{position:absolute;inset:0;pointer-events:none;z-index:2}
+  .frame .preview iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
   .flag-info h3{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(21px,2.8vw,32px);
     line-height:1.1;margin-bottom:12px}
@@ -213,17 +213,15 @@
     overflow:hidden;padding:clamp(64px,10vh,120px) 0;border-top:1px solid var(--line);text-align:center}
   /* 背面：作品サムネイルのマーキー（装飾・操作不可） */
   .ac-marquee{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:16px;z-index:0;pointer-events:none}
-  .ac-row{display:flex;width:max-content;will-change:transform;animation:ac-slide var(--dur,80s) linear infinite}
-  .ac-row.rev{animation-direction:reverse}
+  .ac-row{display:flex;width:max-content;will-change:transform}
   .ac-row img{height:clamp(96px,23vh,200px);aspect-ratio:16/9;object-fit:cover;display:block;
     margin-right:16px;border:1px solid var(--line);border-radius:var(--r);opacity:.4;filter:saturate(.8)}
-  @keyframes ac-slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   /* 中央を暗く落として文字を立たせ、上下は背景に溶かす */
   .ac-shade{position:absolute;inset:0;z-index:1;background:
     radial-gradient(60% 54% at 50% 50%, rgba(10,13,18,.9) 0%, rgba(10,13,18,.62) 52%, rgba(10,13,18,.18) 100%),
     linear-gradient(180deg, var(--bg-cool) 0%, transparent 16%, transparent 84%, var(--bg-cool) 100%)}
   .ac-inner{position:relative;z-index:2;padding:0 clamp(20px,5vw,56px)}
-  @media (prefers-reduced-motion: reduce){ .ac-row{animation:none} }
+
   .ac-eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);margin-bottom:18px}
   .ac-title{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(30px,5.5vw,60px);line-height:1;letter-spacing:-.015em;margin-bottom:16px}
   .ac-title .light{color:var(--amber);font-style:italic;font-weight:600}
@@ -430,9 +428,9 @@
   <!-- ===================== ARCHIVE CTA ===================== -->
   <section class="archive-cta rv">
     <div class="ac-marquee" id="ac-marquee" aria-hidden="true">
-      <div class="ac-row" style="--dur:84s"></div>
-      <div class="ac-row rev" style="--dur:104s"></div>
-      <div class="ac-row" style="--dur:92s"></div>
+      <div class="ac-row" data-speed="38"></div>
+      <div class="ac-row" data-speed="-30"></div>
+      <div class="ac-row" data-speed="34"></div>
     </div>
     <div class="ac-shade"></div>
     <div class="ac-inner">
@@ -496,7 +494,8 @@
   document.querySelectorAll(".frame[data-yt]").forEach(f=>{
     const play=()=>{
       if(f.classList.contains("playing"))return;
-      const pv=f.querySelector("iframe.preview"); if(pv)pv.remove();   // 音なしプレビューを止めて最初から音ありで
+      const pv=f.querySelector(".preview");
+      if(pv){ try{ if(pv._player)pv._player.destroy(); }catch(_){} pv.remove(); }   // 音なしプレビューを確実に止めて最初から音ありで
       const id=f.getAttribute("data-yt");
       const ifr=document.createElement("iframe");
       ifr.src="https://www.youtube.com/embed/"+id+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
@@ -511,20 +510,33 @@
   });
 
   // 代表作（flagship）：ビューポートに入ったら音なしで自動再生。クリックで音ありに切替（上のplay）
+  // Safariは素のiframeの autoplay&mute を無視することがあるため、IFrame APIで onReady に mute()→playVideo() する
   (function(){
     const targets=document.querySelectorAll(".flagship .frame[data-yt]");
     if(!targets.length)return;
-    function preview(f){
-      if(f.classList.contains("playing")||f.querySelector("iframe.preview"))return;
-      const id=f.getAttribute("data-yt");
-      const ifr=document.createElement("iframe");
-      ifr.className="preview";
-      ifr.src="https://www.youtube.com/embed/"+id+"?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&loop=1&playlist="+id+"&modestbranding=1&disablekb=1&fs=0&iv_load_policy=3";
-      ifr.allow="autoplay; encrypted-media";
-      ifr.tabIndex=-1;
-      ifr.title="プレビュー（音なし）";
-      f.appendChild(ifr);
+    let apiReady=false, apiRequested=false; const queue=[];
+    window.onYouTubeIframeAPIReady=function(){ apiReady=true; queue.splice(0).forEach(build); };
+    function loadAPI(){
+      if(apiRequested)return; apiRequested=true;
+      const tag=document.createElement("script");
+      tag.src="https://www.youtube.com/iframe_api";
+      document.head.appendChild(tag);
     }
+    function build(f){
+      if(f.classList.contains("playing")||f.querySelector(".preview"))return;
+      const id=f.getAttribute("data-yt");
+      const wrap=document.createElement("div"); wrap.className="preview";
+      const host=document.createElement("div"); wrap.appendChild(host); f.appendChild(wrap);
+      wrap._player=new YT.Player(host,{
+        videoId:id, host:"https://www.youtube.com",
+        playerVars:{autoplay:1,mute:1,controls:0,playsinline:1,rel:0,loop:1,playlist:id,disablekb:1,fs:0,iv_load_policy:3,modestbranding:1},
+        events:{
+          onReady:function(e){ e.target.mute(); e.target.playVideo(); },
+          onStateChange:function(e){ if(e.data===YT.PlayerState.ENDED){ e.target.seekTo(0); e.target.playVideo(); } }
+        }
+      });
+    }
+    function preview(f){ if(apiReady)build(f); else{ queue.push(f); loadAPI(); } }
     if("IntersectionObserver" in window){
       const io=new IntersectionObserver(es=>{
         es.forEach(e=>{ if(e.isIntersecting){ preview(e.target); io.unobserve(e.target); } });
@@ -612,15 +624,32 @@
       [YT("b5ba9a8X5Co"), "sneaker-thumb.jpg", YT("gK91lsdb1eA"), YT("zW8uieu_9KI"), "s2.jpg", YT("mXolgUeuSOo"), YT("3SKstS_Puco"), YT("Gv1qoxDBubU")],
       ["first3d-thumb.jpg", YT("PqgRY7M-S2M"), YT("YvSpcUJSh3o"), YT("0-VZyN4P7eg"), YT("iLv0dK8ZmzU"), YT("J02gmWmfsok"), YT("ehFCFjIPhZY"), YT("Nx8aw06uRGk")]
     ];
-    document.querySelectorAll("#ac-marquee .ac-row").forEach(function(row,i){
+    const rows=[...document.querySelectorAll("#ac-marquee .ac-row")];
+    rows.forEach(function(row,i){
       const list=ROWS[i%ROWS.length]; const html=[];
       for(let k=0;k<2;k++) for(const u of list)
         html.push('<img src="'+u+'" alt="" decoding="async" onerror="this.style.visibility=\'hidden\'">');
       row.innerHTML=html.join("");
     });
+    // SafariでCSSアニメが初回に開始しないことがあるため、rAFで直接動かす
+    if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){
+      const st=rows.map(r=>({el:r,x:0,v:parseFloat(r.dataset.speed||"36")}));
+      let last=performance.now();
+      (function tick(now){
+        const dt=Math.min((now-last)/1000,.1); last=now;
+        for(const s of st){
+          const half=s.el.scrollWidth/2;
+          if(half>0){
+            s.x=(s.x+s.v*dt)%half; if(s.x<0)s.x+=half;
+            s.el.style.transform="translate3d("+(-s.x)+"px,0,0)";
+          }
+        }
+        requestAnimationFrame(tick);
+      })(last);
+    }
   })();
   </script>
 
-  <div class="buildver">build 2026.07.10 12:58 JST</div>
+  <div class="buildver">build 2026.07.10 13:14 JST</div>
 </body>
 </html>
