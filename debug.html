@@ -88,6 +88,7 @@
     <div class="row"><label>exposure</label><input id="s-exp" type="range" min="0.5" max="1.8" step="0.01"><span class="val" id="v-exp"></span></div>
     <div class="row"><label>dir（陰影）</label><input id="s-dir" type="range" min="0" max="1.5" step="0.025"><span class="val" id="v-dir"></span></div>
     <div class="row"><label>amb（持ち上げ）</label><input id="s-amb" type="range" min="0" max="1.5" step="0.025"><span class="val" id="v-amb"></span></div>
+    <div class="row"><label>env（映り込み）</label><input id="s-env" type="range" min="0" max="6" step="0.1"><span class="val" id="v-env"></span></div>
     <div class="row"><label>angle（初期角°）</label><input id="s-ang" type="range" min="-180" max="180" step="1"><span class="val" id="v-ang"></span></div>
     <div class="row"><label>elev（高さ）</label><input id="s-elev" type="range" min="-0.3" max="0.8" step="0.01"><span class="val" id="v-elev"></span></div>
     <div class="row"><label>zoom（距離）</label><input id="s-zoom" type="range" min="0.5" max="1.8" step="0.02"><span class="val" id="v-zoom"></span></div>
@@ -111,9 +112,9 @@ import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
 
 const MODELS={
-  tiger:{   glb:"tiger.glb",   angle:-162, fov:30, exposure:1.05, dir:0.75, amb:0.70, elev:-0.05, zoom:0.70 },
-  statham:{ glb:"statham.glb", angle:42,   fov:30, exposure:1.00, dir:0.60, amb:0.80, elev:0.20,  zoom:1.06 },
-  can:{     glb:"can.glb",     angle:0,    fov:30, exposure:1.05, dir:0.75, amb:0.70, elev:0.05,  zoom:1.00 },
+  tiger:{   glb:"tiger.glb",   angle:-162, fov:30, exposure:1.05, dir:0.75, amb:0.70, elev:-0.05, zoom:0.70, env:1.0 },
+  statham:{ glb:"statham.glb", angle:42,   fov:30, exposure:1.00, dir:0.60, amb:0.80, elev:0.20,  zoom:1.06, env:1.0 },
+  can:{     glb:"can.glb",     angle:0,    fov:30, exposure:1.25, dir:0.75, amb:0.70, elev:0.05,  zoom:1.22, env:3.5 },
 };
 let cur="tiger";
 let P=Object.assign({},MODELS[cur]);
@@ -165,16 +166,18 @@ const clayMat=new THREE.MeshStandardMaterial({color:0xb6bcc6,roughness:.95,metal
 const lineMat=new THREE.LineBasicMaterial({color:0x14161c});
 let wires=[]; let wiresBuilt=false; let mode="normal";
 
-function buildQuadWire(geo){
-  const pos=geo.attributes.position, idx=geo.index?geo.index.array:null;
-  const triCount=idx?idx.length/3:pos.count/3;
+function buildQuadWire(geo,dpos){
+  const idx=geo.index?geo.index.array:null;
+  const count=dpos.length/3;
+  const triCount=idx?idx.length/3:count/3;
   const P=new THREE.Vector3(), Q=new THREE.Vector3(), Rv=new THREE.Vector3();
-  const pk=(i)=>{P.fromBufferAttribute(pos,i);return Math.round(P.x*1e4)+","+Math.round(P.y*1e4)+","+Math.round(P.z*1e4);};
+  const gp=(i,t)=>t.set(dpos[i*3],dpos[i*3+1],dpos[i*3+2]);
+  const pk=(i)=>{gp(i,P);return Math.round(P.x*1e4)+","+Math.round(P.y*1e4)+","+Math.round(P.z*1e4);};
   const map=new Map();
   const gi=(t,k)=>idx?idx[t*3+k]:t*3+k;
   for(let t=0;t<triCount;t++){
     const a=gi(t,0),b=gi(t,1),c=gi(t,2);
-    P.fromBufferAttribute(pos,a);Q.fromBufferAttribute(pos,b);Rv.fromBufferAttribute(pos,c);
+    gp(a,P);gp(b,Q);gp(c,Rv);
     const lab=P.distanceToSquared(Q),lbc=Q.distanceToSquared(Rv),lca=Rv.distanceToSquared(P);
     let longest=0; if(lbc>=lab&&lbc>=lca)longest=1; else if(lca>=lab&&lca>=lbc)longest=2;
     const ka=pk(a),kb=pk(b),kc=pk(c);
@@ -189,18 +192,32 @@ function buildQuadWire(geo){
   const verts=[];
   for(const rec of map.values()){
     if(rec.n>=2&&rec.long>=2)continue;
-    P.fromBufferAttribute(pos,rec.i1);Q.fromBufferAttribute(pos,rec.i2);
+    gp(rec.i1,P);gp(rec.i2,Q);
     verts.push(P.x,P.y,P.z,Q.x,Q.y,Q.z);
   }
   const g=new THREE.BufferGeometry();
   g.setAttribute("position",new THREE.Float32BufferAttribute(verts,3));
   return g;
 }
+// スキン変形後（現在の姿勢）の頂点位置を返す。ワイヤーをメッシュにピッタリ合わせる用。
+function deformedPositions(mesh){
+  const pos=mesh.geometry.attributes.position, n=pos.count;
+  const out=new Float32Array(n*3), v=new THREE.Vector3();
+  const skinned=mesh.isSkinnedMesh;
+  const bt = skinned ? (mesh.applyBoneTransform?mesh.applyBoneTransform.bind(mesh):mesh.boneTransform.bind(mesh)) : null;
+  for(let i=0;i<n;i++){
+    v.fromBufferAttribute(pos,i);
+    if(bt) bt(i,v);
+    out[i*3]=v.x; out[i*3+1]=v.y; out[i*3+2]=v.z;
+  }
+  return out;
+}
 function buildWires(){
   if(wiresBuilt||!modelRoot)return; wiresBuilt=true;
+  modelRoot.updateMatrixWorld(true);
   modelRoot.traverse(o=>{
     if(!o.isMesh||!o.userData.matOrig)return;
-    const l=new THREE.LineSegments(buildQuadWire(o.geometry),lineMat);
+    const l=new THREE.LineSegments(buildQuadWire(o.geometry,deformedPositions(o)),lineMat);
     l.renderOrder=2; l.visible=false;
     o.add(l); wires.push(l);
   });
@@ -209,9 +226,11 @@ function setMode(m){
   mode=m;
   if(!modelRoot)return;
   if(m==="wire"){
+    // アニメ先頭フレーム(0秒)の姿勢を適用して固定（バインドポーズにしない＝メッシュが飛ばない）
+    if(active){ active.reset(); active.play(); }
+    if(mixer){ mixer.setTime(0); }
+    modelRoot.updateMatrixWorld(true);
     buildWires();
-    // アニメ停止（ループでmixer.update()を止める）＋バインドポーズに静止
-    modelRoot.traverse(o=>{ if(o.isSkinnedMesh&&o.skeleton)o.skeleton.pose(); });
   }
   modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.matOrig) o.material=(m==="wire")?clayMat:o.userData.matOrig; });
   wires.forEach(w=>w.visible=(m==="wire"));
@@ -238,7 +257,7 @@ function loadModel(name){
     modelRoot.traverse(o=>{
       if(o.isSkinnedMesh)o.frustumCulled=false;
       if(o.name && o.name.indexOf("human_eye")>=0) glowEyeNodes.push(o);
-      if(o.isMesh){ o.userData.matOrig=o.material; }
+      if(o.isMesh){ o.userData.matOrig=o.material; if(o.material){ o.material.envMapIntensity=(P.env==null?1:P.env); } }
       if(o.isMesh&&o.material&&o.material.emissive){
         emissiveStore.push({mat:o.material, factor:(o.material.emissiveIntensity==null?1:o.material.emissiveIntensity)});
       }
@@ -310,6 +329,7 @@ function refreshOut(){
     '<span class="k">data-exposure=</span>"'+P.exposure.toFixed(2)+'" '+
     '<span class="k">data-dir=</span>"'+P.dir.toFixed(3)+'" '+
     '<span class="k">data-amb=</span>"'+P.amb.toFixed(3)+'" '+
+    '<span class="k">data-env=</span>"'+(P.env==null?1:P.env).toFixed(2)+'" '+
     '<span class="k">data-angle=</span>"'+P.angle.toFixed(0)+'" '+
     '<span class="k">data-elev=</span>"'+P.elev.toFixed(2)+'" '+
     '<span class="k">data-zoom=</span>"'+P.zoom.toFixed(2)+'"';
@@ -318,6 +338,7 @@ function syncPanel(){
   document.getElementById("s-exp").value=P.exposure; document.getElementById("v-exp").textContent=P.exposure.toFixed(2);
   document.getElementById("s-dir").value=P.dir;      document.getElementById("v-dir").textContent=P.dir.toFixed(3);
   document.getElementById("s-amb").value=P.amb;      document.getElementById("v-amb").textContent=P.amb.toFixed(3);
+  document.getElementById("s-env").value=(P.env==null?1:P.env); document.getElementById("v-env").textContent=(P.env==null?1:P.env).toFixed(2);
   document.getElementById("s-ang").value=P.angle;    document.getElementById("v-ang").textContent=P.angle.toFixed(0);
   document.getElementById("s-elev").value=P.elev;    document.getElementById("v-elev").textContent=P.elev.toFixed(2);
   document.getElementById("s-zoom").value=P.zoom;    document.getElementById("v-zoom").textContent=P.zoom.toFixed(2);
@@ -326,6 +347,7 @@ function syncPanel(){
 document.getElementById("s-exp").addEventListener("input",e=>{P.exposure=+e.target.value; document.getElementById("v-exp").textContent=P.exposure.toFixed(2); renderer.toneMappingExposure=P.exposure; refreshOut();});
 document.getElementById("s-dir").addEventListener("input",e=>{P.dir=+e.target.value; document.getElementById("v-dir").textContent=P.dir.toFixed(3); dirL.intensity=Math.PI*.4*P.dir; refreshOut();});
 document.getElementById("s-amb").addEventListener("input",e=>{P.amb=+e.target.value; document.getElementById("v-amb").textContent=P.amb.toFixed(3); ambL.intensity=Math.PI*.4*P.amb; refreshOut();});
+document.getElementById("s-env").addEventListener("input",e=>{P.env=+e.target.value; document.getElementById("v-env").textContent=P.env.toFixed(2); if(modelRoot)modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.matOrig&&o.userData.matOrig.envMapIntensity!=null)o.userData.matOrig.envMapIntensity=P.env; }); refreshOut();});
 const sAng=document.getElementById("s-ang"); sAng.addEventListener("input",e=>{P.angle=+e.target.value; document.getElementById("v-ang").textContent=P.angle.toFixed(0); refreshOut();}); sAng.addEventListener("change",placeCamera);
 const sElev=document.getElementById("s-elev"); sElev.addEventListener("input",e=>{P.elev=+e.target.value; document.getElementById("v-elev").textContent=P.elev.toFixed(2); refreshOut();}); sElev.addEventListener("change",placeCamera);
 const sZoom=document.getElementById("s-zoom"); sZoom.addEventListener("input",e=>{P.zoom=+e.target.value; document.getElementById("v-zoom").textContent=P.zoom.toFixed(2); refreshOut();}); sZoom.addEventListener("change",placeCamera);
@@ -356,6 +378,6 @@ renderer.setAnimationLoop(()=>{
   renderer.render(scene,camera);
 });
 </script>
-<div class="buildver">build 2026.07.09 17:20 JST</div>
+<div class="buildver">build 2026.07.09 17:45 JST</div>
 </body>
 </html>
