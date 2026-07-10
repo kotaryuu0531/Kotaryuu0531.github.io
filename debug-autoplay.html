@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>音なし自動再生 比較（デバッグ）</title>
+<style>
+  :root{--bg:#0A0D12;--surface:#14181E;--ink:#ECE7DF;--mut:#8C887F;--line:#262A30;--amber:#E9A94C}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;line-height:1.6;padding:24px}
+  h1{font-size:20px;margin-bottom:6px}
+  .sub{color:var(--mut);font-size:13px;margin-bottom:20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .col{border:1px solid var(--line);border-radius:4px;background:var(--surface);overflow:hidden}
+  .tag{font-size:12px;font-weight:600;padding:10px 14px;border-bottom:1px solid var(--line);color:var(--amber)}
+  .stage{position:relative;aspect-ratio:16/9;background:#000}
+  .stage iframe,.stage video{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .status{font-family:ui-monospace,monospace;font-size:12px;padding:8px 14px;border-top:1px solid var(--line);min-height:32px;color:var(--ink)}
+  .desc{font-size:12px;color:var(--mut);padding:10px 14px}
+  /* E用：本番の.frameと同じ重なり構造 */
+  .thumbrep{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .pvrep{position:absolute;inset:0;pointer-events:none;z-index:2}
+  .pvrep iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .playrep{position:absolute;z-index:3;width:56px;height:56px;border-radius:50%;left:50%;top:50%;
+    transform:translate(-50%,-50%);border:1px solid var(--line);background:rgba(10,13,18,.5)}
+  .note{margin-top:20px;color:var(--mut);font-size:12.5px;border-top:1px solid var(--line);padding-top:14px}
+  .note b{color:var(--ink)}
+</style>
+</head>
+<body>
+  <h1>音なし自動再生 比較（デバッグ）</h1>
+  <div class="sub">Safariで開いて、<b>どのパネルが動くか／各STATUSの表示</b>を教えてください。ページを開くだけでOK、クリック不要です。</div>
+
+  <div class="grid">
+    <div class="col">
+      <div class="tag">A：HTML5 video（YouTube不使用・対照実験）</div>
+      <div class="stage"><video muted autoplay loop playsinline src="mazin-loop.mp4"></video></div>
+      <div class="status" id="stA">—</div>
+      <div class="desc">これが動かなければ、Safariの設定（環境設定→Webサイト→自動再生）が「メディアをすべて停止」になっています。コードでは直せません。</div>
+    </div>
+
+    <div class="col">
+      <div class="tag">B：素のiframe埋め込み</div>
+      <div class="stage"><iframe id="ifB" src="https://www.youtube.com/embed/VXNRS9tfQ_c?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&loop=1&playlist=VXNRS9tfQ_c" allow="autoplay; encrypted-media" title="B"></iframe></div>
+      <div class="status" id="stB">目視で判断してください</div>
+      <div class="desc">パラメータだけの最小構成。</div>
+    </div>
+
+    <div class="col">
+      <div class="tag">C：IFrame API＋origin＋リトライ（現行実装）</div>
+      <div class="stage"><div id="hostC"></div></div>
+      <div class="status" id="stC">API待ち…</div>
+      <div class="desc">本番indexと同じ方式。STATUSに再生状態が数値で出ます。</div>
+    </div>
+
+    <div class="col">
+      <div class="tag">D：IFrame API（originなし）</div>
+      <div class="stage"><div id="hostD"></div></div>
+      <div class="status" id="stD">API待ち…</div>
+      <div class="desc">originパラメータの有無の切り分け。</div>
+    </div>
+
+    <div class="col">
+      <div class="tag">E：C方式＋本番と同じ重なり構造</div>
+      <div class="stage">
+        <img class="thumbrep" src="https://img.youtube.com/vi/VXNRS9tfQ_c/hqdefault.jpg" alt="">
+        <div class="pvrep"><div id="hostE"></div></div>
+        <div class="playrep"></div>
+      </div>
+      <div class="status" id="stE">API待ち…</div>
+      <div class="desc">サムネ(z1)／プレビュー(z2)／再生ボタン(z3)。レイヤー説の検証——Cが動いてEだけ止まるならz-index問題。</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>切り分け表</b>：A×＝Safari設定の問題（全滅する）／A◯B◯＝そもそも埋め込みは動く＝index側の構造問題／A◯で B×C◯＝API方式が正解（現状のはず）／A◯でB×C×D×＝SafariがYouTube自動再生自体を拒否 → プレビュー方式の再考が必要。<br>
+    STATUSの数値：-1=未開始 0=終了 1=再生中 2=一時停止 3=バッファ中 5=頭出し済み
+  </div>
+
+<script>
+  // A：videoの再生状態を表示
+  (function(){
+    const v=document.querySelector("video"), st=document.getElementById("stA");
+    const upd=()=>{ st.textContent = v.paused ? "PAUSED（自動再生ブロック）" : "PLAYING ✓"; };
+    v.addEventListener("playing",upd); v.addEventListener("pause",upd);
+    setTimeout(upd,1500); setTimeout(upd,4000);
+  })();
+
+  // C/D/E：IFrame API
+  const NAMES={ "-1":"-1 未開始", "0":"0 終了", "1":"1 再生中 ✓", "2":"2 一時停止", "3":"3 バッファ中", "5":"5 頭出し" };
+  function watch(p, el){
+    setInterval(function(){
+      try{ const s=p.getPlayerState(); el.textContent="state: "+(NAMES[String(s)]||s); }catch(_){}
+    },800);
+  }
+  function makePlayer(host, el, useOrigin, retry){
+    const vars={autoplay:1,mute:1,controls:0,playsinline:1,rel:0,loop:1,playlist:"VXNRS9tfQ_c",disablekb:1,fs:0,iv_load_policy:3};
+    if(useOrigin && location.origin && location.origin.indexOf("http")===0) vars.origin=location.origin;
+    const p=new YT.Player(host,{
+      videoId:"VXNRS9tfQ_c", playerVars:vars,
+      events:{ onReady:function(e){
+        el.textContent="onReady発火 → playVideo()";
+        e.target.mute(); e.target.playVideo();
+        if(retry){ let n=0; const iv=setInterval(function(){
+          let s=-9; try{ s=e.target.getPlayerState(); }catch(_){ clearInterval(iv); return; }
+          if(s===1||++n>10){ clearInterval(iv); return; }
+          e.target.mute(); e.target.playVideo();
+        },400); }
+      }}
+    });
+    watch(p, el);
+  }
+  window.onYouTubeIframeAPIReady=function(){
+    makePlayer("hostC", document.getElementById("stC"), true,  true);
+    makePlayer("hostD", document.getElementById("stD"), false, false);
+    makePlayer("hostE", document.getElementById("stE"), true,  true);
+  };
+  const tag=document.createElement("script"); tag.src="https://www.youtube.com/iframe_api"; document.head.appendChild(tag);
+</script>
+</body>
+</html>
