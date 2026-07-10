@@ -258,7 +258,7 @@ function setMode(m){
     disposeWires(); buildWires();
   }else{
     // ノーマル復帰：元のモーフ値に戻す（以降mixerが動かす）
-    modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.morphOrig&&o.morphTargetInfluences)o.morphTargetInfluences.set(o.userData.morphOrig); });
+    modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.morphOrig&&o.morphTargetInfluences){ const mo=o.userData.morphOrig; for(let i=0;i<mo.length;i++)o.morphTargetInfluences[i]=mo[i]; } });
   }
   modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.matOrig) o.material=(m==="wire")?clayMat:o.userData.matOrig; });
   wires.forEach(w=>w.visible=(m==="wire"));
@@ -411,6 +411,6 @@ renderer.setAnimationLoop(()=>{
   renderer.render(scene,camera);
 });
 </script>
-<div class="buildver">build 2026.07.09 18:20 JST</div>
+<div class="buildver">build 2026.07.09 18:35 JST</div>
 </body>
 </html>
