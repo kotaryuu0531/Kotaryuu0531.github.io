@@ -78,6 +78,10 @@
     <button data-mode="normal" class="on">ノーマル</button>
     <button data-mode="wire">ワイヤー</button>
   </div>
+  <div class="gv-ui" id="gv-wpose">
+    <button data-wpose="rest" class="on">Rest姿勢</button>
+    <button data-wpose="frame0">先頭フレーム</button>
+  </div>
   <div class="gv-ui" id="gv-opts">
     <button id="btn-rotate" class="on">オートターン: ON</button>
   </div>
@@ -114,7 +118,7 @@ import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
 const MODELS={
   tiger:{   glb:"tiger.glb",   angle:-162, fov:30, exposure:1.05, dir:0.75, amb:0.70, elev:-0.05, zoom:0.70, env:1.0 },
   statham:{ glb:"statham.glb", angle:42,   fov:30, exposure:1.00, dir:0.60, amb:0.80, elev:0.20,  zoom:1.06, env:1.0 },
-  can:{     glb:"can.glb",     angle:0,    fov:30, exposure:1.25, dir:0.75, amb:0.70, elev:0.05,  zoom:1.22, env:3.5 },
+  can:{     glb:"can.glb",     angle:0,    fov:30, exposure:1.25, dir:0.75, amb:0.70, elev:0.05,  zoom:1.22, env:6.0 },
 };
 let cur="tiger";
 let P=Object.assign({},MODELS[cur]);
@@ -164,7 +168,22 @@ let emissiveStore=[]; let glowEyeNodes=[];
 const clayMat=new THREE.MeshStandardMaterial({color:0xb6bcc6,roughness:.95,metalness:0,side:THREE.DoubleSide,
   polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
 const lineMat=new THREE.LineBasicMaterial({color:0x14161c});
-let wires=[]; let wiresBuilt=false; let mode="normal";
+let wires=[]; let mode="normal"; let wirePose="rest";
+function disposeWires(){ wires.forEach(w=>{ if(w.parent)w.parent.remove(w); if(w.geometry)w.geometry.dispose(); }); wires=[]; }
+// ワイヤーの姿勢：rest=ボーン基本姿勢（Blenderの全トランスフォームClear相当）＋モーフ0／frame0=アニメ先頭
+function applyWirePose(){
+  if(!modelRoot)return;
+  if(wirePose==="frame0"){
+    if(active){ active.reset(); active.play(); }
+    if(mixer){ mixer.setTime(0); }
+  }else{ // rest
+    modelRoot.traverse(o=>{
+      if(o.isSkinnedMesh&&o.skeleton)o.skeleton.pose();
+      if(o.isMesh&&o.morphTargetInfluences)o.morphTargetInfluences.fill(0);
+    });
+  }
+  modelRoot.updateMatrixWorld(true);
+}
 
 function buildQuadWire(geo,dpos){
   const idx=geo.index?geo.index.array:null;
@@ -201,19 +220,28 @@ function buildQuadWire(geo,dpos){
 }
 // スキン変形後（現在の姿勢）の頂点位置を返す。ワイヤーをメッシュにピッタリ合わせる用。
 function deformedPositions(mesh){
-  const pos=mesh.geometry.attributes.position, n=pos.count;
-  const out=new Float32Array(n*3), v=new THREE.Vector3();
+  const geo=mesh.geometry, pos=geo.attributes.position, n=pos.count;
+  const out=new Float32Array(n*3), v=new THREE.Vector3(), t=new THREE.Vector3();
+  const morphPos=geo.morphAttributes && geo.morphAttributes.position;
+  const infl=mesh.morphTargetInfluences;
   const skinned=mesh.isSkinnedMesh;
-  const bt = skinned ? (mesh.applyBoneTransform?mesh.applyBoneTransform.bind(mesh):mesh.boneTransform.bind(mesh)) : null;
+  const bt=skinned ? (mesh.applyBoneTransform?mesh.applyBoneTransform.bind(mesh):mesh.boneTransform.bind(mesh)) : null;
   for(let i=0;i<n;i++){
     v.fromBufferAttribute(pos,i);
-    if(bt) bt(i,v);
+    // シェイプキー（モーフ）合成：glTFは相対モーフなので base + Σ w*delta
+    if(morphPos&&infl){
+      for(let m=0;m<morphPos.length;m++){
+        const w=infl[m]; if(!w)continue;
+        t.fromBufferAttribute(morphPos[m],i); v.addScaledVector(t,w);
+      }
+    }
+    if(bt) bt(i,v);   // スキン変形（ボーン）
     out[i*3]=v.x; out[i*3+1]=v.y; out[i*3+2]=v.z;
   }
   return out;
 }
 function buildWires(){
-  if(wiresBuilt||!modelRoot)return; wiresBuilt=true;
+  if(!modelRoot)return;
   modelRoot.updateMatrixWorld(true);
   modelRoot.traverse(o=>{
     if(!o.isMesh||!o.userData.matOrig)return;
@@ -226,11 +254,11 @@ function setMode(m){
   mode=m;
   if(!modelRoot)return;
   if(m==="wire"){
-    // アニメ先頭フレーム(0秒)の姿勢を適用して固定（バインドポーズにしない＝メッシュが飛ばない）
-    if(active){ active.reset(); active.play(); }
-    if(mixer){ mixer.setTime(0); }
-    modelRoot.updateMatrixWorld(true);
-    buildWires();
+    applyWirePose();
+    disposeWires(); buildWires();
+  }else{
+    // ノーマル復帰：元のモーフ値に戻す（以降mixerが動かす）
+    modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.morphOrig&&o.morphTargetInfluences)o.morphTargetInfluences.set(o.userData.morphOrig); });
   }
   modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.matOrig) o.material=(m==="wire")?clayMat:o.userData.matOrig; });
   wires.forEach(w=>w.visible=(m==="wire"));
@@ -240,7 +268,7 @@ function markMode(m){ [...document.querySelectorAll("#gv-mode button")].forEach(
 
 function clearModel(){
   if(modelRoot){ scene.remove(modelRoot); modelRoot.traverse(o=>{ if(o.geometry&&o.geometry.dispose)o.geometry.dispose(); }); }
-  wires=[]; wiresBuilt=false; mode="normal";
+  disposeWires(); mode="normal";
   modelRoot=null; mixer=null; actions={}; active=null; emissiveStore=[]; glowEyeNodes=[];
   document.getElementById("gv-clip").innerHTML="";
 }
@@ -257,7 +285,7 @@ function loadModel(name){
     modelRoot.traverse(o=>{
       if(o.isSkinnedMesh)o.frustumCulled=false;
       if(o.name && o.name.indexOf("human_eye")>=0) glowEyeNodes.push(o);
-      if(o.isMesh){ o.userData.matOrig=o.material; if(o.material){ o.material.envMapIntensity=(P.env==null?1:P.env); } }
+      if(o.isMesh){ o.userData.matOrig=o.material; if(o.material){ o.material.envMapIntensity=(P.env==null?1:P.env); } if(o.morphTargetInfluences)o.userData.morphOrig=o.morphTargetInfluences.slice(); }
       if(o.isMesh&&o.material&&o.material.emissive){
         emissiveStore.push({mat:o.material, factor:(o.material.emissiveIntensity==null?1:o.material.emissiveIntensity)});
       }
@@ -355,6 +383,11 @@ document.getElementById("c-emis").addEventListener("change",applyEmissive);
 document.getElementById("c-hideeye").addEventListener("change",applyHideEye);
 const btnRot=document.getElementById("btn-rotate");
 [...document.querySelectorAll("#gv-mode button")].forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+[...document.querySelectorAll("#gv-wpose button")].forEach(b=>b.addEventListener("click",()=>{
+  wirePose=b.dataset.wpose;
+  [...document.querySelectorAll("#gv-wpose button")].forEach(x=>x.classList.toggle("on",x.dataset.wpose===wirePose));
+  if(mode==="wire"){ applyWirePose(); disposeWires(); buildWires(); wires.forEach(w=>w.visible=true); }
+}));
 btnRot.addEventListener("click",()=>{
   rotateWanted=!rotateWanted;
   controls.autoRotate=rotateWanted;
@@ -378,6 +411,6 @@ renderer.setAnimationLoop(()=>{
   renderer.render(scene,camera);
 });
 </script>
-<div class="buildver">build 2026.07.09 17:45 JST</div>
+<div class="buildver">build 2026.07.09 18:20 JST</div>
 </body>
 </html>
