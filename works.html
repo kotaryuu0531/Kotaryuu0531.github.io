@@ -135,7 +135,7 @@
   @keyframes v3dspin{to{transform:rotate(360deg)}}
   .badge3d{cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
   .badge3d:hover,.badge3d:focus-visible{transform:scale(1.12);background:rgba(0,0,0,.72);border-color:var(--amber);color:#fff;box-shadow:0 4px 16px rgba(233,169,76,.22);outline:none}
-  .buildver{position:fixed;left:12px;bottom:10px;z-index:40;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);opacity:.5;pointer-events:none}
+  .buildver{display:none;position:fixed;left:12px;bottom:10px;z-index:40;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);opacity:.5;pointer-events:none}
 </style>
 </head>
 <body>
@@ -201,14 +201,14 @@
   thumb:"https://img.youtube.com/vi/2G3K2FRd1MI/maxresdefault.jpg"
 },
     {
-      title:"モンスターエナジー風パロディCM",
+      title:"MonsterEnergy自主制作CM「Wake Up」",
       tags:["CG","シネマティック","CM"],
       period:"2021年11月〜2026年7月（5年がかり）", date:"2026-07-11",
       url:"https://youtu.be/oGyDT1T_H4Y",
       making:"making-monstercm.html",
       thumb:"https://img.youtube.com/vi/oGyDT1T_H4Y/maxresdefault.jpg",
       is3d:true, glb:"tiger.glb", cam:{angle:-162, elev:-0.05, zoom:0.70, env:1.0},
-      ov:{eyebrow:"PARODY CM — CG個人制作 / 2021–2026", sub:"虎とステイサム風キャラクターが対峙するフルCGの30秒", text:"エナジードリンク「モンスターエナジー」のCMを勝手に作った、フルCGの30秒パロディ（非公式・ファン制作）。モデリングからCyclesレンダリング・グレーディングまで全工程を1人で制作。寅年年賀状の虎から始まり、断続的に5年かけて2026年に完成しました。"}
+      ov:{eyebrow:"SPEC CM — CG個人制作 / 2021–2026", sub:"虎とステイサム風キャラクターが対峙するフルCGの30秒", text:"エナジードリンク「モンスターエナジー」のCMを勝手に作った、フルCGの30秒パロディ（非公式・ファン制作）。モデリングからCyclesレンダリング・グレーディングまで全工程を1人で制作。寅年年賀状の虎から始まり、断続的に5年かけて2026年に完成しました。"}
     },
     {
       title:"このポートフォリオサイト",
@@ -271,7 +271,7 @@
       url:"",
       making:"making-nenga2022.html",
       thumb:"nenga2022-thumb.jpg",
-      ov:{eyebrow:"NEW YEAR CARD — 寅年・実写×CG合成 / 2022", sub:"自作の3DCG虎と実写を合成した年賀状", text:"寅年にあわせて、初めての動物モデリングに挑んだ虎と実写を合成した年賀状。東京駅の夜景に、私と虎のツーショット。この虎がのちに5年かけて育ち、モンスターエナジー風パロディCMの主役になります。"}
+      ov:{eyebrow:"NEW YEAR CARD — 寅年・実写×CG合成 / 2022", sub:"自作の3DCG虎と実写を合成した年賀状", text:"寅年にあわせて、初めての動物モデリングに挑んだ虎と実写を合成した年賀状。東京駅の夜景に、私と虎のツーショット。この虎がのちに5年かけて育ち、自主制作CM「Wake Up」の主役になります。"}
     },
     {
       title:"DanceNuts公演 生配信",
@@ -724,6 +724,6 @@
     });
   })();
   </script>
-  <div class="buildver">build 2026.07.12 19:48 JST</div>
+  <div class="buildver">build 2026.07.12 23:40 JST</div>
 </body>
 </html>
