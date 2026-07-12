@@ -170,7 +170,7 @@
 
     <!-- 3Dビューア -->
     <div class="viewer rv">
-      <div id="gviewer" data-glb="mazin.glb" data-poster="mazin-mat-front.jpg" data-angle="-20" data-fov="30" data-toon="1" data-elev="0.12" aria-label="マジンザハンドのマジン 3DCGモデル（ドラッグで回転できます）">
+      <div id="gviewer" data-glb="mazin.glb" data-poster="mazin-mat-front.jpg" data-angle="-20" data-fov="30" data-toon="1" data-elev="0.12" data-wirepose="bind" aria-label="マジンザハンドのマジン 3DCGモデル（ドラッグで回転できます）">
         <div class="spin" id="gv-spin"><div class="ring"></div><div class="spin-txt" id="gv-spin-txt">読み込み中…</div></div>
       </div>
       <div class="gv-ui" id="gv-mode">
@@ -298,5 +298,6 @@
 
 </script>
 <script type="module" src="viewer3d.js"></script>
+<script src="fit-title.js" defer></script>
 </body>
 </html>
