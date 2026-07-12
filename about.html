@@ -99,6 +99,25 @@
   .vcap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:10px}
   .vcap a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
   .vcap a:hover{border-color:var(--amber)}
+  /* ヒーロー（写真つき） */
+  .herogrid{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,4vw,48px);align-items:end;margin-top:8px}
+  .portrait{position:relative;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+  .portrait img{display:block;width:100%;height:auto}
+  .portrait .pcap{position:absolute;left:0;right:0;bottom:0;padding:22px 14px 10px;
+    background:linear-gradient(transparent,rgba(5,7,10,.78));
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut)}
+  @media(max-width:760px){.herogrid{grid-template-columns:1fr;align-items:start}}
+  /* 強み */
+  .str{display:grid;grid-template-columns:64px 1fr;gap:20px;padding:26px 0;border-top:1px solid var(--line)}
+  .str:last-of-type{border-bottom:1px solid var(--line)}
+  .str .sno{font-family:"Fraunces",serif;font-weight:600;font-size:34px;color:var(--amber);line-height:1;padding-top:4px}
+  .str h3{margin:0 0 10px;font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(18px,2.4vw,22px);letter-spacing:.01em;line-height:1.35;color:var(--ink)}
+  .str p{margin:0;font-size:15px;line-height:1.85;color:var(--ink-mut)}
+  .str p+p{margin-top:10px}
+  .str a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  .str a:hover{border-color:var(--amber)}
+  .str .ev{margin-top:12px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.04em;color:var(--ink-mut)}
+  @media(max-width:560px){.str{grid-template-columns:1fr;gap:8px}}
 </style>
 </head>
 <body>
@@ -111,16 +130,51 @@
 
   <main class="wrap">
     <div class="eyebrow">ABOUT — プロフィール</div>
-    <h1>小竹竜ノ介</h1>
-    <div class="role">RYUNOSUKE KOTAKE ／ 実写映像 · CG · ライブ配信</div>
-    <p class="lead">「感情を動かす」ことを軸に、実写映像・3DCG・ライブ配信をつくっています。目指すのは、ゲームのシネマティック（ムービー）制作。遊ぶ人の感情と、画面の中で起きる演出が重なる瞬間をつくりたいと考えています。</p>
+    <div class="herogrid">
+      <div>
+        <h1>小竹竜ノ介</h1>
+        <div class="role">RYUNOSUKE KOTAKE ／ 実写映像 · CG · ライブ配信</div>
+        <p class="lead">「感情を動かす」ことを軸に、実写映像・3DCG・ライブ配信をつくっています。目指すのは、ゲームのシネマティック（ムービー）制作。遊ぶ人の感情と、画面の中で起きる演出が重なる瞬間をつくりたいと考えています。</p>
+      </div>
+      <figure class="portrait rv" style="margin:0">
+        <img src="doremifa-shoot1.jpg" alt="ドレミファダンスコンサート2025の撮影現場で、カメラを構える小竹竜ノ介">
+        <figcaption class="pcap">ドレミファダンスコンサート2025 の撮影現場で</figcaption>
+      </figure>
+    </div>
 
     <!-- これまで -->
     <section class="section bio rv">
       <div class="sec-lbl">JOURNEY — これまで</div>
       <p>中学1年で放送部「IBS」に入り、校内ニュースの放送や、体育祭・文化祭といった学校行事の撮影・編集に明け暮れました。<strong>中学3年から高校3年の6月までは局長（部長）</strong>として部を率い、ここで映像づくりの土台をつくりました。</p>
-      <p>2017年に映像をはじめてから、実写の撮影・編集を軸に、中学時代から触れているBlenderでの3DCG、音楽イベントなどのライブ配信まで、制作の幅を広げてきました。<strong>「感情を動かす／手段は選ばず」</strong>——必要な技術はそのつど取りに行くスタイルです。</p>
+      <p>2017年に映像をはじめてから、実写の撮影・編集を軸に、中学時代から触れているBlenderでの3DCG、音楽イベントなどのライブ配信まで、制作の幅を広げてきました。<strong>「感情を動かす／手段は選ばず」</strong>——必要な技術はそのつど取りに行くスタイルです。2025年4月から2026年3月までの1年間、大学（工学部）を休学してポートフォリオ制作に専念しました。専門的な訓練を受けてきた人たちと同じ土俵で戦うために、制作の時間を先に確保する、という選択でした。</p>
       <p>つくり手として大切にしているのは、<strong>「演出」と「体験」が一致しているか</strong>。観る人・遊ぶ人の感情の流れと、画面で起きることが噛み合った瞬間に、映像はいちばん強く働くと考えています。</p>
+    </section>
+
+
+    <!-- 強み -->
+    <section class="section rv">
+      <div class="sec-lbl">STRENGTHS — 3つの強み</div>
+      <div class="str">
+        <div class="sno">01</div>
+        <div>
+          <h3>必要な技術を、必要になった瞬間に取りに行く</h3>
+          <p>Unreal Engine 5は、講座で基本を覚えてから2週間で、講座に無いギミックを設計・実装して<a href="making-draward.html">10フロアのゲーム</a>にしました。このサイトの<a href="making-portfolio.html">3Dビューア</a>は、見せたい画のために既製ライブラリを捨ててthree.jsで自作。勤務先の<a href="making-ikeshibu.html">DMX制御照明</a>は研修を受けてオペレーターとして本番に立ちました。Blenderも独学です。「教わってから作る」のではなく、<strong>作りたいものが先にあって、技術が後から追いつく</strong>——この順番で9年やってきました。</p>
+        </div>
+      </div>
+      <div class="str">
+        <div class="sno">02</div>
+        <div>
+          <h3>完成形から逆算して、全体を設計する</h3>
+          <p>カットを撮る前に、完成した映像がどう見えるかを先に決めます。<a href="making-birthday2026.html">22歳記念PV</a>ではロケハンとGoogle Map、Blenderで画を設計してから撮影に入り、<a href="making-birthday21.html">21歳予告</a>は決め台詞から世界観を逆算。<a href="making-kyogu.html">短編映画「狂愚」</a>では結末を作り変え、そのオチが最大の効果を生むように「追い詰められていく過程」を組み立てました。カメラも編集も配信の<a href="making-doremifa2026.html">スイッチングも</a>やってきたので、<strong>いま自分が触っている工程が全体のどこにあるか</strong>を常に把握しながら作れます。</p>
+        </div>
+      </div>
+      <div class="str">
+        <div class="sno">03</div>
+        <div>
+          <h3>作り続けているから、「なぜ面白いのか」を分解する癖がある</h3>
+          <p>誕生日の予告映像を<a href="making-birthday15.html">15歳</a>から<a href="making-birthday2026.html">22歳</a>までほぼ毎年（計7本）、Blenderは<a href="making-challenge.html">1日1体×30日</a>、勤務先の配信現場には<a href="making-ikeshibu.html">130日</a>。制作を止めない生活を続けていると、コンテンツを見る目が変わります。カットが切り替わった瞬間に視線がどこへ行くか、この演出はなぜ効いているのか——<strong>面白さを感覚で消費せず、仕組みとして分解する習慣</strong>が、次の制作の設計図になっています。</p>
+        </div>
+      </div>
     </section>
 
     <!-- IBS -->
@@ -165,15 +219,24 @@
       <div class="tools">
         <div class="toolrow"><div class="tk">映像</div><div class="tv"><span class="tool">Final Cut Pro</span><span class="tool">DaVinci Resolve</span><span class="tool">Logic Pro</span></div></div>
         <div class="toolrow"><div class="tk">3DCG</div><div class="tv"><span class="tool">Blender</span><span class="tool">Procreate</span></div></div>
+        <div class="toolrow"><div class="tk">ゲーム / Web</div><div class="tv"><span class="tool">Unreal Engine 5</span><span class="tool">HTML / CSS / JavaScript</span><span class="tool">three.js</span></div></div>
       </div>
+      <p class="about" style="margin-top:18px">このポートフォリオサイトも自分で設計・制作しています（<a href="making-portfolio.html">設計と実装の記録</a>）。ゲームエンジンでの制作は <a href="making-draward.html">UE5のダンジョンゲーム</a> に。</p>
     </section>
 
     <!-- 経歴 -->
     <section class="section rv">
       <div class="sec-lbl">TIMELINE — 歩み</div>
       <div class="timeline">
-        <div class="tl"><div class="yr">2017</div><div class="ev">映像をはじめる <small>放送部 IBS で活動開始</small></div></div>
+        <div class="tl"><div class="yr">2017</div><div class="ev">映像をはじめる <small>放送部 IBS で活動開始。中3から高3の6月まで局長として部を率いる</small></div></div>
         <div class="tl"><div class="yr">2018</div><div class="ev">初の映像制作「IBS VIDEO #98」 <small>郁秋祭ダイジェスト・一部の構成/編集を担当</small></div></div>
+        <div class="tl"><div class="yr">2019</div><div class="ev">Blenderで初めての3DCG <small>誕生日予告シリーズもこの年に始まる（15歳）</small></div></div>
+        <div class="tl"><div class="yr">2020</div><div class="ev">コロナ禍、学校行事の配信を担う <small>カメラ・スイッチング・運営まで</small></div></div>
+        <div class="tl"><div class="yr">2021</div><div class="ev">IDF（郁文ドリームフェスティバル）を企画・実行 <small>Blenderも本格化：30日チャレンジ・RX-7・マジン</small></div></div>
+        <div class="tl"><div class="yr">2022</div><div class="ev">実写×CGの合成に挑む <small>寅年年賀状</small></div></div>
+        <div class="tl"><div class="yr">2024</div><div class="ev">UE5でゲーム制作／GRIT3部作 <small>11月からイケベ楽器店で生配信カメラ</small></div></div>
+        <div class="tl"><div class="yr">2025</div><div class="ev">大学を休学し、ポートフォリオ制作に専念 <small>人体素体・短編映画「狂愚」・卒制メイキング撮影（休学は2025年4月〜2026年3月）</small></div></div>
+        <div class="tl"><div class="yr">2026</div><div class="ev">モンスターエナジー風CM完成（5年越し） <small>このポートフォリオサイトを設計・公開</small></div></div>
       </div>
     </section>
 

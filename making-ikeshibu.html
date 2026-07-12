@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>イケベ楽器店 イケシブ｜イベント撮影・生配信 / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-size:clamp(15px,1.9vw,19px);color:var(--ink-mut);margin-bottom:20px;opacity:.92}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+
+  /* 動画フレーム（クリック再生） */
+  .hero-video{position:relative;aspect-ratio:16/9;margin:18px 0 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .hero-video .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;
+    border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .hero-video .play::after{content:"";border-left:17px solid var(--ink);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;transition:border-color .3s}
+  .hero-video:hover{border-color:var(--amber-dim)}
+  .hero-video:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .hero-video:hover .play::after{border-left-color:var(--amber)}
+  .hero-video:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .hero-video.playing{cursor:default}
+  .hero-video.playing .poster,.hero-video.playing .play{display:none}
+  .hero-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+
+  /* インタラクティブ3Dビューア（複数） */
+  .viewer{margin-top:clamp(24px,4vh,40px)}
+  .gv3d{position:relative;width:100%;height:min(62vh,520px);touch-action:none;overflow:hidden;
+    background:radial-gradient(130% 110% at 50% 30%, #1b212a 0%, #0c0f14 72%);
+    border:1px solid var(--line);border-radius:var(--r)}
+  .gv3d canvas{display:block;width:100%;height:100%;outline:none}
+  .gv3d .spin{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;
+    background:rgba(10,13,18,.55);z-index:3;transition:opacity .35s}
+  .gv3d .spin.off{opacity:0;pointer-events:none}
+  .gv3d .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:gvspin 1s linear infinite}
+  .gv3d .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
+  @keyframes gvspin{to{transform:rotate(360deg)}}
+  .gv-row{display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;align-items:center}
+  .gv-ui{display:flex;gap:6px}
+  .gv-ui button{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;background:none;
+    border:1px solid var(--line);color:var(--ink-mut);padding:6px 14px;border-radius:100px;cursor:pointer;transition:border-color .2s,color .2s}
+  .gv-ui button:hover{border-color:var(--amber-dim)}
+  .gv-ui button.on{border-color:var(--amber);color:var(--amber)}
+  .gv-ui.gv-clip:empty{display:none}
+  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
+
+  /* feature */
+  .feature{margin:clamp(40px,7vh,72px) 0 0;padding:clamp(32px,5vh,52px) 0 0;border-top:1px solid var(--line)}
+  .lbl{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--amber);margin-bottom:12px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3.4vw,38px);line-height:1.14;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .feature a:hover{border-color:var(--amber)}
+
+  /* 画像グリッド */
+  .grid2,.grid3{display:grid;gap:14px;margin-top:18px}
+  .grid2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .grid3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .grid2 figure,.grid3 figure{margin:0}
+  .imgbox{position:relative;aspect-ratio:4/3;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface);cursor:zoom-in}
+  .imgbox.wide{aspect-ratio:16/9}
+  .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .grid2 figcaption,.grid3 figcaption,figure>figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:8px}
+  .figcap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:10px}
+
+  /* ループ動画・SE動画 */
+  .loopvid{width:100%;aspect-ratio:16/9;display:block;margin:18px 0 0;border:1px solid var(--line);border-radius:var(--r);background:#000;object-fit:cover}
+  .sevid{width:100%;aspect-ratio:16/9;display:block;border:1px solid var(--line);border-radius:var(--r);background:#000}
+
+  /* タイムライン */
+  .tl{margin:18px 0 0}
+  .tl-row{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:14px 0;border-top:1px solid var(--line)}
+  .tl-row:last-child{border-bottom:1px solid var(--line)}
+  .tl-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber);padding-top:2px}
+  .tl-row dd{font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.tl-row{grid-template-columns:1fr;gap:4px}}
+
+  /* spec */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  /* ライトボックス（アトラス縦横ナビ対応） */
+  .lightbox{position:fixed;inset:0;z-index:60;background:rgba(5,7,10,.93);display:none;
+    align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lightbox .lb-cap{position:absolute;left:18px;bottom:14px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-mut)}
+  .lb-nav{position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(10,13,18,.65);
+    color:var(--ink);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+  .lb-nav:hover{border-color:var(--amber);color:var(--amber)}
+  .lb-l{left:14px;top:50%;transform:translateY(-50%)}
+  .lb-r{right:14px;top:50%;transform:translateY(-50%)}
+  .lb-u{top:14px;left:50%;transform:translateX(-50%) rotate(90deg)}
+  .lb-d{bottom:14px;left:50%;transform:translateX(-50%) rotate(-90deg)}
+  .lightbox.plain .lb-nav{display:none}
+  .lightbox.no-v .lb-u,.lightbox.no-v .lb-d{display:none}
+  .lightbox.no-h .lb-l,.lightbox.no-h .lb-r{display:none}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  p,.lead,.feature p{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+  /* イベント／配信のリンクリスト */
+  .llist{margin-top:18px;border-top:1px solid var(--line)}
+  .lrow{display:grid;grid-template-columns:104px 1fr auto;gap:18px;align-items:baseline;
+    padding:14px 4px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);transition:background .2s}
+  .lrow:hover{background:rgba(233,169,76,.05)}
+  .ldate{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--amber);white-space:nowrap}
+  .lname{font-size:14.5px;line-height:1.45}
+  .lgo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);white-space:nowrap}
+  .lrow:hover .lgo{color:var(--amber)}
+  @media(max-width:640px){
+    .lrow{grid-template-columns:1fr;gap:4px;padding:14px 4px}
+    .lgo{margin-top:2px}
+  }
+  .fold{margin-top:14px}
+  .fold summary{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;color:var(--ink-mut);
+    cursor:pointer;padding:10px 0;list-style:none}
+  .fold summary::-webkit-details-marker{display:none}
+  .fold summary::before{content:"▸ ";color:var(--amber)}
+  .fold[open] summary::before{content:"▾ "}
+  .fold summary:hover{color:var(--amber)}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-cg">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">LIVE STREAMING — 楽器店の現場・カメラ / 2024–</div>
+    <h1><span class="nb">イケベ楽器店</span> <span class="nb">イベント生配信カメラ</span></h1>
+    <div class="subtitle">渋谷の楽器店で、イベント生配信のカメラマンを務めています</div>
+    <div class="htags"><a class="htag" href="works.html?tags=ライブ配信">ライブ配信</a><a class="htag" href="works.html?tags=実写映像">実写映像</a><a class="htag" href="works.html?tags=クライアントワーク">クライアントワーク</a></div>
+    <p class="lead">イケベ楽器店の渋谷店舗（イケシブ）で、店舗イベントの生配信カメラマンを務めているアルバイトです。アーティストのリリース記念ライブ、メーカーの新製品発表・クリニック、講師によるワークショップ——題材も規模も毎回違う現場に、2024年11月から入り続けています。ここは自主制作とは違い、「他人の要件で、決まった日時に、必ず成立させる」現場です。以下は、私がシフトで入った日と、その日に開催されたイベント・配信を突き合わせたリストです。</p>
+    <dl class="mdata">
+      <div><dt>期間</dt><dd>2024年11月〜（継続中）</dd></div>
+      <div><dt>出勤日数</dt><dd>130日（記録が残っている分）</dd></div>
+      <div><dt>イベント対応</dt><dd>62日／51イベント</dd></div>
+      <div><dt>生配信</dt><dd>18本（うち17本がアーカイブ公開中）</dd></div>
+      <div><dt>担当</dt><dd>カメラマン（Sony PXW-Z280）／照明オペレーター1回</dd></div>
+    </dl>
+
+    <!-- 担当 -->
+    <section class="feature rv">
+      <div class="lbl">ROLE — CAMERA</div>
+      <h3>ほぼすべての現場でカメラを持っている</h3>
+      <p>この現場での担当は、ほぼ全てがカメラマンです。機材はSony PXW-Z280。マルチカメラの一台として、生配信のプログラムに乗る画を撮り続けています。</p>
+      <p>自主制作なら、納得いくまで撮り直せます。ここではそれができません。開演時間は動かせず、アーティストにもメーカーにも「もう一回」は言えない。限られた設営時間でカメラを立て、本番はその一発を撮り切る——この積み重ねが、<a href="making-doremifa2026.html">9カメ5時間半のスイッチング</a>や<a href="making-dancenuts.html">8カメの公演配信</a>で効いています。スイッチャー側で「どの画が欲しいか」を考えられるのは、カメラマン側で「どの画なら出せるか」を数えきれないほど経験しているからです。</p>
+      <p>題材が毎回変わるのもこの現場の特徴です。ギターのクリニック、サックスのリフェイス会、写真展のトークショー、アーティストのフリーライブ。何が見せ場になるかを事前に把握してからカメラを構える、という準備の癖はここで身につきました。</p>
+    </section>
+
+    <!-- 照明 -->
+    <section class="feature rv">
+      <div class="lbl">ROLE — LIGHTING</div>
+      <h3>一度だけ、照明のオペレーターに立った</h3>
+      <p>イケシブのイベントスペースには、DMXで制御される照明機材があります。その研修を受け、一度だけ本番で照明オペレーターを担当しました。実践は一度きりですが、「光を組んで演出をつくる側」に回った経験は、カメラを持つときの見え方を変えました。どの明かりが撮れる画を決めているのかを、操作する側から理解できたからです。</p>
+      <p>単発の依頼映像（PRS VAULT 開店記念動画など、撮影・編集・翻訳まで担当したもの）は<a href="credits.html">CREDITS</a>にまとめています。</p>
+    </section>
+
+    <!-- 配信アーカイブ -->
+    <section class="feature rv">
+      <div class="lbl">LIVE STREAM ARCHIVE — 17本</div>
+      <h3>アーカイブが公開されている配信</h3>
+      <p>担当した生配信のうち、勤務先の公式YouTubeチャンネルでアーカイブが公開されているものです。すべて店舗の公式配信であり、著作権は運営元に帰属します（下のリンクは公式チャンネルへ遷移します）。</p>
+      <div class="llist">
+        <a class="lrow" href="https://www.youtube.com/watch?v=yDbD_Cm1tU8" target="_blank" rel="noopener">
+          <span class="ldate">2026.06.07</span>
+          <span class="lname">Theo Wanne Japan Tour 2026【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=A63GaoiqtNk" target="_blank" rel="noopener">
+          <span class="ldate">2026.06.06</span>
+          <span class="lname">黒田晃年 Positive Grid REACTOR発表会【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=S9egp2_7NFk" target="_blank" rel="noopener">
+          <span class="ldate">2026.05.10</span>
+          <span class="lname">ソエジマトシキ Yamaha Pacifica SC Demonstration【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=Fnq1CZzWxB8" target="_blank" rel="noopener">
+          <span class="ldate">2026.04.25</span>
+          <span class="lname">Acoustic Canvas 第一部「朝露」【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=pFaotpAMLYA" target="_blank" rel="noopener">
+          <span class="ldate">2026.04.25</span>
+          <span class="lname">Acoustic Canvas 第二部「夜露」【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=cvwba5FmK3I" target="_blank" rel="noopener">
+          <span class="ldate">2026.01.18</span>
+          <span class="lname">FMLギター道【東京編】1/18「ギターを弾いている人向け」回【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=8VBjGgCI9iE" target="_blank" rel="noopener">
+          <span class="ldate">2026.01.17</span>
+          <span class="lname">FMLギター道【東京編】1/17「誰でも歓迎」回【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=vrfVMhV1uBo" target="_blank" rel="noopener">
+          <span class="ldate">2025.12.07</span>
+          <span class="lname">夕日（NEE）/ Line 6 Helix Stadium XL Floor 発売記念セミナー【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=WIycn6WUpo8" target="_blank" rel="noopener">
+          <span class="ldate">2025.10.10</span>
+          <span class="lname">Eventide H90 スペシャルクリニック【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=Ym0VpGcLuL0" target="_blank" rel="noopener">
+          <span class="ldate">2025.09.20</span>
+          <span class="lname">Mattias IA Eklundh Special Event【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=iANhCtOYVyM" target="_blank" rel="noopener">
+          <span class="ldate">2025.07.21</span>
+          <span class="lname">Morris Guitars with エバラ健太＆坂本佳祐（第一部）</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=QHGq5ix5djY" target="_blank" rel="noopener">
+          <span class="ldate">2025.07.21</span>
+          <span class="lname">Morris Guitars with エバラ健太＆坂本佳祐（第二部）</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=1Kait4-eVZk" target="_blank" rel="noopener">
+          <span class="ldate">2025.07.20</span>
+          <span class="lname">Bourgeois Guitars with 矢後憲太（第一部）</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=TOJKeH1RDgk" target="_blank" rel="noopener">
+          <span class="ldate">2025.07.20</span>
+          <span class="lname">Bourgeois Guitars with 矢後憲太（第二部）</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=MnezBezMa_c" target="_blank" rel="noopener">
+          <span class="ldate">2025.07.19</span>
+          <span class="lname">Feel The Maton with 西山隆行</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=NqEkprYnKPk" target="_blank" rel="noopener">
+          <span class="ldate">2025.05.24</span>
+          <span class="lname">Cream Guitars feat. Luis Ortiz &amp; 千愛（水中スピカ）【イケシブLIVES】</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>
+        <a class="lrow" href="https://www.youtube.com/watch?v=HVizYEE3Kz0" target="_blank" rel="noopener">
+          <span class="ldate">2024.12.19</span>
+          <span class="lname">映画『ヘヴィ・トリップII／俺たち北欧メタル危機一発！』公開直前生配信</span>
+          <span class="lgo">アーカイブ →</span>
+        </a>      </div>
+    </section>
+
+    <!-- イベント一覧 -->
+    <section class="feature rv">
+      <div class="lbl">EVENTS — 51本</div>
+      <h3>撮影で入った店舗イベント</h3>
+      <p>シフトの記録と、勤務先が公開しているイベント情報を突き合わせて作成したリストです。会期をまたぐ展示・POP UPは初日で1件として数えています。</p>
+      <details class="fold" open>
+        <summary>すべて表示 / 折りたたむ</summary>
+        <div class="llist">
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260607-theo-wanne/" target="_blank" rel="noopener">
+          <span class="ldate">2026.06.07</span>
+          <span class="lname">Theo Wanne Japan Tour 2026 / Guest : 田中邦和＆才恵加</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260606-positive-grid/" target="_blank" rel="noopener">
+          <span class="ldate">2026.06.06</span>
+          <span class="lname">黒田晃年×Positive Grid：新製品REACTOR・ギターアンプ発表会</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260523-aco-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2026.05.23</span>
+          <span class="lname">西山隆行 イケシブ・アコギワークショップ「決めフレーズのリズム編」</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260517-eg-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2026.05.17</span>
+          <span class="lname">阿部 学 イケシブ・エレキワークショップ「オクターブ奏法編」</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260510-yamaha/" target="_blank" rel="noopener">
+          <span class="ldate">2026.05.10</span>
+          <span class="lname">Yamaha Pacifica SC Demonstration featuring ソエジマトシキ</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260425-morris/" target="_blank" rel="noopener">
+          <span class="ldate">2026.04.25</span>
+          <span class="lname">「Acoustic Canvas」 矢後憲太×いくらまりえ×Morris Guitars</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260424-0510-gibson/" target="_blank" rel="noopener">
+          <span class="ldate">2026.04.24</span>
+          <span class="lname">IKEBE×Gibson Golden Week!</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260418-godspeed/" target="_blank" rel="noopener">
+          <span class="ldate">2026.04.18</span>
+          <span class="lname">Godspeed/青木征洋 アンプシミュレーター・セミナー</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260405-shota-horie/" target="_blank" rel="noopener">
+          <span class="ldate">2026.04.05</span>
+          <span class="lname">「堀江晶太 OFFICIAL ARTIST BOOK」発売記念 トーク＆サイン会</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260326-ar-syura/" target="_blank" rel="noopener">
+          <span class="ldate">2026.03.26</span>
+          <span class="lname">ar syura『OHAI ALII 前夜祭』</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260324-gibson/" target="_blank" rel="noopener">
+          <span class="ldate">2026.03.24</span>
+          <span class="lname">Nothing&#x27;s Carved In Stone｜Gibson Gear Guide 生形真一 愛用器解説</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260322-ibanez/" target="_blank" rel="noopener">
+          <span class="ldate">2026.03.22</span>
+          <span class="lname">IKEBE×Ibanez presents Li-sa-X Guitar Demonstration</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260320-0321-prs/" target="_blank" rel="noopener">
+          <span class="ldate">2026.03.20</span>
+          <span class="lname">THE IKEBE PRS VAULT Grand Opening Event</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260307-aco-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2026.03.07</span>
+          <span class="lname">西山隆行 イケシブ・アコギワークショップ「ソロギター編」</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260303-0319-ncis/" target="_blank" rel="noopener">
+          <span class="ldate">2026.03.04</span>
+          <span class="lname">Nothing&#x27;s Carved In Stone イケシブジャック！</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260301-bass-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2026.03.01</span>
+          <span class="lname">shioRi イケシブ・ベースワークショップ（GBT 10th）</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260221-0308-wwp/" target="_blank" rel="noopener">
+          <span class="ldate">2026.02.25</span>
+          <span class="lname">ワールドペダルパーク・オープン記念 SPECIAL POP UP</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260211-bass-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2026.02.11</span>
+          <span class="lname">平野なつき先生のBASSワークショップ（GBT 10th）</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260121-aco-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2026.01.21</span>
+          <span class="lname">西山隆行 イケシブ・アコギワークショップ「ソロギター中級編」</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20260117-0118-uk/" target="_blank" rel="noopener">
+          <span class="ldate">2026.01.17</span>
+          <span class="lname">FMLギター道【東京編】</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251220-gibson/" target="_blank" rel="noopener">
+          <span class="ldate">2025.12.20</span>
+          <span class="lname">Gibson Brands Japan Guitar Tech 製品診断・セットアップ イベント</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251215-1221-gibson/" target="_blank" rel="noopener">
+          <span class="ldate">2025.12.17</span>
+          <span class="lname">Gibson POP UP Store 2025 Winter</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251214-gibson/" target="_blank" rel="noopener">
+          <span class="ldate">2025.12.14</span>
+          <span class="lname">Gibson POP UP Pre-Open Event feat. 菊地EMMA英昭</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251207-line6/" target="_blank" rel="noopener">
+          <span class="ldate">2025.12.07</span>
+          <span class="lname">Line 6 Helix Stadium XL Floor 発売記念セミナー feat. 夕日（NEE）</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251129-1130-pedal-meeting/" target="_blank" rel="noopener">
+          <span class="ldate">2025.11.29</span>
+          <span class="lname">イケシブ・ペダルミーティング 2025</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251129-earthquaker-devices/" target="_blank" rel="noopener">
+          <span class="ldate">2025.11.29</span>
+          <span class="lname">中尾憲太郎×伊東真一 EarthQuaker Devices Barrows 発売記念トークライブ</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251107-kiyoshi/" target="_blank" rel="noopener">
+          <span class="ldate">2025.11.07</span>
+          <span class="lname">IKEBEベースの日 低音共振祭｜清「プチ清誕祭」トーク＆プチライブ</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251103-ibanez/" target="_blank" rel="noopener">
+          <span class="ldate">2025.11.03</span>
+          <span class="lname">IKEBEベースの日 低音共振祭｜Ibanez SR Series feat. Yuki Atori</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251026-mayones-guitars/" target="_blank" rel="noopener">
+          <span class="ldate">2025.10.26</span>
+          <span class="lname">Alex Hutchings Signature Model Release / Mayones Guitar Clinic</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251021-1024-embers/" target="_blank" rel="noopener">
+          <span class="ldate">2025.10.21</span>
+          <span class="lname">Embers『Slept by』Exhibition</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251010-eventide-audio/" target="_blank" rel="noopener">
+          <span class="ldate">2025.10.10</span>
+          <span class="lname">Eventide H90を使い倒す！スペシャルクリニック with Joe Berger</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20251010-darkglass-electronics/" target="_blank" rel="noopener">
+          <span class="ldate">2025.10.10</span>
+          <span class="lname">Darkglass Electronics &amp; GBT presents『Anagram Meeting』</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250920-mattias-ia-eklundh/" target="_blank" rel="noopener">
+          <span class="ldate">2025.09.20</span>
+          <span class="lname">Mattias IA Eklundh Freak Guitar Lab×Kogalashi Special Event</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250901-0915-little-lilith-ph/" target="_blank" rel="noopener">
+          <span class="ldate">2025.09.11</span>
+          <span class="lname">Little Lilith×イケシブ Special collaboration Photo Gallery</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250827-cerveteri/" target="_blank" rel="noopener">
+          <span class="ldate">2025.08.27</span>
+          <span class="lname">Cerveteri 3rd album 「F」 Release Free Live 「GBTジャック！」</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250816-mikio-ariga/" target="_blank" rel="noopener">
+          <span class="ldate">2025.08.16</span>
+          <span class="lname">有賀幹夫写真展｜有賀幹夫 Talk Show</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250809-mikio-ariga/" target="_blank" rel="noopener">
+          <span class="ldate">2025.08.09</span>
+          <span class="lname">有賀幹夫写真展 Special Live : 森重樹一（ZIGGY）</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250803-mikio-ariga/" target="_blank" rel="noopener">
+          <span class="ldate">2025.08.03</span>
+          <span class="lname">有賀幹夫写真展 Special Live : 大西ツル</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250721-morris-guitars/" target="_blank" rel="noopener">
+          <span class="ldate">2025.07.21</span>
+          <span class="lname">Finger Style Guitar Fair｜Morris Guitars with エバラ健太＆坂本佳祐</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250720-bourgeois-guitars/" target="_blank" rel="noopener">
+          <span class="ldate">2025.07.20</span>
+          <span class="lname">Finger Style Guitar Fair｜Bourgeois Guitars with 矢後憲太</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250719-maton-guitars/" target="_blank" rel="noopener">
+          <span class="ldate">2025.07.19</span>
+          <span class="lname">Finger Style Guitar Fair｜Feel The Maton with 西山隆行</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250706-tyh-bass-trio/" target="_blank" rel="noopener">
+          <span class="ldate">2025.07.06</span>
+          <span class="lname">GRANDEY BASS TOKYO presents TYH BASS TRIO LIVE</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250628-eg-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2025.06.28</span>
+          <span class="lname">阿部 学 イケシブ・エレキワークショップ「オルタネイト・ピッキング編」</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250607-aco-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2025.06.07</span>
+          <span class="lname">西山隆行 イケシブ・アコギワークショップ「16分音符リズムとシンコペーション編」</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250601-theo-wanne/" target="_blank" rel="noopener">
+          <span class="ldate">2025.06.01</span>
+          <span class="lname">第五回 セオ・ワニ サックスマウスピース・ミニリフェイス会</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250601-sago/" target="_blank" rel="noopener">
+          <span class="ldate">2025.06.01</span>
+          <span class="lname">MINA（East Of Eden）新ベース「Seed Dullahan」発売記念イベント</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250524-cream-guitars/" target="_blank" rel="noopener">
+          <span class="ldate">2025.05.24</span>
+          <span class="lname">Cream Guitars feat. Luis Ortiz &amp; 千愛（水中スピカ）</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250524-0615-tak-matsumoto/" target="_blank" rel="noopener">
+          <span class="ldate">2025.05.24</span>
+          <span class="lname">Tak Matsumoto Special Exhibition</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250514-0528-cream-guitars/" target="_blank" rel="noopener">
+          <span class="ldate">2025.05.14</span>
+          <span class="lname">Cream Guitars POP UP STORE</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250125-eg-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2025.01.25</span>
+          <span class="lname">阿部 学 イケシブ・エレキワークショップ「アルペジオ編」</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250118-bass-workshop/" target="_blank" rel="noopener">
+          <span class="ldate">2025.01.18</span>
+          <span class="lname">平野なつき先生のBASSワークショップ（GBT 10th）</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>
+        <a class="lrow" href="https://www.ikebe-gakki.com/blog/20250104-0112-androp/" target="_blank" rel="noopener">
+          <span class="ldate">2025.01.08</span>
+          <span class="lname">androp×イケシブ 15th. Anniversary &amp; new album『hooray』Release記念 Special</span>
+          <span class="lgo">イベント情報 →</span>
+        </a>        </div>
+      </details>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>勤務先</dt><dd>イケベ楽器店（渋谷・イケシブ）／アルバイト</dd></div>
+      <div class="spec-row"><dt>期間</dt><dd>2024年11月〜（継続中）</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>生配信のカメラマン（Sony PXW-Z280）。マルチカメラチームの一員として。ほか、DMX制御の照明オペレーターを研修のうえ1回担当</dd></div>
+      <div class="spec-row"><dt>実績</dt><dd>出勤130日・イベント対応62日（51イベント）・生配信18本 ※記録が残っている分</dd></div>
+      <div class="spec-row"><dt>公開</dt><dd>配信アーカイブは勤務先の公式YouTubeチャンネルで公開。映像の権利は運営元に帰属します</dd></div>
+      <div class="spec-row"><dt>関連</dt><dd>単発の依頼映像（PRS VAULT 開店記念動画ほか）は <a href="credits.html">CREDITS</a> に掲載</dd></div>
+    </dl>
+
+    <footer>
+      <a href="index.html#reel-live">← 配信リールに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

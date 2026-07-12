@@ -266,6 +266,31 @@ function initViewer(holder){
     wiresKey=key;
   }
 
+  // ---- タップリセンター（model-viewer SmoothControls.recenter の移植） ----
+  // タップ（300ms以内・移動2px以内）でモデル表面をレイキャストし、ヒット点を回転の中心に。
+  // カメラは角度・距離を保ったまま追従（＝タップ点が画面中心へグライド）。空振りは初期フレーミングへ戻す。
+  const TAP_MS=300, TAP_DIST=2;
+  const raycaster=new THREE.Raycaster();
+  let tapStart=null, goalTarget=null, goalRadius=null;
+  let homeCenter=null, homeDist=0, sceneMaxDim=1;
+  renderer.domElement.addEventListener("pointerdown",e=>{
+    tapStart={x:e.clientX,y:e.clientY,t:performance.now()};
+  });
+  renderer.domElement.addEventListener("pointerup",e=>{
+    const st=tapStart; tapStart=null;
+    if(!st||!modelRef||!homeCenter)return;
+    if(performance.now()>st.t+TAP_MS||Math.abs(e.clientX-st.x)>TAP_DIST||Math.abs(e.clientY-st.y)>TAP_DIST)return;
+    const rect=renderer.domElement.getBoundingClientRect();
+    const ndc=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1, -((e.clientY-rect.top)/rect.height)*2+1);
+    raycaster.setFromCamera(ndc,camera);
+    // アニメ中のスキンメッシュはバウンディングが古くなるため再計算してからレイキャスト
+    modelRef.traverse(o=>{ if(o.isSkinnedMesh&&!o.userData.isOutline&&o.computeBoundingSphere)o.computeBoundingSphere(); });
+    const hit=raycaster.intersectObject(modelRef,true)
+      .find(h=>(h.object.isMesh||h.object.isSkinnedMesh)&&!h.object.userData.isOutline);
+    if(hit){ goalTarget=hit.point.clone(); goalRadius=null; }
+    else{ goalTarget=homeCenter.clone(); goalRadius=homeDist; }   // 空振り＝初期フレーミングへ
+  });
+
   // ---- 読み込み ----
   let mixer=null, actions={}, active=null, activeName=""; const clock=new THREE.Clock();
   let mode="normal";
@@ -335,6 +360,7 @@ function initViewer(holder){
     camera.position.set(center.x+dist*Math.sin(a), center.y+dist*ELEV, center.z+dist*Math.cos(a));
     camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
     controls.update();
+    homeCenter=center.clone(); homeDist=camera.position.distanceTo(center); sceneMaxDim=maxDim;
 
     applyMode();
     holder.style.backgroundImage="";
@@ -371,11 +397,24 @@ function initViewer(holder){
   modeBtns.forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode; applyMode();}));
 
   resize();
-  const _L=new THREE.Vector3(), _R=new THREE.Vector3(), _UP=new THREE.Vector3(0,1,0);
+  const _L=new THREE.Vector3(), _R=new THREE.Vector3(), _UP=new THREE.Vector3(0,1,0), _D=new THREE.Vector3();
   renderer.setAnimationLoop(()=>{
+    const dt=clock.getDelta();
+    // タップリセンターのグライド：ターゲットとカメラを同じ差分で動かす（向き・距離を保持）
+    if(goalTarget){
+      const k=1-Math.exp(-dt*20);   // model-viewerのDamper（減衰50ms）相当
+      _D.copy(goalTarget).sub(controls.target).multiplyScalar(k);
+      controls.target.add(_D); camera.position.add(_D);
+      if(controls.target.distanceToSquared(goalTarget)<sceneMaxDim*sceneMaxDim*1e-8) goalTarget=null;
+    }
+    if(goalRadius!=null){
+      const cur=camera.position.distanceTo(controls.target);
+      const nr=cur+(goalRadius-cur)*(1-Math.exp(-dt*20));
+      camera.position.sub(controls.target).setLength(nr).add(controls.target);
+      if(Math.abs(nr-goalRadius)<sceneMaxDim*1e-4) goalRadius=null;
+    }
     controls.update();
-    if(mixer&&mode!=="wire")mixer.update(clock.getDelta());
-    else clock.getDelta();
+    if(mixer&&mode!=="wire")mixer.update(dt);
     if(TOON&&toonMats.length){
       _L.copy(camera.position).sub(controls.target).normalize();
       _R.setFromMatrixColumn(camera.matrixWorld,0);

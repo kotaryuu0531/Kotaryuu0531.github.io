@@ -62,6 +62,7 @@ const FRAG=`
 let inited=false, renderer=null, scene=null, camera=null, controls=null, pmrem=null, envTex=null;
 let stage=null, v3d=null, spinTxt=null;
 let dirL=null, ambL=null;
+let goalTarget=null, goalRadius=null;   // タップリセンターのグライド目標
 let toonMats=[];               // 現在シーンのトゥーンマテリアル（ライト追従用）
 const cache=new Map();         // glb URL → {group, toonMats, isToon, box}
 let resumeT=null;
@@ -96,11 +97,48 @@ function ensureInit(){
 
   window.addEventListener("resize",resize);
 
-  const L=new THREE.Vector3(), R=new THREE.Vector3(); const clock=new THREE.Clock();
+  // タップリセンター（model-viewer SmoothControls.recenter の移植）
+  // タップ（300ms以内・移動2px以内）でモデル表面をレイキャストし、ヒット点を回転の中心に。空振りは初期フレーミングへ。
+  const TAP_MS=300, TAP_DIST=2;
+  const raycaster=new THREE.Raycaster();
+  let tapStart=null;
+  renderer.domElement.addEventListener("pointerdown",e=>{
+    tapStart={x:e.clientX,y:e.clientY,t:performance.now()};
+  });
+  renderer.domElement.addEventListener("pointerup",e=>{
+    const st=tapStart; tapStart=null;
+    if(!st||!current)return;
+    if(performance.now()>st.t+TAP_MS||Math.abs(e.clientX-st.x)>TAP_DIST||Math.abs(e.clientY-st.y)>TAP_DIST)return;
+    const rect=renderer.domElement.getBoundingClientRect();
+    const ndc=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1, -((e.clientY-rect.top)/rect.height)*2+1);
+    raycaster.setFromCamera(ndc,camera);
+    current.group.traverse(o=>{ if(o.isSkinnedMesh&&!o.userData.isOutline&&o.computeBoundingSphere)o.computeBoundingSphere(); });
+    const hit=raycaster.intersectObject(current.group,true)
+      .find(h=>(h.object.isMesh||h.object.isSkinnedMesh)&&!h.object.userData.isOutline);
+    if(hit){ goalTarget=hit.point.clone(); goalRadius=null; }
+    else if(current.homeCenter){ goalTarget=current.homeCenter.clone(); goalRadius=current.homeDist; }
+  });
+
+  const L=new THREE.Vector3(), R=new THREE.Vector3(), D=new THREE.Vector3(); const clock=new THREE.Clock();
   renderer.setAnimationLoop(()=>{
-    if(!v3d.classList.contains("open")){ clock.getDelta(); return; }   // 閉じている間は描画しない
+    const dt=clock.getDelta();
+    if(!v3d.classList.contains("open")) return;   // 閉じている間は描画しない
+    // タップリセンターのグライド：ターゲットとカメラを同じ差分で動かす（向き・距離を保持）
+    if(goalTarget&&current){
+      const k=1-Math.exp(-dt*20);   // model-viewerのDamper（減衰50ms）相当
+      D.copy(goalTarget).sub(controls.target).multiplyScalar(k);
+      controls.target.add(D); camera.position.add(D);
+      const md=current.maxDim||1;
+      if(controls.target.distanceToSquared(goalTarget)<md*md*1e-8) goalTarget=null;
+    }
+    if(goalRadius!=null&&current){
+      const cur=camera.position.distanceTo(controls.target);
+      const nr=cur+(goalRadius-cur)*(1-Math.exp(-dt*20));
+      camera.position.sub(controls.target).setLength(nr).add(controls.target);
+      if(Math.abs(nr-goalRadius)<(current.maxDim||1)*1e-4) goalRadius=null;
+    }
     controls.update();
-    if(current&&current.mixer) current.mixer.update(clock.getDelta());
+    if(current&&current.mixer) current.mixer.update(dt);
     if(toonMats.length){  // トゥーン：ライトはカメラに追従（正面やや右上）
       L.copy(camera.position).sub(controls.target).normalize();
       R.setFromMatrixColumn(camera.matrixWorld,0);
@@ -259,6 +297,8 @@ function mountEntry(entry, opts){
   camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
   controls.update();
   controls.autoRotate=true;
+  entry.homeCenter=center.clone(); entry.homeDist=camera.position.distanceTo(center); entry.maxDim=maxDim;
+  goalTarget=null; goalRadius=null;
   resize();
 }
 

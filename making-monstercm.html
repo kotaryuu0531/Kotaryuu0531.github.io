@@ -215,7 +215,7 @@
 
       <h3 style="margin-top:clamp(36px,6vh,56px)">Wireframe — 顔と全身</h3>
       <p>現行モデルのワイヤーフレームです。拡大して ←→ で正面・側面、↑↓ で顔・全身を切り替えられます。</p>
-      <div class="grid2">
+      <div class="grid2" style="grid-template-columns:repeat(2,1fr)">
         <figure><div class="imgbox"><img src="mc-tiger-facewire-front.jpg" alt="顔ワイヤーフレーム 正面" data-atlas="twire" data-r="0" data-c="0" loading="lazy"></div><figcaption>FACE / FRONT</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-tiger-facewire-side.jpg" alt="顔ワイヤーフレーム 側面" data-atlas="twire" data-r="0" data-c="1" loading="lazy"></div><figcaption>FACE / SIDE</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-tiger-wire-front.jpg" alt="全身ワイヤーフレーム 正面" data-atlas="twire" data-r="1" data-c="0" loading="lazy"></div><figcaption>FULL BODY / FRONT</figcaption></figure>
@@ -235,7 +235,7 @@
         <figure><div class="imgbox"><img src="mc-tiger-face-smile.jpg" alt="表情｜笑顔" data-gal="tface" loading="lazy"></div><figcaption>SMILE</figcaption></figure>
       </div>
 
-      <h3 style="margin-top:clamp(36px,6vh,56px)">Texture / UV — 実写の虎を、投影して描く</h3>
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Texture / UV — 実写の虎を投影して描く</h3>
       <p>テクスチャはBlenderのテクスチャペイントで制作しました。ブラシのテクスチャに実写の虎の写真を指定し、モデルへ投影しながら描く方法です。素材はWeb上で収集した実写虎の写真——つまり第三者の著作物を参考・投影して制作した、学習目的・非商用の習作です。</p>
       <div class="grid2">
         <figure><div class="imgbox"><img src="mc-tiger-tex.jpg" alt="虎のテクスチャ" data-gal="tuv" loading="lazy"></div><figcaption>TEXTURE</figcaption></figure>
@@ -250,7 +250,7 @@
     <!-- ステイサム -->
     <section class="feature rv" id="statham">
       <div class="lbl">MODEL 02 — STATHAM</div>
-      <h3>対戦相手は、ハリウッド俳優風</h3>
+      <h3>対戦相手はハリウッド俳優風</h3>
       <p>虎の対戦相手として制作した、実在俳優に似せたファンアートのキャラクターです。頭部は、FBHeadアドオンの無料期間中に生成したベースのメッシュとテクスチャを、手作業で修正して制作。頭部より下はMetaHumanのメッシュ・テクスチャ・ノーマルマップを利用しています。リグはMetaHumanのボーンをうまく扱えなかったため自作——キャラクターモデル「<a href="making-taigei.html">大鯨</a>」で自作した人型リグを流用し、上半身はボーンを直接操作、下半身はIKで制御する構成です（虎・大鯨と同じく自作リグで統一）。</p>
       <div class="viewer">
         <div class="gv3d" data-glb="statham.glb" data-angle="42" data-elev="0.20" data-zoom="1.06" data-fov="30" data-exposure="1.00" data-dir="0.60" data-amb="0.80" data-env="1.0" aria-label="ステイサム風キャラクターの3DCGモデル（ドラッグで回転できます）">
@@ -305,7 +305,7 @@
     <!-- 缶 -->
     <section class="feature rv" id="can">
       <div class="lbl">MODEL 03 — CAN</div>
-      <h3>実物を切り開いて、テクスチャにする</h3>
+      <h3>実物の缶を切り開いてテクスチャに</h3>
       <p>缶の初代は、2021年夏の「<a href="making-challenge.html">1日1モデリング 30日チャレンジ</a>」で作った、円柱にロゴを貼っただけのものでした。2022年1月13日、実物を見ながら採寸して作り直し。ラベルは、実物のアルミ缶をカッターで切り開いて平らに撮影し、そこからテクスチャを制作しています。ブランドやロゴは実在製品のもので、非公式・ファン制作の習作です。</p>
       <div class="viewer">
         <div class="gv3d" data-glb="can.glb" data-angle="0" data-elev="0.05" data-zoom="1.22" data-fov="30" data-exposure="1.25" data-dir="0.75" data-amb="0.70" data-env="6.0" aria-label="モンスターエナジー缶の3DCGモデル（ドラッグで回転できます）">
@@ -338,7 +338,7 @@
     <!-- 背景 -->
     <section class="feature rv" id="arena">
       <div class="lbl">MODEL 04 — ARENA</div>
-      <h3>過去アセットの流用で、闘技場を短時間で組む</h3>
+      <h3>過去アセットの流用で闘技場を組む</h3>
       <p>舞台の地下闘技場は、2026年リメイクで作り直したパートです。ゼロから作らず、金網とトラスは旧版のこのCMから、照明は「<a href="making-birthday21.html">21歳誕生日予告</a>」のシーンから流用して、短時間で構築しました。過去の自作アセットを管理して再利用する、という制作の効率化です。</p>
       <p>壁には、Mのロゴを引き裂いたような爪痕を入れています。CM後半、この爪痕からロゴが現れる演出への伏線です。</p>
       <div class="grid2" style="grid-template-columns:1fr">
@@ -350,7 +350,7 @@
 
     <section class="feature rv" id="sound">
       <div class="lbl">PROCESS — SOUND / FOLEY</div>
-      <h3>炭酸も足音も、自分で録る</h3>
+      <h3>炭酸も足音も自分で録る</h3>
       <p>音の出典は正直に分けて書きます。虎の鳴き声はPixabayのフリー素材を、ライセンスに基づいて使用しました。それ以外のSEは、自分で録音したフォーリーです。炭酸の弾ける音は、メントスを入れた容器にコーラを注ぎ、コンデンサーマイクで収録。虎が固い地面を走る足音は、硬い床に毛布を敷いて叩いた音を加工して作りました。収録の様子はそのまま動画で残しています——再生すると音が出ます。</p>
       <div class="grid2">
         <figure>
@@ -373,7 +373,7 @@
     <!-- ============ STORY ============ -->
     <section class="feature rv" id="story">
       <div class="lbl">STORY — 2021 → 2026 / BEFORE &amp; AFTER</div>
-      <h3>「見応えがない」から、作り直す</h3>
+      <h3>「見応えがない」から作り直す</h3>
       <p>このCMは2025年10月に一度完成し、公開しています。しかしポートフォリオに載せるために見返したとき、「見応えがない」と判断しました。そこで2026年、アニメーションと背景を作り直してリメイクしたのが、ページ冒頭の本編です。</p>
       <p>そして、この作品のいちばんの中身は5年間の積み重ねそのものです。2022年の寅年年賀状のために作った虎（→<a href="making-nenga2022.html">2022年 寅年年賀状</a>）を捨てずに育て続け、造形・毛・アニメーションを段階的に更新してきました。ここからは、その変遷をbefore／afterで見せます。</p>
       <dl class="tl">
@@ -394,9 +394,9 @@
       </video>
       <p class="figcap">旧版の咆哮アニメーション（10フレームを往復スロー再生でループ表示）。</p>
 
-      <h3 style="margin-top:clamp(36px,6vh,56px)">Reshape 2024 — トポロジーを変えずに、顔だけ整形</h3>
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Reshape 2024 — トポロジーを変えずに顔だけ整形</h3>
       <p>2024年5月、トポロジーとUVは一切変えず、顔の頂点位置だけを動かして整形しました。テクスチャやリグを壊さずに、造形だけを更新するアプローチです。拡大して ←→ で旧・新を直接比較できます。</p>
-      <div class="grid2">
+      <div class="grid2" style="grid-template-columns:repeat(2,1fr)">
         <figure><div class="imgbox"><img src="mc-tiger-facewire-front-old.jpg" alt="顔ワイヤー 正面｜旧（2021）" data-atlas="reshape" data-r="0" data-c="0" loading="lazy"></div><figcaption>FRONT / BEFORE（2021）</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-tiger-facewire-front.jpg" alt="顔ワイヤー 正面｜新（2024整形後）" data-atlas="reshape" data-r="0" data-c="1" loading="lazy"></div><figcaption>FRONT / AFTER（2024）</figcaption></figure>
         <figure><div class="imgbox"><img src="mc-tiger-facewire-side-old.jpg" alt="顔ワイヤー 側面｜旧（2021）" data-atlas="reshape" data-r="1" data-c="0" loading="lazy"></div><figcaption>SIDE / BEFORE（2021）</figcaption></figure>
@@ -404,7 +404,7 @@
       </div>
       <p class="figcap">拡大中は ←→＝旧・新の比較、↑↓＝正面・側面の切替。</p>
 
-      <h3 style="margin-top:clamp(36px,6vh,56px)">3 Generations — 同一条件で並べる、5年の進化</h3>
+      <h3 style="margin-top:clamp(36px,6vh,56px)">3 Generations — 同一条件で並べた5年の進化</h3>
       <p>2022・2025・2026の3世代の虎を、同一ライティング・同一画角でレンダリングして並べました。2022→2025はメッシュの変化（2024年の顔整形）、2025→2026はパーティクルとそのマテリアル——つまり毛の作り直しです。拡大して ←→ で世代を送ると、進化がそのまま見えます。</p>
       <div class="grid3" style="grid-template-columns:repeat(3,1fr)">
         <figure><div class="imgbox"><img src="mc-tiger-2022-front.jpg" alt="虎 2022世代 正面" data-atlas="gen" data-r="0" data-c="0" loading="lazy"></div><figcaption>2022 / FRONT</figcaption></figure>

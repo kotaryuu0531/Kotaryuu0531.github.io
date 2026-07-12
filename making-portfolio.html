@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>このポートフォリオサイト — 設計と実装 / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-size:clamp(15px,1.9vw,19px);color:var(--ink-mut);margin-bottom:20px;opacity:.92}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+
+  /* 動画フレーム（クリック再生） */
+  .hero-video{position:relative;aspect-ratio:16/9;margin:18px 0 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .hero-video .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;
+    border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .hero-video .play::after{content:"";border-left:17px solid var(--ink);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;transition:border-color .3s}
+  .hero-video:hover{border-color:var(--amber-dim)}
+  .hero-video:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .hero-video:hover .play::after{border-left-color:var(--amber)}
+  .hero-video:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .hero-video.playing{cursor:default}
+  .hero-video.playing .poster,.hero-video.playing .play{display:none}
+  .hero-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+
+  /* インタラクティブ3Dビューア（複数） */
+  .viewer{margin-top:clamp(24px,4vh,40px)}
+  .gv3d{position:relative;width:100%;height:min(62vh,520px);touch-action:none;overflow:hidden;
+    background:radial-gradient(130% 110% at 50% 30%, #1b212a 0%, #0c0f14 72%);
+    border:1px solid var(--line);border-radius:var(--r)}
+  .gv3d canvas{display:block;width:100%;height:100%;outline:none}
+  .gv3d .spin{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;
+    background:rgba(10,13,18,.55);z-index:3;transition:opacity .35s}
+  .gv3d .spin.off{opacity:0;pointer-events:none}
+  .gv3d .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:gvspin 1s linear infinite}
+  .gv3d .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
+  @keyframes gvspin{to{transform:rotate(360deg)}}
+  .gv-row{display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;align-items:center}
+  .gv-ui{display:flex;gap:6px}
+  .gv-ui button{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;background:none;
+    border:1px solid var(--line);color:var(--ink-mut);padding:6px 14px;border-radius:100px;cursor:pointer;transition:border-color .2s,color .2s}
+  .gv-ui button:hover{border-color:var(--amber-dim)}
+  .gv-ui button.on{border-color:var(--amber);color:var(--amber)}
+  .gv-ui.gv-clip:empty{display:none}
+  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
+
+  /* feature */
+  .feature{margin:clamp(40px,7vh,72px) 0 0;padding:clamp(32px,5vh,52px) 0 0;border-top:1px solid var(--line)}
+  .lbl{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--amber);margin-bottom:12px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3.4vw,38px);line-height:1.14;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .feature a:hover{border-color:var(--amber)}
+
+  /* 画像グリッド */
+  .grid2,.grid3{display:grid;gap:14px;margin-top:18px}
+  .grid2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .grid3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .grid2 figure,.grid3 figure{margin:0}
+  .imgbox{position:relative;aspect-ratio:4/3;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface);cursor:zoom-in}
+  .imgbox.wide{aspect-ratio:16/9}
+  .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .grid2 figcaption,.grid3 figcaption,figure>figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:8px}
+  .figcap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:10px}
+
+  /* ループ動画・SE動画 */
+  .loopvid{width:100%;aspect-ratio:16/9;display:block;margin:18px 0 0;border:1px solid var(--line);border-radius:var(--r);background:#000;object-fit:cover}
+  .sevid{width:100%;aspect-ratio:16/9;display:block;border:1px solid var(--line);border-radius:var(--r);background:#000}
+
+  /* タイムライン */
+  .tl{margin:18px 0 0}
+  .tl-row{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:14px 0;border-top:1px solid var(--line)}
+  .tl-row:last-child{border-bottom:1px solid var(--line)}
+  .tl-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber);padding-top:2px}
+  .tl-row dd{font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.tl-row{grid-template-columns:1fr;gap:4px}}
+
+  /* spec */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  /* ライトボックス（アトラス縦横ナビ対応） */
+  .lightbox{position:fixed;inset:0;z-index:60;background:rgba(5,7,10,.93);display:none;
+    align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lightbox .lb-cap{position:absolute;left:18px;bottom:14px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-mut)}
+  .lb-nav{position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(10,13,18,.65);
+    color:var(--ink);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+  .lb-nav:hover{border-color:var(--amber);color:var(--amber)}
+  .lb-l{left:14px;top:50%;transform:translateY(-50%)}
+  .lb-r{right:14px;top:50%;transform:translateY(-50%)}
+  .lb-u{top:14px;left:50%;transform:translateX(-50%) rotate(90deg)}
+  .lb-d{bottom:14px;left:50%;transform:translateX(-50%) rotate(-90deg)}
+  .lightbox.plain .lb-nav{display:none}
+  .lightbox.no-v .lb-u,.lightbox.no-v .lb-d{display:none}
+  .lightbox.no-h .lb-l,.lightbox.no-h .lb-r{display:none}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  p,.lead,.feature p{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+  /* 数値グリッド */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);margin-top:22px;overflow:hidden}
+  .stat{background:var(--bg-cool);padding:20px 16px}
+  .stat dt{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut);margin-bottom:8px}
+  .stat dd{margin:0;font-family:"Fraunces",serif;font-weight:600;font-size:26px;color:var(--amber);line-height:1}
+  .stat .su{font-family:"Space Mono",monospace;font-size:11px;color:var(--ink-mut);margin-left:4px}
+  @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+  /* 箇条書き */
+  .ul{margin-top:14px;padding-left:0;list-style:none}
+  .ul li{position:relative;padding-left:18px;margin-top:10px;font-size:15.5px;line-height:1.75;color:var(--ink)}
+  .ul li::before{content:"—";position:absolute;left:0;color:var(--amber);font-size:12px;top:.35em}
+  code{font-family:"Space Mono",monospace;font-size:.88em;color:var(--amber);background:rgba(233,169,76,.08);padding:1px 5px;border-radius:2px}
+  .callout{margin-top:20px;padding:18px 20px;border-left:2px solid var(--amber-dim);background:rgba(20,24,30,.5);border-radius:0 var(--r) var(--r) 0}
+  .callout p{color:var(--ink-mut);font-size:14.5px}
+  .callout p+p{margin-top:10px}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-cg">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">WEB — 設計・実装・運用 / 2026</div>
+    <h1><span class="nb">このポートフォリオサイト</span></h1>
+    <div class="subtitle">見ているこのサイト自体が、作品のひとつです</div>
+    <div class="htags"><a class="htag" href="works.html?tags=Web制作">Web制作</a><a class="htag" href="works.html?tags=設計">設計</a><a class="htag" href="works.html?tags=AI協働">AI協働</a></div>
+    <p class="lead">2026年6月、ゲーム業界のシネマティック職を目指すにあたって「作品を並べるだけの一覧」では足りないと考え、自分でポートフォリオサイトを作りました。フレームワークもCMSも使わない、HTML・CSS・JavaScriptだけの静的サイトです。実装にはAI（Claude）を全面的に使い、私はディレクション・デザイン判断・検証・素材制作を担当しました。以下は、その設計と運用の記録です。</p>
+    <dl class="stats">
+      <div class="stat"><dt>PAGES</dt><dd>41<span class="su">枚</span></dd></div>
+      <div class="stat"><dt>WORKS</dt><dd>37<span class="su">作品</span></dd></div>
+      <div class="stat"><dt>HTML/CSS/JS</dt><dd>10,600<span class="su">行超</span></dd></div>
+      <div class="stat"><dt>3D VIEWERS</dt><dd>自作<span class="su">three.js</span></dd></div>
+    </dl>
+
+    <!-- 設計思想 -->
+    <section class="feature rv">
+      <div class="lbl">CONCEPT</div>
+      <h3>作品を見せる場所は、それ自体が静かでなければならない</h3>
+      <p>映像を見せるサイトで、サイトのほうが騒がしくては本末転倒です。トーンは「シネマティック・ダーク」。背景は寒色のシャドウ、アクセントは<b>琥珀（amber）1色だけ</b>——映写機の光をイメージした色を、リンクとラベルとホバーにだけ使います。色数を絞ることで、画面の中でいちばん明るいのが常に作品のサムネイルになる。</p>
+      <p>タイトルはOS標準の明朝体、ラベルと数値は等幅（Space Mono）、英字の大見出しはSerif（Fraunces）。日本語タイトルに欧文ディスプレイ書体を当てると英数字だけが太く暴れるので、和文は明朝、英数もそのラテン部分で揃える、という結論に落ち着きました。</p>
+    </section>
+
+    <!-- ルール -->
+    <section class="feature rv">
+      <div class="lbl">DESIGN RULES</div>
+      <h3>手戻りから生まれた3つの規約</h3>
+      <p>制作を進めるうち、同じ失敗を繰り返していることに気づきました。そこで、判断を都度やり直さないための<b>ルールを文書化</b>し、以降はそれに従っています。</p>
+      <ul class="ul">
+        <li><b>本文に横幅キャップを付けない</b>。本文だけ狭めると画像と右端がズレる。幅を決めるのはページの器ひとつだけにして、文字も画像も同じ列に収める。</li>
+        <li><b>タイトルの改行は意味の切れ目で</b>。日本語はどこでも改行できてしまうので、意味のかたまりを <code>.nb</code>（nowrap）で包み、かたまりの間だけを改行候補にする。狭い画面でも変な位置で割れない。</li>
+        <li><b>pill形状は押せる要素だけ</b>。角丸の楕円は「押せる」という視覚的な手がかり。押せないラベルに同じ形を使うと、ユーザーは無駄なクリックを試みる。形の意味を一貫させる。</li>
+      </ul>
+      <p>この3つはどれも、実際に手戻りが起きてから言語化したものです。ルールは思想から降ってくるのではなく、失敗から積み上がる——というのが、この制作でいちばん腹落ちした感覚でした。</p>
+    </section>
+
+    <!-- 3Dビューア -->
+    <section class="feature rv">
+      <div class="lbl">3D VIEWER</div>
+      <h3>既製のビューアを捨てて、three.jsで書き直した</h3>
+      <p>3Dモデルを回して見せる部分は、当初Googleの <code>model-viewer</code> を使っていました。しかしトゥーンシェーダーのモデル（<a href="making-taigei.html">大鯨</a>）を「Blenderで見えているとおり」に表示しようとすると、既製ビューアの枠内では手が届かない。結局、<b>three.jsで自前のビューアを書き、model-viewerは全廃</b>しました。</p>
+      <ul class="ul">
+        <li><b>トゥーンシェーダー</b>：陰の階調、色トレス輪郭（黒ではなく暖色の輪郭線）、スキニング対応まで自前のシェーダーで実装。</li>
+        <li><b>ワイヤーフレーム表示</b>：四角面のワイヤーを出すため、三角形分割の対角線を判定して除去するアルゴリズムを組んだ。</li>
+        <li><b>タップで再センタリング</b>：model-viewerの実装を読み解き、指数減衰でカメラの注視点が滑らかに移動する挙動を移植した。</li>
+        <li><b>アニメーション対応</b>：クリップの切り替え、クロスフェード、ポーズを5点サンプリングしてカメラのフレーミングを決める処理まで。</li>
+      </ul>
+      <p>ここは「使えるものを使う」ではなく「見せたい画のために書く」という判断でした。<a href="making-monstercm.html">CGの代表作ページ</a>で3つのモデルを同時に置けているのは、この自作ビューアがあるからです。</p>
+    </section>
+
+    <!-- AI協働 -->
+    <section class="feature rv">
+      <div class="lbl">AI COLLABORATION</div>
+      <h3>実装はAI、判断は自分</h3>
+      <p>このサイトのコードは、そのほとんどをAI（Claude）が書いています。隠さずに書きます。そのうえで、私が何をしていたかを正確に書きます。</p>
+      <div class="callout">
+        <p><b>私の担当</b>：サイトの構成と情報設計／デザインの方向づけと全ての意匠判断／各ページに何を載せ、何を載せないかの決定／3Dモデル・画像・動画の素材制作と最適化／実装の検証と、間違っているときの差し戻し。</p>
+        <p><b>AIの担当</b>：HTML・CSS・JavaScriptの実装／three.jsビューアのコーディング／アセット処理スクリプトの作成。</p>
+      </div>
+      <p>重要なのは、AIは<b>指示された以上のことをしない</b>という点です。「ここのワイヤーが変だ」「このカメラの寄り方が気持ち悪い」「この改行位置はみっともない」——気づいて言語化して差し戻すのは人間の仕事でした。実際、自前ビューアのワイヤーモードがバインドポーズ基準でメッシュがずれた問題も、Safariでホイールがページごとスクロールしてしまう問題も、私が気づいて指摘したことから直っています。<b>何が「良い」かを判断できる人間がいないと、AIは完成に到達しない</b>——これがこの制作でいちばん大きな学びでした。</p>
+    </section>
+
+    <!-- ドキュメント -->
+    <section class="feature rv">
+      <div class="lbl">DOCUMENTATION</div>
+      <h3>次のセッションに渡す前提で、書き残す</h3>
+      <p>AIとの作業には文脈の限界があります。長い会話は続けられず、セッションが変われば前回の判断は引き継がれない。そこで制作の初期に、2つのドキュメントを整備しました。</p>
+      <ul class="ul">
+        <li><b>仕様書</b>：デザイントークン、フォントの使い分け、改行の3原則、タグ規約、新しい作品ページを追加する手順、アセットの最適化コマンド、デプロイ手順。</li>
+        <li><b>引き継ぎ</b>：いま何が出来ていて、何が決まっていて、次に何をするか。表記の決定事項（人名の表記、担当範囲の書き方、出典の明記ルール）もここに集約。</li>
+      </ul>
+      <p>この2枚があるので、セッションが変わっても同じ作法で作業が続きます。<b>「引き継げる形にしておく」——これは映像の現場で香盤表や絵コンテがやっていることと、本質的には同じ仕事</b>だと思っています。個人制作でも、未来の自分は他人です。</p>
+    </section>
+
+    <!-- 誠実さ -->
+    <section class="feature rv">
+      <div class="lbl">HONESTY</div>
+      <h3>盛らない、という設計判断</h3>
+      <p>このサイトを作るうえで、最初に決めたことがあります。<b>担当範囲を盛らない</b>ということです。</p>
+      <p>チュートリアルを見て作ったものは「チュートリアルを見て作った」と書く。ファン制作の二次創作は「非公式」と明記する。プロの監修が入った作品は、どの範囲に監修が入ったかを書く。受賞は「自分が受賞した」ではなく「制作した映像が、主催団体の受賞時に参考資料として採用された」と正確に書く。データが消えて何も残らなかった仕事も、消えたと書いたうえで載せる。</p>
+      <p>面接で崩れない経歴は、盛らなかった経歴だけです。そしてこのサイトを見た人が最初に受け取るべきなのは「すごそう」ではなく「信用できそう」だと考えました。</p>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>形式</dt><dd>完全な静的サイト（HTML / CSS / JavaScript）。フレームワーク・CMS・ビルドツール不使用</dd></div>
+      <div class="spec-row"><dt>ホスティング</dt><dd>GitHub Pages</dd></div>
+      <div class="spec-row"><dt>規模</dt><dd>41ページ／37作品／HTML・CSS・JS 11,000行超</dd></div>
+      <div class="spec-row"><dt>3D</dt><dd>three.js による自作ビューア（トゥーンシェーダー・ワイヤーフレーム・アニメーション再生・タップ再センタリング）。model-viewerは全廃</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>設計・情報設計・デザイン判断・素材制作・検証（実装はAI／Claudeとの協働）</dd></div>
+      <div class="spec-row"><dt>制作</dt><dd>2026年6月〜（継続中）</dd></div>
+    </dl>
+
+    <footer>
+      <a href="works.html">← WORKS に戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

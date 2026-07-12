@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>短編映画「狂愚」— 3日間の映画制作合宿 / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-size:clamp(15px,1.9vw,19px);color:var(--ink-mut);margin-bottom:20px;opacity:.92}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+
+  /* 動画フレーム（クリック再生） */
+  .hero-video{position:relative;aspect-ratio:16/9;margin:18px 0 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .hero-video .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;
+    border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .hero-video .play::after{content:"";border-left:17px solid var(--ink);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;transition:border-color .3s}
+  .hero-video:hover{border-color:var(--amber-dim)}
+  .hero-video:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .hero-video:hover .play::after{border-left-color:var(--amber)}
+  .hero-video:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .hero-video.playing{cursor:default}
+  .hero-video.playing .poster,.hero-video.playing .play{display:none}
+  .hero-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+
+  /* インタラクティブ3Dビューア（複数） */
+  .viewer{margin-top:clamp(24px,4vh,40px)}
+  .gv3d{position:relative;width:100%;height:min(62vh,520px);touch-action:none;overflow:hidden;
+    background:radial-gradient(130% 110% at 50% 30%, #1b212a 0%, #0c0f14 72%);
+    border:1px solid var(--line);border-radius:var(--r)}
+  .gv3d canvas{display:block;width:100%;height:100%;outline:none}
+  .gv3d .spin{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;
+    background:rgba(10,13,18,.55);z-index:3;transition:opacity .35s}
+  .gv3d .spin.off{opacity:0;pointer-events:none}
+  .gv3d .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:gvspin 1s linear infinite}
+  .gv3d .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
+  @keyframes gvspin{to{transform:rotate(360deg)}}
+  .gv-row{display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;align-items:center}
+  .gv-ui{display:flex;gap:6px}
+  .gv-ui button{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;background:none;
+    border:1px solid var(--line);color:var(--ink-mut);padding:6px 14px;border-radius:100px;cursor:pointer;transition:border-color .2s,color .2s}
+  .gv-ui button:hover{border-color:var(--amber-dim)}
+  .gv-ui button.on{border-color:var(--amber);color:var(--amber)}
+  .gv-ui.gv-clip:empty{display:none}
+  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
+
+  /* feature */
+  .feature{margin:clamp(40px,7vh,72px) 0 0;padding:clamp(32px,5vh,52px) 0 0;border-top:1px solid var(--line)}
+  .lbl{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--amber);margin-bottom:12px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3.4vw,38px);line-height:1.14;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .feature a:hover{border-color:var(--amber)}
+
+  /* 画像グリッド */
+  .grid2,.grid3{display:grid;gap:14px;margin-top:18px}
+  .grid2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .grid3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .grid2 figure,.grid3 figure{margin:0}
+  .imgbox{position:relative;aspect-ratio:4/3;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface);cursor:zoom-in}
+  .imgbox.wide{aspect-ratio:16/9}
+  .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .grid2 figcaption,.grid3 figcaption,figure>figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:8px}
+  .figcap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:10px}
+
+  /* ループ動画・SE動画 */
+  .loopvid{width:100%;aspect-ratio:16/9;display:block;margin:18px 0 0;border:1px solid var(--line);border-radius:var(--r);background:#000;object-fit:cover}
+  .sevid{width:100%;aspect-ratio:16/9;display:block;border:1px solid var(--line);border-radius:var(--r);background:#000}
+
+  /* タイムライン */
+  .tl{margin:18px 0 0}
+  .tl-row{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:14px 0;border-top:1px solid var(--line)}
+  .tl-row:last-child{border-bottom:1px solid var(--line)}
+  .tl-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber);padding-top:2px}
+  .tl-row dd{font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.tl-row{grid-template-columns:1fr;gap:4px}}
+
+  /* spec */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  /* ライトボックス（アトラス縦横ナビ対応） */
+  .lightbox{position:fixed;inset:0;z-index:60;background:rgba(5,7,10,.93);display:none;
+    align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lightbox .lb-cap{position:absolute;left:18px;bottom:14px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-mut)}
+  .lb-nav{position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(10,13,18,.65);
+    color:var(--ink);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+  .lb-nav:hover{border-color:var(--amber);color:var(--amber)}
+  .lb-l{left:14px;top:50%;transform:translateY(-50%)}
+  .lb-r{right:14px;top:50%;transform:translateY(-50%)}
+  .lb-u{top:14px;left:50%;transform:translateX(-50%) rotate(90deg)}
+  .lb-d{bottom:14px;left:50%;transform:translateX(-50%) rotate(-90deg)}
+  .lightbox.plain .lb-nav{display:none}
+  .lightbox.no-v .lb-u,.lightbox.no-v .lb-d{display:none}
+  .lightbox.no-h .lb-l,.lightbox.no-h .lb-r{display:none}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  p,.lead,.feature p{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-cg">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">SHORT FILM — 3日間の映画制作合宿 / 2025</div>
+    <h1><span class="nb">短編映画</span> <span class="nb">「狂愚」</span></h1>
+    <div class="subtitle">初対面の5人チームが、3日間で1本の映画を完成させる合宿プログラム</div>
+    <div class="htags"><a class="htag" href="works.html?tags=実写映像">実写映像</a><a class="htag" href="works.html?tags=短編映画">短編映画</a><a class="htag" href="works.html?tags=チーム制作">チーム制作</a></div>
+    <p class="lead">高校時代の放送部の先輩——東京工芸大学に進んだ先輩に誘われて参加した、3日間の映画制作合宿で作った短編映画です。初日に集合してその場で5人のチームに分けられ、共通の脚本を渡され、合宿地へ向かうバスの中からプリプロダクションを開始。2日目の午前に撮影、その日のうちに編集、3日目に音と色を仕上げて、東京工芸大学内の映画館で上映する——という強行日程のプログラムでした。参加者はほぼ映像学科の学生で、他大学の工学部は私ひとり。内心ビクビクでしたが、チームの他の4人は全員1年生だったため、むしろ私が制作を引っ張る役回りになりました。</p>
+
+    <div class="hero-video rv" data-yt="a34It7Shq-A" tabindex="0" role="button" aria-label="短編映画「狂愚」を再生">
+      <img class="poster" src="https://img.youtube.com/vi/a34It7Shq-A/maxresdefault.jpg"
+           onerror="this.onerror=null;this.src='https://img.youtube.com/vi/a34It7Shq-A/hqdefault.jpg'" alt="短編映画「狂愚」のサムネイル">
+      <div class="play"></div>
+    </div>
+
+    <!-- プログラム -->
+    <section class="feature rv">
+      <div class="lbl">PROGRAM — 8/6–8/8</div>
+      <h3>3日で1本を完成させる日程</h3>
+      <p>スケジュールはプログラム側で厳密に決められていて、提出の締め切りだけは動きません。この制約の中でどこに時間を使うかを決めるのが、チームの最初の仕事でした。</p>
+      <dl class="tl">
+        <div class="tl-row"><dt>1日目 8/6</dt><dd>10:00集合、チーム分けと脚本の配布。バスの中で脚本を読み込み、宿に着いたらロケハン。17:30までに改変した脚本・フロアプラン・撮影スケジュールを提出</dd></div>
+        <div class="tl-row"><dt>2日目 8/7</dt><dd>午前中に撮影（15:00に機材返却）。そのまま編集に入り、22:00にピクチャーロック</dd></div>
+        <div class="tl-row"><dt>3日目 8/8</dt><dd>朝から音・色の仕上げ。バスで東京へ戻り、15:30に作品提出。東京工芸大学内の映画館で上映会・講評</dd></div>
+      </dl>
+    </section>
+
+    <!-- プリプロダクション -->
+    <section class="feature rv">
+      <div class="lbl">PRE-PRODUCTION</div>
+      <h3>キャラクターから逆算するカメラ割り</h3>
+      <p>配布された脚本は改変してよいルールだったので、まずチームでよりドラマチックな結末になるよう脚本を改変。そのうえで、キャラクター設定を深く詰めてから演技を決め、その演技に合わせてカメラ割りを決める——という順番でプリプロダクションを進めました。画が先ではなく、人物が先です。</p>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Script Revision — 結末を作り変える</h3>
+      <p>改変の核は結末です。チームで議論して、幕切れを次のように作り変えました。</p>
+      <dl class="tl">
+        <div class="tl-row"><dt>原案の結末</dt><dd>取り立てる男・黒崎に追い詰められた石田が、絶望したまま終わる</dd></div>
+        <div class="tl-row"><dt>改変後の結末</dt><dd>限界を迎えた石田が、黒崎の背後から石で後頭部を殴り、殺害してしまう</dd></div>
+      </dl>
+      <p>狙いは結末のインパクトです。そしてこのオチを成立させるために、本編は「石田が追い詰められていく過程」を丁寧に積み上げる構成にしました。結末が決まったことで、各シーンの演技のトーンもカメラ割りの狙いも定まる——<a href="making-birthday21.html">21歳予告</a>の「決め台詞から逆算する」と同じ、終わりから逆算する組み立て方です。</p>
+
+      <h3 style="margin-top:clamp(36px,6vh,56px)">Storyboard — 全員の合意をカメラ割りに落とす</h3>
+      <p>初対面のチームだったので、自分の我を通すのではなく、全員が「これは自分たちの意見だ」と納得できる形で議論をまとめながら、狙いのカメラ割りに落とし込んでいきました。合宿の趣旨も「脚本を書いた人でも監督の作品でもなく、メンバー全員の作品」。その前提を守りながら舵を取る、というバランスの練習になりました。</p>
+      <div class="grid2" style="grid-template-columns:repeat(2,1fr)">
+        <figure><div class="imgbox" style="aspect-ratio:3/4"><img src="kyogu-conte-1.jpg" alt="絵コンテ 1枚目" data-gal="conte" loading="lazy"></div><figcaption>SHEET 1</figcaption></figure>
+        <figure><div class="imgbox" style="aspect-ratio:3/4"><img src="kyogu-conte-2.jpg" alt="絵コンテ 2枚目" data-gal="conte" loading="lazy"></div><figcaption>SHEET 2</figcaption></figure>
+        <figure><div class="imgbox" style="aspect-ratio:3/4"><img src="kyogu-conte-3.jpg" alt="絵コンテ 3枚目" data-gal="conte" loading="lazy"></div><figcaption>SHEET 3</figcaption></figure>
+        <figure><div class="imgbox" style="aspect-ratio:3/4"><img src="kyogu-conte-4.jpg" alt="絵コンテ 4枚目" data-gal="conte" loading="lazy"></div><figcaption>SHEET 4</figcaption></figure>
+      </div>
+      <p class="figcap">私が描いたカメラ割りの絵コンテ。清書ではなく、限られた時間で「何をどう撮るか」をチームに伝えるための現場用の速記です。拡大中は ←→ でシートを切替。</p>
+    </section>
+
+    <!-- 撮影・仕上げ -->
+    <section class="feature rv">
+      <div class="lbl">SHOOT &amp; POST</div>
+      <h3>午前だけの撮影から締め切りギリギリの完成まで</h3>
+      <p>撮影当日は演者として参加。泥に塗れ、軽い怪我をするくらいの迫真の演技で臨みました。撮影に使えるのは実質午前中だけ。終わり次第すぐに編集へ入り、カット編集の担当の横について意見を出し合いながら、その夜のうちにピクチャーロックまで持っていきました。</p>
+      <p>翌朝、音と色のついたバージョンをチームで確認。最後に私が映像全体の彩度を大きく落として作品のトーンを締め、締め切りギリギリに完成させました。</p>
+    </section>
+
+    <!-- 講評と学び -->
+    <section class="feature rv">
+      <div class="lbl">FEEDBACK / LESSONS</div>
+      <h3>褒められた絵と失敗した音</h3>
+      <p>上映後、先輩や教授から講評を受けました。褒められたのは構図と絵作り——特に、映画館のスクリーンという大画面を活かした引きの画です。あわせて「カットが切り替わった直後、視線はまず動きのある場所・明るい場所へ向かう」という視線誘導の考え方を学び、以降の画づくりで意識するようになりました。</p>
+      <p>いっぽう音は失敗しました。取り直しが重なって撮影時間が押すなか、カットごとにレコーダーのRECを切り替える時間を惜しんで回しっぱなしにした結果、電源が切れて音声を失ってしまいました。カメラの内蔵マイクの音でどうにか救済しましたが、自分が音に慣れていれば防げたミスです。この失敗から、音への意識が一段上がりました。</p>
+      <p>順位をつけるプログラムではありませんでしたが、主催の先輩の一人からは「一番面白かった」という言葉をもらいました。短い制作期間と慣れないチームでの、荒削りだけれどその場でできるベストの一本です。</p>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>公開</dt><dd>2025年8月8日（合宿最終日に東京工芸大学内の映画館で上映。本編はYouTubeで公開）</dd></div>
+      <div class="spec-row"><dt>形式</dt><dd>短編映画（実写）</dd></div>
+      <div class="spec-row"><dt>体制</dt><dd>5人チーム（監督／カメラ／録音／編集／演者）。私以外は東京工芸大学の1年生</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>演者（配役）。あわせて脚本の改変・カメラ割りなどプリプロダクションを主導し、編集への立ち会いと仕上げの彩度調整を担当</dd></div>
+      <div class="spec-row"><dt>脚本</dt><dd>運営から配布された共通脚本を、チームで改変して使用</dd></div>
+      <div class="spec-row"><dt>制作期間</dt><dd>2025年8月6日〜8日（3日間の合宿）</dd></div>
+    </dl>
+
+    <footer>
+      <a href="index.html#reel-eizo">← 映像リールに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+  <div class="lightbox" id="lightbox">
+    <img src="" alt="拡大表示">
+    <div class="lb-cap" id="lb-cap"></div>
+    <button class="lb-nav lb-l" id="lb-l" aria-label="前へ">‹</button>
+    <button class="lb-nav lb-r" id="lb-r" aria-label="次へ">›</button>
+    <button class="lb-nav lb-u" id="lb-u" aria-label="上へ">‹</button>
+    <button class="lb-nav lb-d" id="lb-d" aria-label="下へ">›</button>
+  </div>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  // ライトボックス（gal＝横巡回）
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img"), lbCap=document.getElementById("lb-cap");
+  lb.classList.add("no-v");
+  const gals={}; let cur=null;
+  document.querySelectorAll("[data-gal]").forEach(img=>{
+    const g=img.dataset.gal; (gals[g]=gals[g]||[]).push(img);
+    img.addEventListener("click",()=>{cur={g:g,i:gals[g].indexOf(img)};lb.classList.remove("plain");lb.classList.add("open");show();});
+  });
+  function show(){const im=gals[cur.g][cur.i];lbImg.src=im.src;lbImg.alt=im.alt||"拡大表示";lbCap.textContent=im.alt||"";}
+  function move(d){if(!cur)return;const L=gals[cur.g].length;cur.i=(cur.i+d+L)%L;show();}
+  document.getElementById("lb-l").addEventListener("click",e=>{e.stopPropagation();move(-1);});
+  document.getElementById("lb-r").addEventListener("click",e=>{e.stopPropagation();move(1);});
+  lb.addEventListener("click",()=>lb.classList.remove("open"));
+  document.addEventListener("keydown",e=>{
+    if(!lb.classList.contains("open"))return;
+    if(e.key==="Escape")lb.classList.remove("open");
+    else if(e.key==="ArrowLeft"){e.preventDefault();move(-1);}
+    else if(e.key==="ArrowRight"){e.preventDefault();move(1);}
+  });
+
+  // 動画: クリック/Enterで再生（YouTubeファサード）
+  document.querySelectorAll(".hero-video[data-yt]").forEach(f=>{
+    const play=()=>{
+      if(f.classList.contains("playing"))return;
+      const ifr=document.createElement("iframe");
+      ifr.src="https://www.youtube.com/embed/"+f.getAttribute("data-yt")+"?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+      ifr.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";
+      ifr.setAttribute("allowfullscreen","");
+      ifr.title="本編の映像";
+      f.appendChild(ifr); f.classList.add("playing");
+    };
+    f.addEventListener("click",play);
+    f.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();play();}});
+  });
+</script>
+</body>
+</html>

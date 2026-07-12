@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>静物デッサン — 観察の訓練 / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.9),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:clamp(120px,16vh,180px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(32px,5.6vw,64px);line-height:1.18;letter-spacing:.01em;margin-bottom:14px}
+  .nb{white-space:nowrap}
+  .subtitle{font-size:clamp(15px,1.9vw,19px);color:var(--ink-mut);margin-bottom:20px;opacity:.92}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.85}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+
+  /* 動画フレーム（クリック再生） */
+  .hero-video{position:relative;aspect-ratio:16/9;margin:18px 0 0;border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#000;cursor:pointer;transition:border-color .3s}
+  .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .hero-video .play{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;
+    border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;background:rgba(10,13,18,.35);transition:all .3s}
+  .hero-video .play::after{content:"";border-left:17px solid var(--ink);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;transition:border-color .3s}
+  .hero-video:hover{border-color:var(--amber-dim)}
+  .hero-video:hover .play{border-color:var(--amber);background:rgba(233,169,76,.12)}
+  .hero-video:hover .play::after{border-left-color:var(--amber)}
+  .hero-video:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .hero-video.playing{cursor:default}
+  .hero-video.playing .poster,.hero-video.playing .play{display:none}
+  .hero-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+
+  /* インタラクティブ3Dビューア（複数） */
+  .viewer{margin-top:clamp(24px,4vh,40px)}
+  .gv3d{position:relative;width:100%;height:min(62vh,520px);touch-action:none;overflow:hidden;
+    background:radial-gradient(130% 110% at 50% 30%, #1b212a 0%, #0c0f14 72%);
+    border:1px solid var(--line);border-radius:var(--r)}
+  .gv3d canvas{display:block;width:100%;height:100%;outline:none}
+  .gv3d .spin{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;
+    background:rgba(10,13,18,.55);z-index:3;transition:opacity .35s}
+  .gv3d .spin.off{opacity:0;pointer-events:none}
+  .gv3d .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:gvspin 1s linear infinite}
+  .gv3d .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
+  @keyframes gvspin{to{transform:rotate(360deg)}}
+  .gv-row{display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;align-items:center}
+  .gv-ui{display:flex;gap:6px}
+  .gv-ui button{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;background:none;
+    border:1px solid var(--line);color:var(--ink-mut);padding:6px 14px;border-radius:100px;cursor:pointer;transition:border-color .2s,color .2s}
+  .gv-ui button:hover{border-color:var(--amber-dim)}
+  .gv-ui button.on{border-color:var(--amber);color:var(--amber)}
+  .gv-ui.gv-clip:empty{display:none}
+  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
+
+  /* feature */
+  .feature{margin:clamp(40px,7vh,72px) 0 0;padding:clamp(32px,5vh,52px) 0 0;border-top:1px solid var(--line)}
+  .lbl{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--amber);margin-bottom:12px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(22px,3.4vw,38px);line-height:1.14;letter-spacing:-.01em;margin-bottom:16px}
+  .feature p{color:var(--ink-mut);font-size:15.5px}
+  .feature p+p{margin-top:14px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim);transition:border-color .2s}
+  .feature a:hover{border-color:var(--amber)}
+
+  /* 画像グリッド */
+  .grid2,.grid3{display:grid;gap:14px;margin-top:18px}
+  .grid2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .grid3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .grid2 figure,.grid3 figure{margin:0}
+  .imgbox{position:relative;aspect-ratio:4/3;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface);cursor:zoom-in}
+  .imgbox.wide{aspect-ratio:16/9}
+  .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .grid2 figcaption,.grid3 figcaption,figure>figcaption{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);padding-top:8px}
+  .figcap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:10px}
+
+  /* ループ動画・SE動画 */
+  .loopvid{width:100%;aspect-ratio:16/9;display:block;margin:18px 0 0;border:1px solid var(--line);border-radius:var(--r);background:#000;object-fit:cover}
+  .sevid{width:100%;aspect-ratio:16/9;display:block;border:1px solid var(--line);border-radius:var(--r);background:#000}
+
+  /* タイムライン */
+  .tl{margin:18px 0 0}
+  .tl-row{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:14px 0;border-top:1px solid var(--line)}
+  .tl-row:last-child{border-bottom:1px solid var(--line)}
+  .tl-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber);padding-top:2px}
+  .tl-row dd{font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.tl-row{grid-template-columns:1fr;gap:4px}}
+
+  /* spec */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  /* ライトボックス（アトラス縦横ナビ対応） */
+  .lightbox{position:fixed;inset:0;z-index:60;background:rgba(5,7,10,.93);display:none;
+    align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lightbox .lb-cap{position:absolute;left:18px;bottom:14px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-mut)}
+  .lb-nav{position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(10,13,18,.65);
+    color:var(--ink);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+  .lb-nav:hover{border-color:var(--amber);color:var(--amber)}
+  .lb-l{left:14px;top:50%;transform:translateY(-50%)}
+  .lb-r{right:14px;top:50%;transform:translateY(-50%)}
+  .lb-u{top:14px;left:50%;transform:translateX(-50%) rotate(90deg)}
+  .lb-d{bottom:14px;left:50%;transform:translateX(-50%) rotate(-90deg)}
+  .lightbox.plain .lb-nav{display:none}
+  .lightbox.no-v .lb-u,.lightbox.no-v .lb-d{display:none}
+  .lightbox.no-h .lb-l,.lightbox.no-h .lb-r{display:none}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  p,.lead,.feature p{text-wrap:pretty}
+  h1,h3{text-wrap:balance}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+  .ul{margin-top:14px;padding-left:0;list-style:none}
+  .ul li{position:relative;padding-left:18px;margin-top:10px;font-size:15.5px;line-height:1.75;color:var(--ink)}
+  .ul li::before{content:"—";position:absolute;left:0;color:var(--amber);font-size:12px;top:.35em}
+</style>
+</head>
+<body>
+  <div class="blackout"></div>
+
+  <header class="topbar">
+    <a class="back" href="index.html#reel-cg">← PORTFOLIO</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">DRAWING — 静物・鉛筆デッサン / 2021</div>
+    <h1><span class="nb">静物デッサン</span></h1>
+    <div class="subtitle">球・布・金属——見たものを、面と陰に分解する</div>
+    <div class="htags"><a class="htag" href="works.html?tags=デッサン">デッサン</a><a class="htag" href="works.html?tags=基礎訓練">基礎訓練</a></div>
+    <p class="lead">2021年8月2日〜6日の4日間、1日90分ずつ描いた鉛筆デッサンです。モチーフは、縞のクロスの上に置かれた球と金属の玉じゃくし。技術的に高い水準の絵ではありませんが、<b>「見たものを面と陰に分解して、紙の上に再構成する」訓練の記録</b>として掲載しています。この作業はそのまま、3DCGでライティングを組むときの頭の使い方につながっています。</p>
+
+    <!-- モチーフと結果 -->
+    <section class="feature rv">
+      <div class="lbl">MOTIF / RESULT</div>
+      <h3>何を見て、どう解釈したか</h3>
+      <p>左が実際のモチーフ、右が描いたものです。並べると、自分がどこを拾い、どこを捨てたかがはっきり見えます。</p>
+      <div class="grid2" style="grid-template-columns:repeat(2,1fr)">
+        <figure><div class="imgbox" style="aspect-ratio:4/3"><img src="dessin-motif.jpg" alt="モチーフ：縞のクロス、青い球、金属の玉じゃくし" data-gal="d" loading="lazy"></div><figcaption>MOTIF — 実際の静物</figcaption></figure>
+        <figure><div class="imgbox" style="aspect-ratio:4/3"><img src="dessin-work.jpg" alt="鉛筆デッサン（2021年8月・4日間／計6時間）" data-gal="d" loading="lazy"></div><figcaption>DRAWING — 鉛筆・4日間</figcaption></figure>
+      </div>
+      <p class="figcap">拡大中は ←→ でモチーフとデッサンを直接比較できます。</p>
+    </section>
+
+    <!-- 観察 -->
+    <section class="feature rv">
+      <div class="lbl">OBSERVATION</div>
+      <h3>3つの素材を、3つの理屈で描き分ける</h3>
+      <p>このモチーフは、質感の異なる3つの物体で構成されています。それぞれ、光の返し方の理屈が違う。</p>
+      <ul class="ul">
+        <li><b>球（プラスチック）</b>：拡散反射と、鋭いハイライト。光源の形がそのまま白い抜けとして残る。手前の縞は球の上を回り込むので、円柱ではなく球であることが縞の歪みで示される。</li>
+        <li><b>クロス（布）</b>：畝と皺による細かな陰影。縞の黒い部分は「黒い面」ではなく「陰のついた黒い面」で、光の当たる側と落ちる側で濃さを変える必要がある。</li>
+        <li><b>玉じゃくし（金属）</b>：周囲を映し込む。固有色がほとんどなく、明暗のコントラストが極端に出る。掬う部分の内側は、外側とは逆向きの反射になる。</li>
+      </ul>
+      <p>この「素材ごとに光の返り方が違う」という理解は、後にBlenderでマテリアルを組むときの考え方とそのまま重なりました。ラフネス、メタリック、スペキュラー——CGのパラメータは、デッサンで手を動かして覚えた区別に名前を付け直したものだと感じています。</p>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>形式</dt><dd>静物デッサン（鉛筆）</dd></div>
+      <div class="spec-row"><dt>制作</dt><dd>2021年8月2日〜6日（4日間／1日90分・計約6時間）</dd></div>
+      <div class="spec-row"><dt>モチーフ</dt><dd>縞のクロス、球、金属の玉じゃくし</dd></div>
+      <div class="spec-row"><dt>位置づけ</dt><dd>作品ではなく、観察の訓練の記録として掲載</dd></div>
+    </dl>
+
+    <footer>
+      <a href="works.html">← WORKS に戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+  <div class="lightbox" id="lightbox">
+    <img src="" alt="拡大表示">
+    <div class="lb-cap" id="lb-cap"></div>
+    <button class="lb-nav lb-l" id="lb-l" aria-label="前へ">‹</button>
+    <button class="lb-nav lb-r" id="lb-r" aria-label="次へ">›</button>
+  </div>
+
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img"), lbCap=document.getElementById("lb-cap");
+  lb.classList.add("no-v");
+  const imgs=[...document.querySelectorAll("[data-gal='d']")];
+  let cur=0;
+  const show=()=>{const im=imgs[cur];lbImg.src=im.src;lbImg.alt=im.alt||"拡大表示";lbCap.textContent=im.alt||"";};
+  imgs.forEach((img,i)=>img.addEventListener("click",()=>{cur=i;lb.classList.add("open");show();}));
+  const move=d=>{cur=(cur+d+imgs.length)%imgs.length;show();};
+  document.getElementById("lb-l").addEventListener("click",e=>{e.stopPropagation();move(-1);});
+  document.getElementById("lb-r").addEventListener("click",e=>{e.stopPropagation();move(1);});
+  lb.addEventListener("click",()=>lb.classList.remove("open"));
+  document.addEventListener("keydown",e=>{
+    if(!lb.classList.contains("open"))return;
+    if(e.key==="Escape")lb.classList.remove("open");
+    else if(e.key==="ArrowLeft"){e.preventDefault();move(-1);}
+    else if(e.key==="ArrowRight"){e.preventDefault();move(1);}
+  });
+</script>
+</body>
+</html>
