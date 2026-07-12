@@ -82,9 +82,10 @@
   }
   @keyframes drift{0%{transform:translate(-3%, -2%) scale(1.05)}100%{transform:translate(3%, 2%) scale(1.12)}}
   /* showreel video sits here — see comment below */
-  .reel-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
+  .reel-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:1;background:#000}
+  @media (orientation:portrait){.reel-stage video{object-fit:cover;opacity:.9}}
   .reel-vignette{position:absolute;inset:0;background:
-      linear-gradient(to top, rgba(10,13,18,.95) 0%, rgba(10,13,18,.25) 40%, rgba(10,13,18,.45) 100%)}
+      linear-gradient(to top, rgba(10,13,18,.72) 0%, rgba(10,13,18,0) 26%, rgba(10,13,18,0) 78%, rgba(10,13,18,.5) 100%)}
   /* letterbox bars */
   .bar{position:absolute;left:0;right:0;height:clamp(28px,5vh,56px);background:var(--letterbox);z-index:3}
   .bar.top{top:0}.bar.bot{bottom:0}
@@ -234,7 +235,7 @@
   .ac-btn.mini{font-size:12px;padding:11px 18px}
   .ac-btns.sub{margin-top:12px}
   /* メイキングCTA：メイキング内の画像が流れる帯 */
-  .mkcta{position:relative;display:block;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);height:72px;margin-top:16px;text-decoration:none;background:var(--surface);transition:border-color .3s}
+  .mkcta{position:relative;display:block;flex:1 1 100%;width:100%;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);height:72px;margin-top:16px;text-decoration:none;background:var(--surface);transition:border-color .3s}
   .mkcta .mkrow{position:absolute;top:50%;transform:translateY(-50%);display:flex;width:max-content;will-change:transform}
   .mkcta .mkrow img{height:72px;aspect-ratio:16/9;object-fit:cover;display:block;margin-right:10px;opacity:.34;filter:saturate(.85);transition:opacity .3s}
   .mkcta .mkshade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,13,18,.92) 0%,rgba(10,13,18,.55) 40%,rgba(10,13,18,.25) 100%)}
@@ -305,8 +306,6 @@
 
     <div class="hero-inner">
       <div class="eyebrow">SHOWREEL — 2026</div>
-      <h1>感情を動かす。<br><span class="light">手段は選ばない。</span></h1>
-      <p class="hero-sub">シネマティックアーティスト／ムービー制作。カメラ・3DCG・ライブ配信を横断し、観客の感情を設計する映像をつくります。</p>
       <div class="hero-meta">
         <span class="tag on">CINEMATOGRAPHY</span>
         <span class="tag on">3DCG / BLENDER</span>
@@ -337,7 +336,7 @@
         <p>就活を前にした決意表明と、憧れのバイクをカッコ良く表現。ロケ地を1:1でCG化してプリビズを組み、画を設計してから撮った60秒のセルフCM。</p>
         <div class="btn-row">
           <!-- 再生は枠のクリックで。ここはメイキング（写真＋テキストの解説ページ）への導線のみ -->
-          <a class="mkcta" href="making-birthday2026.html" aria-label="メイキングを見る"><div class="mkrow" data-speed="20"><img src="previs-road.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="locscout-real.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="model-rig.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="shotlist.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="grade-after.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="previs-scene.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"></div><div class="mkshade"></div><span class="mklabel"><span class="ic">⚙</span> メイキングを見る <span class="mkarrow">→</span></span></a>
+          <a class="mkcta" href="making-birthday2026.html" aria-label="メイキングを見る"><div class="mkrow" data-speed="20"><img src="previs-road.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="locscout-real.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="model-rig.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="shotlist.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="grade-after.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="previs-scene.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"></div><div class="mkshade"></div><span class="mklabel"><span class="ic">⚙</span> メイキングを見る <span class="mkarrow">→</span></span></a>
         </div>
       </div>
     </div>
@@ -374,7 +373,7 @@
         <p>寅年年賀状の虎を、5年かけてCMの主役に。モデリングからCyclesレンダリングまで全工程1人のフルCG30秒（非公式・ファン制作）。</p>
         <div class="btn-row">
           <!-- 再生は枠のクリックで。ここはメイキングへの導線のみ -->
-          <a class="mkcta" href="making-monstercm.html" aria-label="メイキングを見る"><div class="mkrow" data-speed="20"><img src="mc-tiger-2026-front.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="mc-arena.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="mc-statham-render-front.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="mc-can-render.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="mc-tiger-face-bark.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="mc-tiger-rig-pose.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"></div><div class="mkshade"></div><span class="mklabel"><span class="ic">⚙</span> メイキングを見る <span class="mkarrow">→</span></span></a>
+          <a class="mkcta" href="making-monstercm.html" aria-label="メイキングを見る"><div class="mkrow" data-speed="20"><img src="mc-tiger-2026-front.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="mc-arena.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="mc-statham-render-front.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="mc-can-render.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="mc-tiger-face-bark.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="mc-tiger-rig-pose.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"></div><div class="mkshade"></div><span class="mklabel"><span class="ic">⚙</span> メイキングを見る <span class="mkarrow">→</span></span></a>
         </div>
       </div>
     </div>
@@ -408,7 +407,7 @@
         <div class="wtags"><a class="wtag" href="works.html?tags=配信・イベント撮影">配信・イベント撮影</a><a class="wtag" href="works.html?tags=スイッチング">スイッチング</a></div>
         <p>参加者約4,000人・東京体育館。5時間半の生配信を、9カメのスイッチングでノンストップで。松平健さんの「マツケンサンバⅡ」も、参加団体の演技も、会場の笑顔も、リアルタイムに切り替えて届けました。</p>
         <div class="btn-row">
-          <a class="mkcta" href="making-doremifa2026.html" aria-label="メイキングを見る"><div class="mkrow" data-speed="20"><img src="doremifa2026-switch.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="doremifa2026-eterna.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="https://img.youtube.com/vi/niXIBdwd2bA/hqdefault.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"><img src="doremifa-shoot1.jpg" alt="" decoding="async" loading="lazy" onerror="this.style.visibility='hidden'"></div><div class="mkshade"></div><span class="mklabel"><span class="ic">⚙</span> メイキングを見る <span class="mkarrow">→</span></span></a>
+          <a class="mkcta" href="making-doremifa2026.html" aria-label="メイキングを見る"><div class="mkrow" data-speed="20"><img src="doremifa2026-switch.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="doremifa2026-eterna.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="https://img.youtube.com/vi/niXIBdwd2bA/hqdefault.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"><img src="doremifa-shoot1.jpg" alt="" decoding="async" onerror="this.style.visibility='hidden'"></div><div class="mkshade"></div><span class="mklabel"><span class="ic">⚙</span> メイキングを見る <span class="mkarrow">→</span></span></a>
         </div>
       </div>
     </div>
@@ -671,6 +670,6 @@
   })();
   </script>
 
-  <div class="buildver">build 2026.07.12 19:48 JST</div>
+  <div class="buildver">build 2026.07.12 20:59 JST</div>
 </body>
 </html>
