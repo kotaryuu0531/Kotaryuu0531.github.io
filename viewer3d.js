@@ -73,6 +73,7 @@ function initViewer(holder){
   const TOON=holder.dataset.toon==="1";
   const ELEV=parseFloat(holder.dataset.elev||"0.28");
   const ZOOM=parseFloat(holder.dataset.zoom||"1.3");
+  const WIREPOSE=holder.dataset.wirepose||"first";   // "first"=先頭フレーム / "bind"=バインド（T）ポーズ
 
   // UIはビューアと同じ .viewer（無ければ親要素）内で探す
   const root=holder.closest(".viewer")||holder.parentElement||document;
@@ -376,15 +377,28 @@ function initViewer(holder){
   function applyMode(){
     if(modelRef){
       if(mode==="wire"){
-        // 先頭フレーム(0秒)の実ポーズで静止し、その変形後頂点からワイヤーを生成
-        if(mixer&&active){ mixer.stopAllAction(); active.reset(); active.play(); mixer.setTime(0); }
-        modelRef.updateMatrixWorld(true);
-        buildWires(activeName||"static");
+        if(WIREPOSE==="bind"&&mixer){
+          // 元の（バインド／T）ポーズで静止し、その頂点からワイヤーを生成
+          mixer.stopAllAction();
+          modelRef.traverse(o=>{ if(o.isSkinnedMesh&&o.skeleton&&!o.userData.isOutline)o.skeleton.pose(); });
+          modelRef.traverse(o=>{ if(o.isMesh&&o.userData.morphOrig&&o.morphTargetInfluences){
+            const mo=o.userData.morphOrig; for(let i=0;i<mo.length;i++)o.morphTargetInfluences[i]=mo[i];
+          }});
+          modelRef.updateMatrixWorld(true);
+          buildWires("bind");
+        }else{
+          // 先頭フレーム(0秒)の実ポーズで静止し、その変形後頂点からワイヤーを生成
+          if(mixer&&active){ mixer.stopAllAction(); active.reset(); active.play(); mixer.setTime(0); }
+          modelRef.updateMatrixWorld(true);
+          buildWires(activeName||"static");
+        }
       }else{
         // ノーマル復帰：元のシェイプキー値に戻す（以降はmixerが動かす）
         modelRef.traverse(o=>{ if(o.isMesh&&o.userData.morphOrig&&o.morphTargetInfluences){
           const mo=o.userData.morphOrig; for(let i=0;i<mo.length;i++)o.morphTargetInfluences[i]=mo[i];
         }});
+        // バインド静止から戻る場合はアクションを再開する
+        if(WIREPOSE==="bind"&&mixer&&active){ active.reset(); active.play(); mixer.setTime(0); }
       }
       modelRef.traverse(o=>{ if(o.isMesh&&o.userData.matOrig&&!o.userData.isOutline){
         o.material=(mode==="wire")?clayMat:o.userData.matOrig;
