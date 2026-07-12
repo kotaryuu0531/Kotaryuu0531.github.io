@@ -23,6 +23,7 @@
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
   .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
   .ready .blackout{opacity:0}
+  .nb{white-space:nowrap}
 
   .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
     padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.92),rgba(10,13,18,0));backdrop-filter:blur(2px)}
@@ -35,9 +36,11 @@
   .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
     display:flex;align-items:center;gap:12px;margin-bottom:18px}
   .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
-  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(38px,7vw,72px);line-height:1.08;letter-spacing:.01em;margin-bottom:8px}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(30px,5.4vw,56px);line-height:1.18;letter-spacing:.01em;margin-bottom:16px}
+  .namerow{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(19px,2.4vw,24px);letter-spacing:.02em;margin-bottom:6px}
+  .namerow small{font-family:"Space Mono",monospace;font-weight:400;font-size:12px;letter-spacing:.14em;color:var(--ink-mut);margin-left:12px}
   .role{font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.1em;color:var(--ink-mut);margin-bottom:24px}
-  .lead{color:var(--ink);font-size:clamp(15px,1.8vw,20px);line-height:1.7;opacity:.9;max-width:none}
+  .lead{color:var(--ink);font-size:clamp(15px,1.8vw,19px);line-height:1.8;opacity:.9}
 
   .section{margin-top:clamp(42px,7vh,84px)}
   .sec-lbl{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--amber);margin-bottom:20px;display:flex;align-items:center;gap:12px}
@@ -46,27 +49,26 @@
   .bio p{color:var(--ink-mut);font-size:15.5px;line-height:1.85;margin-bottom:16px}
   .bio p:last-child{margin-bottom:0}
   .bio strong{color:var(--ink);font-weight:600}
+  .bio a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  .bio a:hover{border-color:var(--amber)}
 
   .pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
   .pillar{border:1px solid var(--line);border-radius:var(--r);padding:22px;background:var(--surface)}
   .pillar .pno{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber)}
   .pillar h3{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:20px;margin:9px 0 10px}
   .pillar p{color:var(--ink-mut);font-size:13.5px;line-height:1.75}
-
-  .tools{display:flex;flex-direction:column;gap:16px}
-  .toolrow{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:start}
-  .toolrow .tk{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--amber);padding-top:5px}
-  .toolrow .tv{color:var(--ink);font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.03em;line-height:1.9}
-  .tool{display:inline;white-space:nowrap}
-  .tool:not(:last-child)::after{content:"/";color:var(--ink-mut);margin:0 9px}
-  @media(max-width:560px){.toolrow{grid-template-columns:1fr;gap:8px}}
+  .pillar a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  .pillar a:hover{border-color:var(--amber)}
 
   .timeline{display:flex;flex-direction:column}
   .tl{display:grid;grid-template-columns:96px 1fr;gap:20px;padding:15px 0;border-top:1px solid var(--line)}
   .tl:last-child{border-bottom:1px solid var(--line)}
   .tl .yr{font-family:"Space Mono",monospace;font-size:13px;color:var(--amber);letter-spacing:.04em}
   .tl .ev{color:var(--ink);font-size:14.5px;line-height:1.6}
-  .tl .ev small{color:var(--ink-mut);font-size:12.5px;font-family:"Space Mono",monospace;letter-spacing:.04em}
+  .tl .ev small{display:block;color:var(--ink-mut);font-size:12.5px;font-family:"Space Mono",monospace;letter-spacing:.03em;margin-top:3px}
+  .tl .ev a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  .tl .ev a:hover{border-color:var(--amber)}
+  @media(max-width:560px){.tl{grid-template-columns:64px 1fr;gap:12px}}
 
   .contact{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
   .contact a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;color:var(--ink);text-decoration:none;border:1px solid var(--line);padding:14px 22px;border-radius:var(--r);transition:all .3s}
@@ -99,14 +101,16 @@
   .vcap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:10px}
   .vcap a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
   .vcap a:hover{border-color:var(--amber)}
+
   /* ヒーロー（写真つき） */
-  .herogrid{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,4vw,48px);align-items:end;margin-top:8px}
+  .herogrid{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(24px,4vw,48px);align-items:end;margin-top:8px}
   .portrait{position:relative;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
   .portrait img{display:block;width:100%;height:auto}
   .portrait .pcap{position:absolute;left:0;right:0;bottom:0;padding:22px 14px 10px;
     background:linear-gradient(transparent,rgba(5,7,10,.78));
     font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut)}
   @media(max-width:760px){.herogrid{grid-template-columns:1fr;align-items:start}}
+
   /* 強み */
   .str{display:grid;grid-template-columns:64px 1fr;gap:20px;padding:26px 0;border-top:1px solid var(--line)}
   .str:last-of-type{border-bottom:1px solid var(--line)}
@@ -114,9 +118,9 @@
   .str h3{margin:0 0 10px;font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(18px,2.4vw,22px);letter-spacing:.01em;line-height:1.35;color:var(--ink)}
   .str p{margin:0;font-size:15px;line-height:1.85;color:var(--ink-mut)}
   .str p+p{margin-top:10px}
+  .str strong{color:var(--ink);font-weight:600}
   .str a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
   .str a:hover{border-color:var(--amber)}
-  .str .ev{margin-top:12px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.04em;color:var(--ink-mut)}
   @media(max-width:560px){.str{grid-template-columns:1fr;gap:8px}}
 </style>
 </head>
@@ -132,9 +136,10 @@
     <div class="eyebrow">ABOUT — プロフィール</div>
     <div class="herogrid">
       <div>
-        <h1>小竹竜ノ介</h1>
-        <div class="role">RYUNOSUKE KOTAKE ／ 実写映像 · CG · ライブ配信</div>
-        <p class="lead">「感情を動かす」ことを軸に、実写映像・3DCG・ライブ配信をつくっています。目指すのは、ゲームのシネマティック（ムービー）制作。遊ぶ人の感情と、画面の中で起きる演出が重なる瞬間をつくりたいと考えています。</p>
+        <h1><span class="nb">感情を動かす。</span> <span class="nb">手段は選ばない。</span></h1>
+        <div class="namerow">小竹竜ノ介<small>RYUNOSUKE KOTAKE</small></div>
+        <div class="role">実写映像 · CG · 配信・イベント撮影</div>
+        <p class="lead">実写映像・3DCG・ライブ配信——媒体は、作品ごとに選ぶ手段です。芯にあるのは、人の感情を動かす「構成」。観る人の感情の流れと、画面で起きることが噛み合う瞬間をつくっています。</p>
       </div>
       <figure class="portrait rv" style="margin:0">
         <img src="doremifa-shoot1.jpg" alt="ドレミファダンスコンサート2025の撮影現場で、カメラを構える小竹竜ノ介">
@@ -142,14 +147,13 @@
       </figure>
     </div>
 
-    <!-- これまで -->
+    <!-- 芯 -->
     <section class="section bio rv">
-      <div class="sec-lbl">JOURNEY — これまで</div>
-      <p>中学1年で放送部「IBS」に入り、校内ニュースの放送や、体育祭・文化祭といった学校行事の撮影・編集に明け暮れました。<strong>中学3年から高校3年の6月までは局長（部長）</strong>として部を率い、ここで映像づくりの土台をつくりました。</p>
-      <p>2017年に映像をはじめてから、実写の撮影・編集を軸に、中学時代から触れているBlenderでの3DCG、音楽イベントなどのライブ配信まで、制作の幅を広げてきました。<strong>「感情を動かす／手段は選ばず」</strong>——必要な技術はそのつど取りに行くスタイルです。2025年4月から2026年3月までの1年間、大学（工学部）を休学してポートフォリオ制作に専念しました。専門的な訓練を受けてきた人たちと同じ土俵で戦うために、制作の時間を先に確保する、という選択でした。</p>
-      <p>つくり手として大切にしているのは、<strong>「演出」と「体験」が一致しているか</strong>。観る人・遊ぶ人の感情の流れと、画面で起きることが噛み合った瞬間に、映像はいちばん強く働くと考えています。</p>
+      <div class="sec-lbl">CORE — 芯にあるもの</div>
+      <p>中学1年から6年間、放送部IBSで、現役のプロ映像ディレクターの指導の下で映像制作に打ち込みました。当時から考えていたのは、<strong>「機材や解像度は時代で変わるが、人に伝える構成は変わらない」</strong>ということ。フルHDでも4Kでも、視聴者の感情を動かすいちばんのファクターは構成だ——そう決めて、高校まではとにかく構成を磨きました。</p>
+      <p>大学からは、技術と画を磨いています。シネマカメラでの撮影、DaVinci Resolveでのカラーグレーディング、そして3DCG。映画館で「国宝」の映像美と音響に圧倒された経験は、構成至上だった自分の基準を更新しました——<strong>画の美しさもまた、感情を動かす独立したファクターである</strong>と。面白さを感覚で消費せず、なぜ効いているのかを分解する癖が、いまも自分の基準を更新し続けています。</p>
+      <p>実写・CG・ライブ配信を行き来してきたのは、器用貧乏だからではありません。<strong>作品ごとに、そのアイデアに最適な媒体を選んできた結果</strong>です。2025年4月から2026年3月までの1年間は大学（工学部）を休学し、制作に専念しました。つくりたいものは常に完成量を上回りますが、手は止めません。9年間で37作品——このサイトは、その記録です。</p>
     </section>
-
 
     <!-- 強み -->
     <section class="section rv">
@@ -157,28 +161,28 @@
       <div class="str">
         <div class="sno">01</div>
         <div>
-          <h3>必要な技術を、必要になった瞬間に取りに行く</h3>
-          <p>Unreal Engine 5は、講座で基本を覚えてから2週間で、講座に無いギミックを設計・実装して<a href="making-draward.html">10フロアのゲーム</a>にしました。このサイトの<a href="making-portfolio.html">3Dビューア</a>は、見せたい画のために既製ライブラリを捨ててthree.jsで自作。勤務先の<a href="making-ikeshibu.html">DMX制御照明</a>は研修を受けてオペレーターとして本番に立ちました。Blenderも独学です。「教わってから作る」のではなく、<strong>作りたいものが先にあって、技術が後から追いつく</strong>——この順番で9年やってきました。</p>
+          <h3>完成形から逆算して全体を設計する</h3>
+          <p>カットを撮る前に、完成した映像がどう見えるかを先に決めます。<a href="making-birthday2026.html">22歳記念PV</a>ではロケハンとGoogle Map、Blenderで画を設計してから撮影に入り、<a href="making-birthday21.html">21歳予告</a>は決め台詞から世界観を逆算。<a href="making-kyogu.html">短編映画「狂愚」</a>では結末を作り変え、そのオチが最大の効果を生むように「追い詰められていく過程」を組み立てました。カメラも編集も配信の<a href="making-doremifa2026.html">スイッチングも</a>やってきたので、<strong>いま自分が触っている工程が全体のどこにあるか</strong>を常に把握しながら作れます。</p>
         </div>
       </div>
       <div class="str">
         <div class="sno">02</div>
         <div>
-          <h3>完成形から逆算して、全体を設計する</h3>
-          <p>カットを撮る前に、完成した映像がどう見えるかを先に決めます。<a href="making-birthday2026.html">22歳記念PV</a>ではロケハンとGoogle Map、Blenderで画を設計してから撮影に入り、<a href="making-birthday21.html">21歳予告</a>は決め台詞から世界観を逆算。<a href="making-kyogu.html">短編映画「狂愚」</a>では結末を作り変え、そのオチが最大の効果を生むように「追い詰められていく過程」を組み立てました。カメラも編集も配信の<a href="making-doremifa2026.html">スイッチングも</a>やってきたので、<strong>いま自分が触っている工程が全体のどこにあるか</strong>を常に把握しながら作れます。</p>
+          <h3>必要な技術を、必要な瞬間に取りに行く</h3>
+          <p>Unreal Engine 5は、講座で基本を覚えてから2週間で、講座に無いギミックを設計・実装して<a href="making-draward.html">10フロアのゲーム</a>にしました。このサイトの<a href="making-portfolio.html">3Dビューア</a>は、見せたい画のために既製ライブラリを捨ててthree.jsで自作。勤務先の<a href="making-ikeshibu.html">DMX制御照明</a>は研修を受けてオペレーターとして本番に立ちました。Blenderも独学です。「教わってから作る」のではなく、<strong>作りたいものが先にあって、技術が後から追いつく</strong>——この順番で9年やってきました。</p>
         </div>
       </div>
       <div class="str">
         <div class="sno">03</div>
         <div>
-          <h3>作り続けているから、「なぜ面白いのか」を分解する癖がある</h3>
-          <p>誕生日の予告映像を<a href="making-birthday15.html">15歳</a>から<a href="making-birthday2026.html">22歳</a>までほぼ毎年（計7本）、Blenderは<a href="making-challenge.html">1日1体×30日</a>、勤務先の配信現場には<a href="making-ikeshibu.html">130日</a>。制作を止めない生活を続けていると、コンテンツを見る目が変わります。カットが切り替わった瞬間に視線がどこへ行くか、この演出はなぜ効いているのか——<strong>面白さを感覚で消費せず、仕組みとして分解する習慣</strong>が、次の制作の設計図になっています。</p>
+          <h3>率いても、支えても、完成まで運ぶ</h3>
+          <p>放送部IBSでは中3から高3の6月まで局長として部を率い、<a href="making-idf.html">IDF（郁文ドリームフェスティバル）</a>はゼロから企画して多くの人を巻き込み実現させました。<a href="making-rough.html">農工祭のステージ収録</a>では自分で撮影チームを組み、<a href="making-birthday2026.html">22歳記念PV</a>の外ロケでは事前準備で撮影クルーを設計どおりに動かしました。<a href="making-kyogu.html">短編映画「狂愚」</a>では、初対面の4人チームでプリプロダクションを主導。一方、<a href="making-ikeshibu.html">勤務先の配信現場</a>ではチームの一員としてカメラに集中し、自分の提案が大きな違いを生むと判断したときだけ意見を出します。<strong>立場に応じて役割を切り替えながら、作品を完成に運ぶ</strong>——率いた経験と、支えて機能した経験の両方があります。</p>
         </div>
       </div>
     </section>
 
     <!-- IBS -->
-    <section class="section rv" id="ibs">
+    <section class="section bio rv" id="ibs">
       <div class="sec-lbl">IBS — 放送部での6年間</div>
       <p>IBS（郁文館 放送部）は、私の映像制作の原点です。校内ニュースをテレビ番組のように放送し、体育祭・文化祭などの学校行事を撮影・編集する部活で、中学1年から所属し、<strong>中学3年から高校3年の6月まで局長（部長）</strong>を務めました。中学・高校の6年間、ここでコンテンツ制作を学んできました。</p>
       <p>特徴的だったのは、<strong>現役のプロ映像ディレクターがコーチとして指導してくださっていた</strong>ことです。「IBS VIDEO #」シリーズの制作では、企画の段階から会議でアドバイスをもらい、編集した映像を何度もプレビューで見てもらって、構成のOKが出てはじめて、プロも使う外部スタジオでEED・MA（映像と音声の最終仕上げ）を行う——という本格的な工程を踏んでいました。学生扱いせず、プロと同じ基準で修正を求められる環境で鍛えられたことが、いまの制作の基礎になっています。</p>
@@ -198,45 +202,33 @@
         <div class="pillar">
           <div class="pno">01</div>
           <h3>実写映像</h3>
-          <p>撮影から編集まで一貫して。シネマティックな1本ものから、被写体に寄り添うドキュメンタリーまで。いちばん長く取り組んできた軸です。</p>
+          <p>撮影から編集まで一貫して。シネマティックな<a href="making-birthday2026.html">1本もの</a>から、被写体に寄り添う<a href="making-grit.html">ドキュメンタリー</a>まで。いちばん長く取り組んできた軸です。</p>
         </div>
         <div class="pillar">
           <div class="pno">02</div>
           <h3>CG</h3>
-          <p>Blenderでのモデリング。テクスチャはProcreateで手描きで自作。実写では撮れない画づくりの引き出しです。</p>
+          <p>Blenderでのフルスクラッチモデリング。セルルックの<a href="making-taigei.html">キャラクター</a>から、リアル系の<a href="making-monstercm.html">30秒CM</a>まで。実写では撮れない画づくりの引き出しです。</p>
         </div>
         <div class="pillar">
           <div class="pno">03</div>
-          <h3>ライブ配信</h3>
-          <p>音楽イベントを中心に、マルチカメラでの撮影・配信の現場を数多く経験。一発勝負の現場対応力が身につく場です。</p>
+          <h3>配信・イベント撮影</h3>
+          <p>マルチカメラでの、やり直しのきかないリアルタイム撮影。<a href="making-doremifa2026.html">松平健さん出演・4000人規模のコンサートのスイッチング</a>から、<a href="making-rough.html">ステージ公演の収録</a>まで。一発勝負の現場で対応力を磨いてきました。</p>
         </div>
       </div>
     </section>
 
-    <!-- ツール -->
+    <!-- 道具＝取りに行った順 -->
     <section class="section rv">
-      <div class="sec-lbl">TOOLS — 道具</div>
-      <div class="tools">
-        <div class="toolrow"><div class="tk">映像</div><div class="tv"><span class="tool">Final Cut Pro</span><span class="tool">DaVinci Resolve</span><span class="tool">Logic Pro</span></div></div>
-        <div class="toolrow"><div class="tk">3DCG</div><div class="tv"><span class="tool">Blender</span><span class="tool">Procreate</span></div></div>
-        <div class="toolrow"><div class="tk">ゲーム / Web</div><div class="tv"><span class="tool">Unreal Engine 5</span><span class="tool">HTML / CSS / JavaScript</span><span class="tool">three.js</span></div></div>
-      </div>
-      <p class="about" style="margin-top:18px">このポートフォリオサイトも自分で設計・制作しています（<a href="making-portfolio.html">設計と実装の記録</a>）。ゲームエンジンでの制作は <a href="making-draward.html">UE5のダンジョンゲーム</a> に。</p>
-    </section>
-
-    <!-- 経歴 -->
-    <section class="section rv">
-      <div class="sec-lbl">TIMELINE — 歩み</div>
+      <div class="sec-lbl">TOOLS — 取りに行った順</div>
       <div class="timeline">
-        <div class="tl"><div class="yr">2017</div><div class="ev">映像をはじめる <small>放送部 IBS で活動開始。中3から高3の6月まで局長として部を率いる</small></div></div>
-        <div class="tl"><div class="yr">2018</div><div class="ev">初の映像制作「IBS VIDEO #98」 <small>郁秋祭ダイジェスト・一部の構成/編集を担当</small></div></div>
-        <div class="tl"><div class="yr">2019</div><div class="ev">Blenderで初めての3DCG <small>誕生日予告シリーズもこの年に始まる（15歳）</small></div></div>
-        <div class="tl"><div class="yr">2020</div><div class="ev">コロナ禍、学校行事の配信を担う <small>カメラ・スイッチング・運営まで</small></div></div>
-        <div class="tl"><div class="yr">2021</div><div class="ev">IDF（郁文ドリームフェスティバル）を企画・実行 <small>Blenderも本格化：30日チャレンジ・RX-7・マジン</small></div></div>
-        <div class="tl"><div class="yr">2022</div><div class="ev">実写×CGの合成に挑む <small>寅年年賀状</small></div></div>
-        <div class="tl"><div class="yr">2024</div><div class="ev">UE5でゲーム制作／GRIT3部作 <small>11月からイケベ楽器店で生配信カメラ</small></div></div>
-        <div class="tl"><div class="yr">2025</div><div class="ev">大学を休学し、ポートフォリオ制作に専念 <small>人体素体・短編映画「狂愚」・卒制メイキング撮影（休学は2025年4月〜2026年3月）</small></div></div>
-        <div class="tl"><div class="yr">2026</div><div class="ev">モンスターエナジー風CM完成（5年越し） <small>このポートフォリオサイトを設計・公開</small></div></div>
+        <div class="tl"><div class="yr">2017</div><div class="ev">Final Cut Pro / Motion／イベント撮影 <small>放送部IBSで映像制作を開始。学校行事の撮影・編集に明け暮れる</small></div></div>
+        <div class="tl"><div class="yr">2019</div><div class="ev">Blender <small>独学で3DCGを開始</small></div></div>
+        <div class="tl"><div class="yr">2020</div><div class="ev">Premiere Pro／ライブ配信 <small>部室のソフト移行に合わせて習得。コロナ禍で校内行事の配信も始まる</small></div></div>
+        <div class="tl"><div class="yr">2023</div><div class="ev">C言語／Procreate <small>大学の授業でC言語。12月、<a href="making-sneaker.html">スニーカー</a>からテクスチャの手描きを開始</small></div></div>
+        <div class="tl"><div class="yr">2024</div><div class="ev">Unreal Engine 5 <small>講座で基本を覚え、2週間で<a href="making-draward.html">10フロアのダンジョンゲーム</a>に</small></div></div>
+        <div class="tl"><div class="yr">2024</div><div class="ev">音楽イベントの生配信現場 <small>イケベ楽器店で生配信カメラ（Sony PXW-Z280）。DMX照明の研修を受け本番も担当</small></div></div>
+        <div class="tl"><div class="yr">2025</div><div class="ev">Logic Pro／DaVinci Resolve <small>1月に作曲の学習を開始し、まず1曲制作。11月、<a href="making-rough.html">農工祭roughの収録</a>でDaVinci Resolveを習得</small></div></div>
+        <div class="tl"><div class="yr">2026</div><div class="ev">AIエンジニアリング <small>Claudeとの協働で<a href="making-portfolio.html">このサイトを設計・実装</a>——実装はAI、判断は自分</small></div></div>
       </div>
     </section>
 
