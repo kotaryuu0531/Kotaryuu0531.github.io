@@ -145,6 +145,12 @@
   .rv.in{opacity:1;transform:none}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
   .buildver{display:none;position:fixed;left:12px;bottom:10px;z-index:40;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);opacity:.5;pointer-events:none}
+  /* 比較UIは確定値で固定し非表示（オートターンのみ残す） */
+  .tv-ui{display:none!important}
+  .tv-rot{position:absolute;right:12px;bottom:12px;z-index:5;font-family:"Space Mono",monospace;font-size:11px;
+    letter-spacing:.06em;padding:8px 14px;border-radius:100px;background:rgba(10,13,18,.7);
+    border:1px solid var(--line);color:var(--ink-mut);cursor:pointer;transition:all .25s}
+  .tv-rot.on,.tv-rot:hover{border-color:var(--amber);color:var(--amber)}
 </style>
 </head>
 <body>
@@ -169,6 +175,7 @@
     <div class="viewer rv">
       <div id="tviewer" aria-label="大鯨 3Dキャラクターモデル（ドラッグで回転できます）">
         <div class="spin" id="tv-spin"><div class="ring"></div><div class="spin-txt" id="tv-spin-txt">読み込み中…</div></div>
+        <button class="tv-rot on" id="tv-rot" type="button">オートターン: ON</button>
       </div>
       <div class="tv-ui">
         <div class="seg" id="tv-mode">
@@ -437,9 +444,18 @@
   const controls=new OrbitControls(camera,renderer.domElement);
   controls.enableDamping=true; controls.dampingFactor=.08;
   controls.autoRotate=true; controls.autoRotateSpeed=1.1;
+  let rotateWanted=true;
   let resumeT=null;
   controls.addEventListener("start",()=>{controls.autoRotate=false; if(resumeT)clearTimeout(resumeT);});
-  controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{controls.autoRotate=true;},3000);});
+  controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{ if(rotateWanted)controls.autoRotate=true; },3000);});
+  const rotBtn=document.getElementById("tv-rot");
+  rotBtn.addEventListener("click",()=>{
+    rotateWanted=!rotateWanted;
+    controls.autoRotate=rotateWanted;
+    if(!rotateWanted&&resumeT)clearTimeout(resumeT);
+    rotBtn.classList.toggle("on",rotateWanted);
+    rotBtn.textContent="オートターン: "+(rotateWanted?"ON":"OFF");
+  });
 
   function resize(){
     const w=holder.clientWidth,h=holder.clientHeight;
@@ -634,11 +650,14 @@
     outlines.forEach(([o,ol])=>o.add(ol));
     scene.add(model);
 
-    controls.target.copy(center);
-    const dist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2)*1.25;
-    camera.position.set(center.x+dist*Math.sin(20*Math.PI/180),
-                        center.y+dist*0.10,
-                        center.z+dist*Math.cos(20*Math.PI/180));
+    // 初期カメラ：debug-taigei で決めた「一番可愛い」画角（顔まわりに寄る）
+    const tgt=new THREE.Vector3(center.x+0.018*maxDim, center.y+0.281*maxDim, center.z-0.017*maxDim);
+    controls.target.copy(tgt);
+    const dist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2)*0.375;
+    const iniA=-19.6*Math.PI/180;
+    camera.position.set(tgt.x+dist*Math.sin(iniA),
+                        tgt.y+dist*(-0.081),
+                        tgt.z+dist*Math.cos(iniA));
     camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
     controls.update();
 
@@ -734,7 +753,7 @@
   resize();
   renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-  <div class="buildver">build 2026.07.13 17:58 JST</div>
+  \g<1>build 2026.07.14 09:55 JST\g<2>
 <script src="fit-title.js" defer></script>
 </body>
 </html>

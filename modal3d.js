@@ -93,7 +93,23 @@ function ensureInit(){
   controls.enableDamping=true; controls.dampingFactor=.08;
   controls.autoRotate=true; controls.autoRotateSpeed=1.1;
   controls.addEventListener("start",()=>{controls.autoRotate=false; if(resumeT)clearTimeout(resumeT);});
-  controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{controls.autoRotate=true;},3000);});
+  window.__v3dRotateWanted=true;
+  controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{ if(window.__v3dRotateWanted)controls.autoRotate=true; },3000);});
+  const rotBtn=document.createElement("button");
+  rotBtn.type="button"; rotBtn.className="v3d-rot";
+  rotBtn.textContent="オートターン: ON";
+  rotBtn.style.cssText="position:absolute;right:12px;bottom:12px;z-index:6;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;padding:8px 14px;border-radius:100px;background:rgba(10,13,18,.7);border:1px solid #E9A94C;color:#E9A94C;cursor:pointer;transition:all .25s";
+  rotBtn.addEventListener("click",(e)=>{
+    e.stopPropagation();
+    window.__v3dRotateWanted=!window.__v3dRotateWanted;
+    controls.autoRotate=window.__v3dRotateWanted;
+    if(!window.__v3dRotateWanted&&resumeT)clearTimeout(resumeT);
+    const on=window.__v3dRotateWanted;
+    rotBtn.textContent="オートターン: "+(on?"ON":"OFF");
+    rotBtn.style.borderColor=on?"#E9A94C":"#262A30";
+    rotBtn.style.color=on?"#E9A94C":"#8C887F";
+  });
+  stage.appendChild(rotBtn);
 
   window.addEventListener("resize",resize);
 
@@ -297,6 +313,9 @@ function mountEntry(entry, opts){
   camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
   controls.update();
   controls.autoRotate=true;
+  window.__v3dRotateWanted=true;
+  const rb=stage.querySelector(".v3d-rot");
+  if(rb){ rb.textContent="オートターン: ON"; rb.style.borderColor="#E9A94C"; rb.style.color="#E9A94C"; }
   entry.homeCenter=center.clone(); entry.homeDist=camera.position.distanceTo(center); entry.maxDim=maxDim;
   goalTarget=null; goalRadius=null;
   resize();

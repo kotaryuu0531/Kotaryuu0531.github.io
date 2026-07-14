@@ -81,7 +81,19 @@ function initViewer(holder){
   const spinTxt=holder.querySelector(".spin-txt");
   const modeBox=root.querySelector("#gv-mode, .gv-mode");
   const clipBox=root.querySelector(".gv-clip");
-  const rotBtn=root.querySelector(".gv-rot");
+  let rotBtn=root.querySelector(".gv-rot");
+  if(!rotBtn){   // ページ側に無ければ自動生成してビューア右下に重ねる
+    rotBtn=document.createElement("button");
+    rotBtn.type="button"; rotBtn.className="gv-rot on";
+    rotBtn.textContent="オートターン: ON";
+    rotBtn.style.cssText="position:absolute;right:12px;bottom:12px;z-index:5;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;padding:8px 14px;border-radius:100px;background:rgba(10,13,18,.7);border:1px solid #262A30;color:#8C887F;cursor:pointer;transition:all .25s";
+    rotBtn.addEventListener("mouseenter",()=>{rotBtn.style.borderColor="#E9A94C";rotBtn.style.color="#E9A94C";});
+    rotBtn.addEventListener("mouseleave",()=>{const on=rotBtn.classList.contains("on");rotBtn.style.borderColor=on?"#E9A94C":"#262A30";rotBtn.style.color=on?"#E9A94C":"#8C887F";});
+    if(getComputedStyle(holder).position==="static")holder.style.position="relative";
+    holder.appendChild(rotBtn);
+  }
+  const syncRotBtn=()=>{const on=rotBtn.classList.contains("on");rotBtn.style.borderColor=on?"#E9A94C":"#262A30";rotBtn.style.color=on?"#E9A94C":"#8C887F";};
+  syncRotBtn();
 
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
@@ -113,6 +125,7 @@ function initViewer(holder){
       if(!rotateWanted&&resumeT)clearTimeout(resumeT);
       rotBtn.classList.toggle("on",rotateWanted);
       rotBtn.textContent="オートターン: "+(rotateWanted?"ON":"OFF");
+      syncRotBtn();
     });
   }
 
