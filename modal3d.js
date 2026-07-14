@@ -301,22 +301,24 @@ function mountEntry(entry, opts){
   const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
   const maxDim=Math.max(size.x,size.y,size.z);
   camera.fov=entry.isToon?28:30;
-  controls.target.copy(center);
+  const tOff=new THREE.Vector3(parseFloat(opts.tx)||0, parseFloat(opts.ty)||0, parseFloat(opts.tz)||0).multiplyScalar(maxDim);
+  const tgt=center.clone().add(tOff);
+  controls.target.copy(tgt);
   const zoom=(opts.zoom!=null&&!isNaN(parseFloat(opts.zoom)))?parseFloat(opts.zoom):(entry.isToon?1.25:1.3);
   const angDeg=(opts.angle!=null&&!isNaN(parseFloat(opts.angle)))?parseFloat(opts.angle):(entry.isToon?20:-28);
   const elev=(opts.elev!=null&&!isNaN(parseFloat(opts.elev)))?parseFloat(opts.elev):(entry.isToon?0.10:0.28);
   const dist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2)*zoom;
   const a=angDeg*Math.PI/180;
-  camera.position.set(center.x+dist*Math.sin(a),
-                      center.y+dist*elev,
-                      center.z+dist*Math.cos(a));
+  camera.position.set(tgt.x+dist*Math.sin(a),
+                      tgt.y+dist*elev,
+                      tgt.z+dist*Math.cos(a));
   camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
   controls.update();
   controls.autoRotate=true;
   window.__v3dRotateWanted=true;
   const rb=stage.querySelector(".v3d-rot");
   if(rb){ rb.textContent="オートターン: ON"; rb.style.borderColor="#E9A94C"; rb.style.color="#E9A94C"; }
-  entry.homeCenter=center.clone(); entry.homeDist=camera.position.distanceTo(center); entry.maxDim=maxDim;
+  entry.homeCenter=tgt.clone(); entry.homeDist=camera.position.distanceTo(tgt); entry.maxDim=maxDim;
   goalTarget=null; goalRadius=null;
   resize();
 }

@@ -309,7 +309,8 @@
       url:"",
       making:"making-taigei.html",
       thumb:"taigei-hero.jpg",
-      is3d:true, glb:"Taigei_figure.glb", toon:true,
+      is3d:true, glb:"Taigei_figure.glb",
+      cam:{angle:-19.6, elev:-0.081, zoom:0.375, tx:0.018, ty:0.281, tz:-0.017}, toon:true,
       ov:{eyebrow:"FAN 3D — 艦これ「大鯨」/ 2020", sub:"独学キャラモデリングの到達点", text:"高1の秋、YouTube講座を視聴しながら独学でキャラモデリングに挑み、一体をまるごと完成させた『艦これ』大鯨の二次創作。アニメ調では自己最高クオリティ。2026年、ポートフォリオ用に素体差し替え・リテクスチャ・自作トゥーンビューアで改修しました。"}
     },
     {
@@ -620,7 +621,7 @@
       card.innerHTML =
         '<div class="thumb'+(vid?' playable':'')+'"'+(vid?' data-yt="'+vid+'" role="button" tabindex="0" aria-label="再生"':'')+'>'+
           thumbInner +
-          (w.is3d?'<div class="badge3d" data-glb="'+(w.glb||"")+'"'+(w.toon?' data-toon="1"':'')+(w.contrast?' data-contrast="'+w.contrast+'"':'')+(w.cam?' data-angle="'+w.cam.angle+'" data-elev="'+w.cam.elev+'" data-zoom="'+w.cam.zoom+'"'+(w.cam.env!=null?' data-env="'+w.cam.env+'"':''):'')+'>3D</div>':'')+
+          (w.is3d?'<div class="badge3d" data-glb="'+(w.glb||"")+'"'+(w.toon?' data-toon="1"':'')+(w.contrast?' data-contrast="'+w.contrast+'"':'')+(w.cam?' data-angle="'+w.cam.angle+'" data-elev="'+w.cam.elev+'" data-zoom="'+w.cam.zoom+'"'+(w.cam.env!=null?' data-env="'+w.cam.env+'"':'')+(w.cam.tx!=null?' data-tx="'+w.cam.tx+'" data-ty="'+w.cam.ty+'" data-tz="'+w.cam.tz+'"':''):'')+'>3D</div>':'')+
           (vid?'<div class="play"></div>':'')+
         '</div>'+
         '<div class="wbody">'+
@@ -721,10 +722,10 @@
         catch(err){ console.error(err); const t=v3d.querySelector(".v3d-spin .txt"); if(t)t.textContent="読み込みに失敗しました"; return; }
         finally{ loading=false; }
       }
-      mod.open({glb:b.dataset.glb, toon:b.dataset.toon==="1", contrast:b.dataset.contrast||"soft", angle:b.dataset.angle, elev:b.dataset.elev, zoom:b.dataset.zoom, env:b.dataset.env});
+      mod.open({glb:b.dataset.glb, toon:b.dataset.toon==="1", contrast:b.dataset.contrast||"soft", angle:b.dataset.angle, elev:b.dataset.elev, zoom:b.dataset.zoom, env:b.dataset.env, tx:b.dataset.tx, ty:b.dataset.ty, tz:b.dataset.tz});
     });
   })();
   </script>
-  \g<1>build 2026.07.14 09:55 JST\g<2>
+  <div class="buildver">build 2026.07.14 10:18 JST</div>
 </body>
 </html>
