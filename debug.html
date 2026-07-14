@@ -1,400 +1,788 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex">
-<title>DEBUG — 3Dビューア（虎 / ステイサム）</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[DEBUG] 大鯨 3Dキャラクターモデル（ファンアート） / RYUNOSUKE KOTAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
 <style>
   :root{
-    --bg-cool:#0A0D12; --surface:#14181E; --ink:#ECE7DF; --ink-mut:#8C887F;
-    --line:#262A30; --amber:#E9A94C; --amber-dim:#6b5430; --r:2px;
+    --bg-cool:#0A0D12;--bg-warm:#15110D;--surface:#14181E;--letterbox:#000;
+    --ink:#ECE7DF;--ink-mut:#8C887F;--line:#262A30;--amber:#E9A94C;--amber-dim:#6b5430;--r:2px;
   }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg-cool);color:var(--ink);
-    font-family:"Archivo",system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif}
-  .wrap{max-width:1100px;margin:0 auto;padding:clamp(20px,4vw,44px)}
-  .eyebrow{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--amber);margin:0 0 6px}
-  h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-weight:600;letter-spacing:.01em;
-    font-size:clamp(20px,3vw,28px);margin:0 0 4px;line-height:1.15}
-  .sub{color:var(--ink-mut);font-size:13px;margin:0 0 22px}
-  .model-sw{display:flex;gap:8px;margin:0 0 16px}
-  .model-sw button{font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.06em;background:none;
-    border:1px solid var(--line);color:var(--ink-mut);padding:8px 22px;border-radius:var(--r);cursor:pointer;transition:.2s}
-  .model-sw button:hover{border-color:var(--amber-dim)}
-  .model-sw button.on{border-color:var(--amber);color:var(--amber);background:rgba(233,169,76,.06)}
-  #gviewer{position:relative;width:100%;height:min(70vh,600px);touch-action:none;overflow:hidden;
-    background:radial-gradient(130% 110% at 50% 30%, #1b212a 0%, #0c0f14 72%);
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(120% 70% at 50% -10%, var(--bg-warm) 0%, var(--bg-cool) 55%),var(--bg-cool);
+    color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.5;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .blackout{position:fixed;inset:0;background:#000;z-index:50;opacity:1;transition:opacity 1s ease .1s;pointer-events:none}
+  .ready .blackout{opacity:0}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);background:linear-gradient(to bottom,rgba(10,13,18,.92),rgba(10,13,18,0));backdrop-filter:blur(2px)}
+  .back{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--ink-mut);text-decoration:none;transition:color .25s}
+  .back:hover,.back:focus-visible{color:var(--amber)}
+  .brand{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em}
+  .brand b{color:var(--amber)}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:clamp(110px,15vh,160px) clamp(20px,5vw,56px) clamp(60px,10vh,120px)}
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber)}
+  h1{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","YuMincho","Yu Mincho",serif;font-weight:600;font-size:clamp(34px,6vw,66px);line-height:1.1;letter-spacing:.01em;margin-bottom:10px}
+  .nb{white-space:nowrap}
+  .subtitle{font-family:"Archivo",sans-serif;font-weight:500;font-size:clamp(14px,2vw,20px);letter-spacing:.02em;
+    color:var(--ink-mut);margin-bottom:22px}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+  .htag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut);
+    border:1px solid var(--line);border-radius:100px;padding:5px 13px;text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s}
+  .htag:hover,.htag:focus-visible{border-color:var(--amber-dim);color:var(--amber);outline:none}
+  .lead{color:var(--ink);font-size:clamp(15px,1.7vw,19px);opacity:.88}
+
+  /* ファンアート注記 */
+  .disclaimer{margin-top:16px;padding:12px 16px;border:1px solid var(--line);border-left:2px solid var(--amber-dim);
+    border-radius:var(--r);background:rgba(233,169,76,.04);font-size:13px;line-height:1.65;color:var(--ink-mut)}
+
+  /* インタラクティブ3Dビューア（自前 three.js トゥーンビューア） */
+  .viewer{margin-top:clamp(26px,4vh,42px)}
+  #tviewer{position:relative;width:100%;height:min(72vh,620px);touch-action:none;overflow:hidden;
+    background:radial-gradient(130% 110% at 50% 26%, #1b212a 0%, #0c0f14 72%);
     border:1px solid var(--line);border-radius:var(--r)}
-  #gviewer canvas{display:block;width:100%;height:100%;outline:none}
-  #gviewer .spin{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;
+  #tviewer canvas{display:block;width:100%;height:100%;outline:none}
+  #tviewer .spin{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;
     background:rgba(10,13,18,.55);z-index:3;transition:opacity .35s}
-  #gviewer .spin.off{opacity:0;pointer-events:none}
-  #gviewer .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:gvspin 1s linear infinite}
-  #gviewer .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
-  @keyframes gvspin{to{transform:rotate(360deg)}}
-  .gv-ui{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
-  .gv-ui button{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;background:none;
-    border:1px solid var(--line);color:var(--ink-mut);padding:7px 18px;border-radius:100px;cursor:pointer;transition:.2s}
-  .gv-ui button:hover{border-color:var(--amber-dim)}
-  .gv-ui button.on{border-color:var(--amber);color:var(--amber)}
-  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px}
-  .panel{margin-top:26px;border:1px dashed var(--line);border-radius:var(--r);padding:18px 18px 8px}
-  .panel h2{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut);margin:0 0 14px;text-transform:uppercase}
-  .row{display:grid;grid-template-columns:120px 1fr 64px;align-items:center;gap:12px;margin-bottom:12px}
-  .row label{font-family:"Space Mono",monospace;font-size:12px;color:var(--ink-mut)}
-  .row input[type=range]{width:100%;accent-color:var(--amber)}
-  .row .val{font-family:"Space Mono",monospace;font-size:12px;color:var(--ink);text-align:right}
-  .toggle-row{display:flex;align-items:center;gap:10px;margin:4px 0 12px}
-  .toggle-row label{font-family:"Space Mono",monospace;font-size:12px;color:var(--ink-mut)}
-  .out{margin-top:8px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
-    font-family:"Space Mono",monospace;font-size:12px;color:var(--amber);word-break:break-all;line-height:1.7}
-  .out .k{color:var(--ink-mut)}
-  .hint{font-size:12px;color:var(--ink-mut);margin:14px 0 0;line-height:1.7}
-  .buildver{position:fixed;left:12px;bottom:10px;z-index:40;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);opacity:.5;pointer-events:none}
+  #tviewer .spin.off{opacity:0;pointer-events:none}
+  #tviewer .ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--amber);animation:tvspin 1s linear infinite}
+  #tviewer .spin-txt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-mut)}
+  @keyframes tvspin{to{transform:rotate(360deg)}}
+  .tv-ui{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:12px;
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-mut)}
+  .tv-ui .seg{display:flex;gap:6px}
+  .tv-ui button{font-family:inherit;font-size:11px;letter-spacing:.06em;background:none;
+    border:1px solid var(--line);color:var(--ink-mut);padding:6px 14px;border-radius:100px;cursor:pointer;transition:border-color .2s,color .2s}
+  .tv-ui button:hover{border-color:var(--amber-dim)}
+  .tv-ui button.on{border-color:var(--amber);color:var(--amber)}
+  .tv-ui label{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .tv-ui input[type="checkbox"]{accent-color:var(--amber);width:14px;height:14px;cursor:pointer}
+  .tv-ui input[type="range"]{accent-color:var(--amber);width:150px;cursor:pointer}
+  .tv-ui .num{color:var(--amber);min-width:3ch;text-align:right}
+  .tv-ui .dim{opacity:.35;pointer-events:none}
+  .tv-pad{position:relative;width:78px;height:78px;border:1px solid var(--line);border-radius:50%;cursor:grab;touch-action:none;flex:none;
+    background:radial-gradient(closest-side,#161b24 0%,#10141b 100%)}
+  .tv-pad::before,.tv-pad::after{content:"";position:absolute;background:var(--line);pointer-events:none}
+  .tv-pad::before{left:50%;top:8%;bottom:8%;width:1px}
+  .tv-pad::after{top:50%;left:8%;right:8%;height:1px}
+  .tv-pad .dot{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--amber);transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 8px rgba(233,169,76,.5)}
+  .cap{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-mut);margin-top:12px;line-height:1.6}
+
+  /* 制作について */
+  .about{margin-top:clamp(30px,5vh,48px);border-top:1px solid var(--line);padding-top:clamp(26px,4vh,40px)}
+  .about h2{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(19px,2.4vw,26px);margin-bottom:14px}
+  .about p{color:var(--ink-mut);font-size:15px;line-height:1.7;margin-bottom:14px}
+  .about p:last-child{margin-bottom:0}
+
+  /* ヒーロー画像・特集セクション・画像グリッド */
+  .heroimg{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;margin-top:clamp(26px,4vh,42px);
+    border:1px solid var(--line);border-radius:var(--r);cursor:zoom-in}
+  .feature{margin-top:clamp(30px,5vh,48px);border-top:1px solid var(--line);padding-top:clamp(26px,4vh,40px)}
+  .feature .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-bottom:12px}
+  .feature h3{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(21px,2.8vw,32px);line-height:1.16;margin-bottom:14px}
+  .feature p{color:var(--ink-mut);font-size:15px;line-height:1.7}
+  .feature p+p{margin-top:12px}
+  .feature a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  .feature a:hover{border-color:var(--amber)}
+  .g{display:grid;gap:12px;margin-top:18px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .g img{width:100%;display:block;border:1px solid var(--line);border-radius:var(--r);background:#0c0f14;cursor:zoom-in;transition:opacity .2s}
+  .g img:hover{opacity:.9}
+  .figcap{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.05em;color:var(--ink-mut);margin-top:10px;line-height:1.6}
+  @media(max-width:680px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:430px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .lightbox{position:fixed;inset:0;z-index:90;background:rgba(5,7,10,.93);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid var(--line);border-radius:var(--r)}
+  .lightbox .lb-cap{position:absolute;left:18px;bottom:14px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-mut)}
+  .lb-nav{position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(10,13,18,.65);
+    color:var(--ink);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+  .lb-nav:hover{border-color:var(--amber);color:var(--amber)}
+  .lb-l{left:14px;top:50%;transform:translateY(-50%)}
+  .lb-r{right:14px;top:50%;transform:translateY(-50%)}
+  .lb-u{top:14px;left:50%;transform:translateX(-50%) rotate(90deg)}
+  .lb-d{bottom:14px;left:50%;transform:translateX(-50%) rotate(-90deg)}
+  .lightbox.plain .lb-nav{display:none}
+  .lightbox.no-v .lb-u,.lightbox.no-v .lb-d{display:none}
+  .lightbox.no-h .lb-l,.lightbox.no-h .lb-r{display:none}
+
+  /* スペック */
+  .spec-head{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--amber);margin-top:clamp(44px,8vh,84px);margin-bottom:14px}
+  .spec{margin:0 0 clamp(8px,2vh,16px)}
+  .spec-row{display:grid;grid-template-columns:180px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+  .spec-row:last-child{border-bottom:1px solid var(--line)}
+  .spec-row dt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--amber);padding-top:2px}
+  .spec-row dd{font-family:"Archivo",sans-serif;font-size:15px;color:var(--ink)}
+  @media(max-width:620px){.spec-row{grid-template-columns:1fr;gap:6px}}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vh,90px);padding-top:32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer a{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--ink);text-decoration:none;
+    border:1px solid var(--line);padding:13px 20px;border-radius:var(--r);transition:all .3s}
+  footer a:hover{border-color:var(--amber);color:var(--amber)}
+  footer .colophon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-mut)}
+
+  p,.lead,.about p{text-wrap:pretty}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+  .buildver{display:none;position:fixed;left:12px;bottom:10px;z-index:40;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-mut);opacity:.5;pointer-events:none}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="eyebrow">DEBUG / VIEWER TEST</div>
-  <h1>3Dビューア確認 — 虎 / ステイサム</h1>
-  <p class="sub">リアル寄りPBR（RoomEnvironment＋ACES）。モデル・クリップを切替、パネルでライティングとカメラを調整して本番用の数値を決めます。</p>
+  <div class="blackout"></div>
 
-  <div class="model-sw" id="model-sw">
-    <button data-model="tiger" class="on">虎 / tiger</button>
-    <button data-model="statham">ステイサム / statham</button>
-    <button data-model="can">缶 / can</button>
+  <header class="topbar">
+    <a class="back" href="works.html">← ARCHIVE</a>
+    <div class="brand">RYUNOSUKE KOTAKE<b>.</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="eyebrow">FAN 3D — 艦これ「大鯨」/ 2020</div>
+    <h1><span class="nb">大鯨（Taigei）</span> <span class="nb">3Dモデル</span></h1>
+    <div class="subtitle">独学で学んだキャラモデリングの、アニメ調の最高到達点</div>
+    <div class="htags"><a class="htag" href="works.html?tags=CG">CG</a><a class="htag" href="works.html?tags=キャラクター">キャラクター</a></div>
+    <p class="lead">『艦隊これくしょん -艦これ-』の「大鯨」を題材にした、非公式ファンアートの3Dキャラクターモデルです。高校1年の秋、YouTubeのキャラモデリング講座を視聴しながら独学でキャラモデリングに挑み、モデリングからUV・テクスチャ・リギングまで、一体をまるごと完成させました。アニメ調の制作物としては、いまも自分の最高クオリティの一体です。2026年、ポートフォリオ化にあわせて首より下の胴体の差し替え・リテクスチャ・表示の更新まで改修しています。下のビューアで自由に回せます。</p>
+    <div class="disclaimer">本作は個人制作の<strong>非公式ファンアート</strong>です。キャラクター「大鯨」および『艦隊これくしょん -艦これ-』のデザイン・著作権は原作者および運営（DMM GAMES／KADOKAWA 等）に帰属します。キャラクターデザインを自作したものではありません。</div>
+
+    <img class="heroimg rv" src="taigei-hero.jpg" alt="大鯨 3Dモデル トゥーンシェーダーのビューティーレンダー">
+
+    <!-- インタラクティブ3Dビューア（自前 three.js トゥーンビューア） -->
+    <div class="viewer rv">
+      <div id="tviewer" aria-label="大鯨 3Dキャラクターモデル（ドラッグで回転できます）">
+        <div class="spin" id="tv-spin"><div class="ring"></div><div class="spin-txt" id="tv-spin-txt">読み込み中…</div></div>
+      </div>
+      <div class="tv-ui">
+        <div class="seg" id="tv-mode">
+          <button data-mode="toon" class="on">トゥーン</button>
+          <button data-mode="normal">ノーマル</button>
+          <button data-mode="wire">ワイヤー</button>
+        </div>
+        <label id="tv-trace-w"><input type="checkbox" id="tv-trace" checked> 色トレス線</label>
+        <label id="tv-shadow-w">影の強さ <input type="range" id="tv-shadow" min="0" max="100" value="71"> <span class="num" id="tv-shadow-val">71</span></label>
+      </div>
+      <div class="tv-ui" id="tv-light-w">
+        <span>ライト（パッドをドラッグ）</span>
+        <div class="tv-pad" id="tv-pad"><div class="dot" id="tv-dot"></div></div>
+        <span>右 <span class="num" id="tv-lx">+1.04</span> ／ 上 <span class="num" id="tv-ly">+0.48</span></span>
+        <label>明るさ <input type="range" id="tv-bright" min="70" max="130" value="100"> <span class="num" id="tv-bright-val">100</span>%</label>
+      </div>
+      <figcaption class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ・2本指＝平行移動。<br>ワイヤーフレーム表示は、実際のワイヤーとわずかに異なる場合があります。</figcaption>
+    </div>
+
+    <!-- 制作について -->
+    <!-- 4アングル -->
+    <section class="feature rv">
+      <div class="lbl">TURNAROUND</div>
+      <h3>基本ポーズ・4アングル</h3>
+      <p>トゥーンシェーダー適用のマテリアルプレビュー。4アングルとも平行投影（オルソ）で撮っています。</p>
+      <div class="g g4">
+        <img src="taigei-new-mat-front.jpg" alt="大鯨 正面" data-atlas="turn" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-new-mat-34.jpg" alt="大鯨 斜め" data-atlas="turn" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-new-mat-side.jpg" alt="大鯨 側面" data-atlas="turn" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-new-mat-back.jpg" alt="大鯨 背面" data-atlas="turn" data-r="0" data-c="3" loading="lazy">
+      </div>
+      <p class="figcap">正面／斜め／側面／背面。拡大中は ←→ で切替。</p>
+    </section>
+
+    <!-- 表情 -->
+    <section class="feature rv">
+      <div class="lbl">FACIAL</div>
+      <h3>表情はすべてボーンで動かす</h3>
+      <p>表情はシェイプキーではなく、すべてボーンで制御しています。まぶたの全開から半目・閉じまでの全域、眉、口の開閉、そしてウインクの左右非対称——リグの可動域を4つの表情で。</p>
+      <div class="g g4">
+        <img src="taigei-face-smile.jpg" alt="笑顔" data-atlas="face" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-face-surprise.jpg" alt="驚き" data-atlas="face" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-face-wink.jpg" alt="ウインク" data-atlas="face" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-face-pout.jpg" alt="むくれ顔" data-atlas="face" data-r="0" data-c="3" loading="lazy">
+      </div>
+      <p class="figcap">笑顔／驚き／ウインク／むくれ顔。拡大中は ←→ で切替。</p>
+    </section>
+
+    <!-- リファレンス -->
+    <section class="feature rv">
+      <div class="lbl">REFERENCE</div>
+      <h3>目標はアーケードの立ち絵</h3>
+      <p>制作当時に参考にしていたのは、『艦これアーケード』の大鯨です。ゲーム画面を何度も見返しながら、髪の房の流れやセーラー服のシルエットを立体に起こしていきました。</p>
+      <div class="g g2">
+        <img src="taigei-ref-front.jpg" alt="リファレンス｜正面（『艦これアーケード』ゲーム画面）" data-atlas="ref" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-ref-side.jpg" alt="リファレンス｜側面（『艦これアーケード』ゲーム画面）" data-atlas="ref" data-r="0" data-c="1" loading="lazy">
+      </div>
+      <p class="figcap">『艦隊これくしょん -艦これ- アーケード』ゲーム画面より引用（権利は各権利者に帰属します）。拡大中は ←→ で切替。</p>
+    </section>
+
+    <!-- テクスチャ & UV -->
+    <section class="feature rv">
+      <div class="lbl">TEXTURE / UV</div>
+      <h3>手描きテクスチャとUV</h3>
+      <p>テクスチャは4枚（顔／体／制服／髪）、マテリアルは5つ——テクスチャ4種に、瞳のハイライト用を加えた構成です。Procreateで手描きし、肌は血色と寒色の影の重ねが見せ場。UVは、テクスチャを手描きする前提で、島の整理と描きやすさを優先して展開しています。</p>
+      <div class="g g3">
+        <img src="taigei-tex-face.jpg" alt="顔｜テクスチャ" data-atlas="tuv" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-uv-face.jpg" alt="顔｜UV" data-atlas="tuv" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-uvtex-face.jpg" alt="顔｜UV重ね" data-atlas="tuv" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-tex-body.jpg" alt="体｜テクスチャ" data-atlas="tuv" data-r="1" data-c="0" loading="lazy">
+        <img src="taigei-uv-body.jpg" alt="体｜UV" data-atlas="tuv" data-r="1" data-c="1" loading="lazy">
+        <img src="taigei-uvtex-body.jpg" alt="体｜UV重ね" data-atlas="tuv" data-r="1" data-c="2" loading="lazy">
+        <img src="taigei-tex-uniform.jpg" alt="制服｜テクスチャ" data-atlas="tuv" data-r="2" data-c="0" loading="lazy">
+        <img src="taigei-uv-uniform.jpg" alt="制服｜UV" data-atlas="tuv" data-r="2" data-c="1" loading="lazy">
+        <img src="taigei-uvtex-uniform.jpg" alt="制服｜UV重ね" data-atlas="tuv" data-r="2" data-c="2" loading="lazy">
+      </div>
+      <p class="figcap">縦＝顔／体／制服、横＝テクスチャ／UV／UV重ね。拡大中は ←→＝表示の切替、↑↓＝パーツの切替（画面のボタンでも操作できます）。</p>
+      <div class="g g3">
+        <img src="taigei-tex-hair.jpg" alt="髪テクスチャ" loading="lazy">
+      </div>
+      <p class="figcap">髪テクスチャ（カーブ由来・共通の正方UV）。</p>
+    </section>
+
+    <!-- トポロジー -->
+    <section class="feature rv">
+      <div class="lbl">TOPOLOGY</div>
+      <h3>ワイヤーフレーム（すべてサブディビジョン適用前のケージ）</h3>
+      <p>ワイヤーはサブディビジョンサーフェスを適用する前のケージで見せています——手で組んだ割りそのものです。着衣の下にも破綻のない土台の人体が通っています。</p>
+      <div class="g g3">
+        <img src="taigei-cloth-wire-front.jpg" alt="着衣｜正面" data-atlas="wire" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-cloth-wire-side.jpg" alt="着衣｜側面" data-atlas="wire" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-cloth-wire-back.jpg" alt="着衣｜背面" data-atlas="wire" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-wire-front.jpg" alt="土台ボディ｜正面" data-atlas="wire" data-r="1" data-c="0" loading="lazy">
+        <img src="taigei-wire-side.jpg" alt="土台ボディ｜側面" data-atlas="wire" data-r="1" data-c="1" loading="lazy">
+        <img src="taigei-wire-back.jpg" alt="土台ボディ｜背面" data-atlas="wire" data-r="1" data-c="2" loading="lazy">
+        <img src="taigei-face-wire.jpg" alt="顔のループ（平たい眼球方式）" data-atlas="wire" data-r="2" data-c="0" loading="lazy">
+        <img src="taigei-hand-wire-back.jpg" alt="手の甲" data-atlas="wire" data-r="2" data-c="1" loading="lazy">
+        <img src="taigei-hand-wire-palm.jpg" alt="手のひら" data-atlas="wire" data-r="2" data-c="2" loading="lazy">
+      </div>
+      <p class="figcap">上段＝着衣、中段＝土台ボディ（各 正面／側面／背面）、下段＝顔・手の甲・手のひら。拡大中は ←→↑↓ で切替。</p>
+    </section>
+
+    <!-- Before/After -->
+    <section class="feature rv">
+      <div class="lbl">BEFORE / AFTER</div>
+      <h3>2026年のブラッシュアップ</h3>
+      <p>本体はあくまで2020年の作品ですが、ポートフォリオ化にあたって2026年に改修しました。差し替えた胴体（首より下の素体メッシュ）v2は、2024年に別のキャラクターを作った際、大鯨の素体を元に改良して作ったもの。<strong>首の接続頂点数を変えずに</strong>作ってあったため、今回そのまま差し替えることができました——接続部の規格を揃えておくと、胴体が資産として使い回せる、という設計の恩恵です。あわせてテクスチャも描き直しています。</p>
+      <div class="g g2">
+        <img src="taigei-old-wire-front.jpg" alt="素体v1 ワイヤー（Before）" data-atlas="bw" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-wire-front.jpg" alt="素体v2 ワイヤー（After）" data-atlas="bw" data-r="0" data-c="1" loading="lazy">
+      </div>
+      <p class="figcap">素体ワイヤー：左＝v1（2020）／右＝v2（2024）。トポロジーの整理。拡大中は ←→ で切替。</p>
+      <div class="g g4">
+        <img src="taigei-old-mat-front.jpg" alt="旧｜正面" data-atlas="ba" data-r="0" data-c="0" loading="lazy">
+        <img src="taigei-old-mat-34.jpg" alt="旧｜斜め" data-atlas="ba" data-r="0" data-c="1" loading="lazy">
+        <img src="taigei-old-mat-side.jpg" alt="旧｜側面" data-atlas="ba" data-r="0" data-c="2" loading="lazy">
+        <img src="taigei-old-mat-back.jpg" alt="旧｜背面" data-atlas="ba" data-r="0" data-c="3" loading="lazy">
+        <img src="taigei-new-mat-front.jpg" alt="新｜正面" data-atlas="ba" data-r="1" data-c="0" loading="lazy">
+        <img src="taigei-new-mat-34.jpg" alt="新｜斜め" data-atlas="ba" data-r="1" data-c="1" loading="lazy">
+        <img src="taigei-new-mat-side.jpg" alt="新｜側面" data-atlas="ba" data-r="1" data-c="2" loading="lazy">
+        <img src="taigei-new-mat-back.jpg" alt="新｜背面" data-atlas="ba" data-r="1" data-c="3" loading="lazy">
+      </div>
+      <p class="figcap">マテリアルプレビュー：上段＝旧、下段＝新（トゥーンシェーダー適用）。横＝正面／斜め／側面／背面。拡大中は ←→＝アングル、↑↓＝新旧。</p>
+    </section>
+
+    <!-- スペック -->
+    <div class="spec-head">SPEC</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>種別</dt><dd>3Dキャラクターモデル（非公式ファンアート・二次創作）</dd></div>
+      <div class="spec-row"><dt>キャラクター原案</dt><dd>『艦隊これくしょん -艦これ-』大鯨 ※デザイン・著作権は原作（DMM GAMES／KADOKAWA 等）に帰属</dd></div>
+      <div class="spec-row"><dt>担当</dt><dd>モデリング・テクスチャ・リギング・ルックデベロップメント</dd></div>
+      <div class="spec-row"><dt>頂点数／三角面</dt><dd>合計 34,671 / 68,234（サブディビジョン適用後）<br>ボディ 17,522 / 34,916<br>制服 11,011 / 21,298<br>髪 3,028 / 5,932<br>顔パーツ（目・眉・まつ毛・歯・舌）3,110 / 6,088</dd></div>
+      <div class="spec-row"><dt>リグ</dt><dd>ボーン315本（Blender上。目・口・表情もシェイプキーではなくボーンで制御／髪は物理演算用に本数多め）。ビューア用GLBはポーズを固定した静的メッシュ</dd></div>
+      <div class="spec-row"><dt>テクスチャ</dt><dd>4枚（顔・体・制服＝各2048px ／ 髪＝1024px）・マテリアル5（テクスチャ4種＋瞳のハイライト用）</dd></div>
+      <div class="spec-row"><dt>ビューア用GLB</dt><dd>28,077頂点 / 54,722三角面（服で隠れる面を削除した軽量版・アンリット）</dd></div>
+      <div class="spec-row"><dt>使用ソフト</dt><dd>Blender ／ Procreate 5.4.11</dd></div>
+      <div class="spec-row"><dt>制作期間</dt><dd>本制作 2020年9月〜2021年1月 ／ 2026年7月にポートフォリオ用へ改修（下のタイムライン参照）</dd></div>
+      <div class="spec-row"><dt>クレジット</dt><dd><a href="https://youtu.be/BBtgjTiL1XQ" target="_blank" rel="noopener">YouTubeのキャラモデリング講座</a>をベースに学習・制作。素体v2への作り直し・平たい眼球方式・UVレイアウト・肌の寒色影・アンリット運用は自分の判断による改善</dd></div>
+    </dl>
+
+    <div class="spec-head">TIMELINE</div>
+    <dl class="spec">
+      <div class="spec-row"><dt>2020/9/14〜12/20</dt><dd>モデリング（YouTubeのキャラモデリング講座を視聴しながら学習）</dd></div>
+      <div class="spec-row"><dt>2020/12/20〜2021/1/1</dt><dd>シェーディング・UV編集・テクスチャペイント</dd></div>
+      <div class="spec-row"><dt>2021/1/2〜1/7</dt><dd>リギング</dd></div>
+      <div class="spec-row"><dt>2024/1/7〜1/8</dt><dd>胴体（首より下の素体）メッシュ v2 作成（別キャラ制作時に大鯨の素体を元に改良。首の接続頂点数は据え置き）</dd></div>
+      <div class="spec-row"><dt>2026/7/1</dt><dd>ポージング</dd></div>
+      <div class="spec-row"><dt>2026/7/3</dt><dd>テクスチャ更新・胴体を v2 へ差し替え（ポートフォリオ化のためのブラッシュアップ）</dd></div>
+    </dl>
+
+    <footer>
+      <a href="works.html">← アーカイブに戻る</a>
+      <span class="colophon">© 2026 RYUNOSUKE KOTAKE</span>
+    </footer>
+  </main>
+
+  <div class="lightbox" id="lightbox">
+    <img src="" alt="拡大表示">
+    <div class="lb-cap" id="lb-cap"></div>
+    <button class="lb-nav lb-l" id="lb-l" aria-label="左へ">‹</button>
+    <button class="lb-nav lb-r" id="lb-r" aria-label="右へ">›</button>
+    <button class="lb-nav lb-u" id="lb-u" aria-label="上へ">‹</button>
+    <button class="lb-nav lb-d" id="lb-d" aria-label="下へ">›</button>
   </div>
 
-  <div id="gviewer" aria-label="3DCGモデルビューア（ドラッグで回転）">
-    <div class="spin" id="gv-spin"><div class="ring"></div><div class="spin-txt" id="gv-spin-txt">読み込み中…</div></div>
-  </div>
+<script>
+  window.addEventListener("load",()=>document.body.classList.add("ready"));
+  document.addEventListener("DOMContentLoaded",()=>document.body.classList.add("ready"));
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
 
-  <div class="gv-ui" id="gv-clip"></div>
-  <div class="gv-ui" id="gv-mode">
-    <button data-mode="normal" class="on">ノーマル</button>
-    <button data-mode="wire">ワイヤー</button>
-  </div>
-  <div class="gv-ui" id="gv-opts">
-    <button id="btn-rotate" class="on">オートターン: ON</button>
-  </div>
-  <div class="cap">ドラッグ＝回転 ／ スクロール（2本指）＝拡大縮小 ／ 右ドラッグ＝平行移動 ／ ワイヤー時はアニメ停止（バインドポーズ）</div>
+  // 画像のタップ拡大（data-atlas付きは縦横ナビ対応）
+  const lb=document.getElementById("lightbox"), lbImg=lb.querySelector("img"), lbCap=document.getElementById("lb-cap");
+  const atlases={};
+  document.querySelectorAll("[data-atlas]").forEach(img=>{
+    const a=img.dataset.atlas, r=+img.dataset.r, c=+img.dataset.c;
+    if(!atlases[a])atlases[a]=[];
+    if(!atlases[a][r])atlases[a][r]=[];
+    atlases[a][r][c]=img;
+    img.addEventListener("click",()=>openAtlas(a,r,c));
+  });
+  let cur=null;
+  function showCell(){
+    const cell=atlases[cur.a][cur.r][cur.c];
+    lbImg.src=cell.src; lbCap.textContent=cell.alt||"";
+  }
+  function openAtlas(a,r,c){
+    cur={a:a,r:r,c:c};
+    const rows=atlases[a].filter(Boolean);
+    const maxC=Math.max(...rows.map(row=>row.filter(Boolean).length));
+    lb.classList.toggle("no-v",rows.length<2);   // 行が1つ→縦ナビを出さない
+    lb.classList.toggle("no-h",maxC<2);          // 列が1つ→横ナビを出さない
+    lb.classList.remove("plain");lb.classList.add("open");showCell();
+  }
+  function openPlain(img){cur=null;lbImg.src=img.src;lbCap.textContent=img.alt||"";lb.classList.add("open","plain");}
+  document.querySelectorAll(".g img:not([data-atlas]), .heroimg").forEach(img=>{
+    img.addEventListener("click",()=>openPlain(img));
+  });
+  function closeLb(){lb.classList.remove("open");}
+  function move(dr,dc){
+    if(!cur)return;
+    const rows=atlases[cur.a], R=rows.length;
+    let r=cur.r, c=cur.c;
+    if(dr){ do{ r=(r+dr+R)%R; }while(!rows[r]); while(!rows[r][c]&&c>0)c--; }
+    if(dc){ const C=rows[r].length; do{ c=(c+dc+C)%C; }while(!rows[r][c]); }
+    cur.r=r; cur.c=c; showCell();
+  }
+  const nav=(id,dr,dc)=>{const b=document.getElementById(id); b.addEventListener("click",e=>{e.stopPropagation();move(dr,dc);});};
+  nav("lb-l",0,-1); nav("lb-r",0,1); nav("lb-u",-1,0); nav("lb-d",1,0);
+  lb.addEventListener("click",closeLb);
+  document.addEventListener("keydown",e=>{
+    if(!lb.classList.contains("open"))return;
+    if(e.key==="Escape")closeLb();
+    else if(e.key==="ArrowLeft"){e.preventDefault();move(0,-1);}
+    else if(e.key==="ArrowRight"){e.preventDefault();move(0,1);}
+    else if(e.key==="ArrowUp"){e.preventDefault();move(-1,0);}
+    else if(e.key==="ArrowDown"){e.preventDefault();move(1,0);}
+  });
 
-  <div class="panel">
-    <h2>Lighting &amp; Camera — 調整して数値を決める（モデルごと）</h2>
-    <div class="row"><label>exposure</label><input id="s-exp" type="range" min="0.5" max="1.8" step="0.01"><span class="val" id="v-exp"></span></div>
-    <div class="row"><label>dir（陰影）</label><input id="s-dir" type="range" min="0" max="1.5" step="0.025"><span class="val" id="v-dir"></span></div>
-    <div class="row"><label>amb（持ち上げ）</label><input id="s-amb" type="range" min="0" max="1.5" step="0.025"><span class="val" id="v-amb"></span></div>
-    <div class="row"><label>env（映り込み）</label><input id="s-env" type="range" min="0" max="6" step="0.1"><span class="val" id="v-env"></span></div>
-    <div class="row"><label>angle（初期角°）</label><input id="s-ang" type="range" min="-180" max="180" step="1"><span class="val" id="v-ang"></span></div>
-    <div class="row"><label>elev（高さ）</label><input id="s-elev" type="range" min="-0.3" max="0.8" step="0.01"><span class="val" id="v-elev"></span></div>
-    <div class="row"><label>zoom（距離）</label><input id="s-zoom" type="range" min="0.5" max="1.8" step="0.02"><span class="val" id="v-zoom"></span></div>
-    <div class="toggle-row"><input type="checkbox" id="c-emis"><label for="c-emis">発光（emissive）を抑える ※ステイサムの緑目確認</label></div>
-    <div class="toggle-row"><input type="checkbox" id="c-hideeye"><label for="c-hideeye">緑目の球（human_eye）を隠す ※消して下に目があるか確認</label></div>
-    <div class="out" id="out"></div>
-    <p class="hint">この <span style="color:var(--amber)">data-*</span> 文字列を本番 <code>#gviewer</code> に貼れば同じ見た目になります。angle/elev/zoom はスライダーを離すとカメラ再配置。</p>
-  </div>
-
-  <p class="hint" style="margin-top:22px">
-    ※単体テスト用（<code>debug.html</code>）。<code>tiger.glb</code> / <code>statham.glb</code> と同じフォルダに置いて開いてください。<br>
-    ※three.js は CDN 読み込みのため <code>file://</code> か本番URLで開くのが確実（chat内プレビューでは読めないことがあります）。<br>
-    ※ステイサムは78MBあるため初回読み込みに時間がかかります（本番前にテクスチャ軽量化予定）。
-  </p>
-</div>
+</script>
 
 <script type="module">
-import * as THREE from "three";
-import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
-import {OrbitControls} from "three/addons/controls/OrbitControls.js";
-import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
+  import * as THREE from "three";
+  import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
+  import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 
-const MODELS={
-  tiger:{   glb:"tiger.glb",   angle:-162, fov:30, exposure:1.05, dir:0.75, amb:0.70, elev:-0.05, zoom:0.70, env:1.0 },
-  statham:{ glb:"statham.glb", angle:42,   fov:30, exposure:1.00, dir:0.60, amb:0.80, elev:0.20,  zoom:1.06, env:1.0 },
-  can:{     glb:"can.glb",     angle:0,    fov:30, exposure:1.25, dir:0.75, amb:0.70, elev:0.05,  zoom:1.22, env:6.0 },
-};
-let cur="tiger";
-let P=Object.assign({},MODELS[cur]);
+  const holder=document.getElementById("tviewer");
+  const spin=document.getElementById("tv-spin"), spinTxt=document.getElementById("tv-spin-txt");
 
-const holder=document.getElementById("gviewer");
-const spin=document.getElementById("gv-spin"), spinTxt=document.getElementById("gv-spin-txt");
+  // ============ 調整パラメータ（見た目のチューニングはここ） ============
+  const TUNE={
+    skin:  {level:.88, tint:[1.00,.87,.83], rim:.18, lift:.15},  // 肌：暖色のやわらかい影
+    face:  {level:.92, tint:[1.00,.88,.85], rim:.10, lift:.55},  // 顔：影をかなり弱く
+    hair:  {level:.74, tint:[.82,.85,1.00], rim:.34, lift:0},    // 髪：寒色影＋強めリム
+    cloth: {level:.78, tint:[.85,.87,1.00], rim:.22, lift:0},    // 服：寒色影
+    dark:  {level:.80, tint:[.88,.90,1.00], rim:.28, lift:0},    // タイツ等の暗部
+  };
+  const RIM_COLOR=[.85,.92,1.0];
+  const SOFT=.035;                     // セル境界の柔らかさ
+  const OUTLINE={
+    screen:.0008, maxFrac:.0026, partCap:.18, minPart:.055,
+    color:0x171a26,                    // 色トレスOFF時の線色
+  };
+  const TRACE={                         // 色トレスON時の部位別の線色（はっきり色味を出す）
+    hair:0x232c5e,   // 髪：青紺
+    skin:0xa5654f,   // 肌：明るい赤茶
+    cloth:0x3a4370,  // 服：やわらかい紺
+    dark:0x2b2e40,   // タイツ：青灰
+    shoes:0x6e4326,  // 靴：焦茶
+  };
+  // =====================================================================
 
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-holder.appendChild(renderer.domElement);
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.NoToneMapping;
+  holder.appendChild(renderer.domElement);
 
-const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(30,1,0.01,100);
-const pmrem=new THREE.PMREMGenerator(renderer);
-scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
-const dirL=new THREE.DirectionalLight(0xffffff,1); dirL.position.set(1.5,2.2,2.5); scene.add(dirL);
-const ambL=new THREE.AmbientLight(0xffffff,1); scene.add(ambL);
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(28,1,0.01,100);
 
-const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true; controls.dampingFactor=.08;
-controls.autoRotate=true; controls.autoRotateSpeed=1.1;
-let rotateWanted=true;   // 手動トグルの状態（OFFなら放置しても再開しない）
-let resumeT=null;
-controls.addEventListener("start",()=>{controls.autoRotate=false; if(resumeT)clearTimeout(resumeT);});
-controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{ if(rotateWanted)controls.autoRotate=true; },3000);});
+  // ノーマル（通常シェーディング）モード用のライト。自作シェーダーには影響しない
+  scene.add(new THREE.AmbientLight(0xffffff,Math.PI*.5));
+  const dirN=new THREE.DirectionalLight(0xffffff,Math.PI*.55); dirN.position.set(1.5,2.2,2.5); scene.add(dirN);
 
-function resize(){ const w=holder.clientWidth,h=holder.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
-window.addEventListener("resize",resize);
+  const controls=new OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true; controls.dampingFactor=.08;
+  controls.autoRotate=true; controls.autoRotateSpeed=1.1;
+  let resumeT=null;
+  controls.addEventListener("start",()=>{controls.autoRotate=false; if(resumeT)clearTimeout(resumeT);});
+  controls.addEventListener("end",()=>{if(resumeT)clearTimeout(resumeT); resumeT=setTimeout(()=>{controls.autoRotate=true;},3000);});
 
-function computeBounds(root){
-  const box=new THREE.Box3(), tmp=new THREE.Box3();
-  root.updateMatrixWorld(true);
-  root.traverse(o=>{
-    if(o.isSkinnedMesh){ o.computeBoundingBox(); tmp.copy(o.boundingBox).applyMatrix4(o.matrixWorld); box.union(tmp); }
-    else if(o.isMesh){ if(!o.geometry.boundingBox)o.geometry.computeBoundingBox(); tmp.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); box.union(tmp); }
-  });
-  return box;
-}
-
-const loader=new GLTFLoader();
-const clock=new THREE.Clock();
-let modelRoot=null, mixer=null, actions={}, active=null, frameCenter=null, frameDist=1;
-let emissiveStore=[]; let glowEyeNodes=[];
-// ===== ワイヤーモード（クレイ＋四角面ワイヤー・viewer3d.js流儀） =====
-const clayMat=new THREE.MeshStandardMaterial({color:0xb6bcc6,roughness:.95,metalness:0,side:THREE.DoubleSide,
-  polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
-const lineMat=new THREE.LineBasicMaterial({color:0x14161c});
-let wires=[]; let mode="normal";
-function disposeWires(){ wires.forEach(w=>{ if(w.parent)w.parent.remove(w); if(w.geometry)w.geometry.dispose(); }); wires=[]; }
-// ワイヤーはアニメ先頭フレーム(0秒)の姿勢で固定（変形後頂点から生成＝メッシュと一致）
-function applyWirePose(){
-  if(!modelRoot)return;
-  if(active){ active.reset(); active.play(); }
-  if(mixer){ mixer.setTime(0); }
-  modelRoot.updateMatrixWorld(true);
-}
-
-function buildQuadWire(geo,dpos){
-  const idx=geo.index?geo.index.array:null;
-  const count=dpos.length/3;
-  const triCount=idx?idx.length/3:count/3;
-  const P=new THREE.Vector3(), Q=new THREE.Vector3(), Rv=new THREE.Vector3();
-  const gp=(i,t)=>t.set(dpos[i*3],dpos[i*3+1],dpos[i*3+2]);
-  const pk=(i)=>{gp(i,P);return Math.round(P.x*1e4)+","+Math.round(P.y*1e4)+","+Math.round(P.z*1e4);};
-  const map=new Map();
-  const gi=(t,k)=>idx?idx[t*3+k]:t*3+k;
-  for(let t=0;t<triCount;t++){
-    const a=gi(t,0),b=gi(t,1),c=gi(t,2);
-    gp(a,P);gp(b,Q);gp(c,Rv);
-    const lab=P.distanceToSquared(Q),lbc=Q.distanceToSquared(Rv),lca=Rv.distanceToSquared(P);
-    let longest=0; if(lbc>=lab&&lbc>=lca)longest=1; else if(lca>=lab&&lca>=lbc)longest=2;
-    const ka=pk(a),kb=pk(b),kc=pk(c);
-    const edges=[[ka,kb,a,b],[kb,kc,b,c],[kc,ka,c,a]];
-    for(let e=0;e<3;e++){
-      const [k1,k2,i1,i2]=edges[e];
-      const key=k1<k2?k1+"|"+k2:k2+"|"+k1;
-      let rec=map.get(key); if(!rec){rec={n:0,long:0,i1,i2};map.set(key,rec);}
-      rec.n++; if(e===longest)rec.long++;
-    }
+  function resize(){
+    const w=holder.clientWidth,h=holder.clientHeight;
+    renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
   }
-  const verts=[];
-  for(const rec of map.values()){
-    if(rec.n>=2&&rec.long>=2)continue;
-    gp(rec.i1,P);gp(rec.i2,Q);
-    verts.push(P.x,P.y,P.z,Q.x,Q.y,Q.z);
-  }
-  const g=new THREE.BufferGeometry();
-  g.setAttribute("position",new THREE.Float32BufferAttribute(verts,3));
-  return g;
-}
-// スキン変形後（現在の姿勢）の頂点位置を返す。ワイヤーをメッシュにピッタリ合わせる用。
-function deformedPositions(mesh){
-  const geo=mesh.geometry, pos=geo.attributes.position, n=pos.count;
-  const out=new Float32Array(n*3), v=new THREE.Vector3(), t=new THREE.Vector3();
-  const morphPos=geo.morphAttributes && geo.morphAttributes.position;
-  const infl=mesh.morphTargetInfluences;
-  const skinned=mesh.isSkinnedMesh;
-  const bt=skinned ? (mesh.applyBoneTransform?mesh.applyBoneTransform.bind(mesh):mesh.boneTransform.bind(mesh)) : null;
-  for(let i=0;i<n;i++){
-    v.fromBufferAttribute(pos,i);
-    // シェイプキー（モーフ）合成：glTFは相対モーフなので base + Σ w*delta
-    if(morphPos&&infl){
-      for(let m=0;m<morphPos.length;m++){
-        const w=infl[m]; if(!w)continue;
-        t.fromBufferAttribute(morphPos[m],i); v.addScaledVector(t,w);
+  window.addEventListener("resize",resize);
+
+  // ============ アニメ調カスタムシェーダー ============
+  const VERT=`
+    varying vec3 vN; varying vec3 vW; varying vec2 vUv;
+    void main(){
+      vN=normalize(mat3(modelMatrix)*normal);
+      vec4 wp=modelMatrix*vec4(position,1.0);
+      vW=wp.xyz; vUv=uv;
+      gl_Position=projectionMatrix*viewMatrix*wp;
+    }`;
+  const FRAG=`
+    uniform sampler2D map; uniform float useMap; uniform vec3 baseColor;
+    uniform vec3 uLightDir; uniform float uLevel; uniform vec3 uTint;
+    uniform float uRim; uniform vec3 uRimColor; uniform float uLift;
+    uniform float uThreshold; uniform float uSoft; uniform float uBright;
+    varying vec3 vN; varying vec3 vW; varying vec2 vUv;
+    void main(){
+      vec4 base=mix(vec4(baseColor,1.0),texture2D(map,vUv),useMap);
+      vec3 N=normalize(vN); if(!gl_FrontFacing) N=-N;
+      vec3 V=normalize(cameraPosition-vW);
+      float d=dot(N,normalize(uLightDir))*.5+.5;
+      float shade=smoothstep(uThreshold-uSoft,uThreshold+uSoft,d);
+      shade=mix(shade,1.0,uLift);
+      vec3 shadowCol=base.rgb*uLevel*uTint;
+      vec3 col=mix(shadowCol,base.rgb*uBright,shade);
+      float fres=pow(1.0-clamp(dot(N,V),0.0,1.0),3.0);
+      col+=uRimColor*(fres*uRim*(0.35+0.65*(1.0-shade)));
+      gl_FragColor=vec4(col,base.a);
+    }`;
+
+  const toonMats=[], outlineMats=[], outlines=[];
+  let modelRef=null;
+  // ワイヤーモード：クレイ（下地）＋四角面ワイヤー（対角線を除去したライン）
+  const clayMat=new THREE.MeshStandardMaterial({color:0xb6bcc6,roughness:.95,metalness:0,side:THREE.DoubleSide,
+    polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}); // 面を奥に押してライン描画を安定させる
+  const lineMat=new THREE.LineBasicMaterial({color:0x14161c}); // クレイ上の視認性優先で黒
+  const wires=[]; let wiresBuilt=false;
+
+  // 三角形化で入った対角線を除去したワイヤーを作る。
+  // ルール：ある辺が「両側の三角形どちらでも最長辺」なら、四角形の対角線とみなして描かない。
+  // 頂点はUVシームで分裂しているため、座標を量子化したキーで辺を同一視する。
+  function buildQuadWire(geo){
+    const pos=geo.attributes.position, idx=geo.index?geo.index.array:null;
+    const triCount=idx?idx.length/3:pos.count/3;
+    const P=new THREE.Vector3(), Q=new THREE.Vector3(), Rv=new THREE.Vector3();
+    const pk=(i)=>{P.fromBufferAttribute(pos,i);return Math.round(P.x*1e4)+","+Math.round(P.y*1e4)+","+Math.round(P.z*1e4);};
+    const map=new Map();
+    const gi=(t,k)=>idx?idx[t*3+k]:t*3+k;
+    for(let t=0;t<triCount;t++){
+      const a=gi(t,0),b=gi(t,1),c=gi(t,2);
+      P.fromBufferAttribute(pos,a);Q.fromBufferAttribute(pos,b);Rv.fromBufferAttribute(pos,c);
+      const lab=P.distanceToSquared(Q),lbc=Q.distanceToSquared(Rv),lca=Rv.distanceToSquared(P);
+      let longest=0; if(lbc>=lab&&lbc>=lca)longest=1; else if(lca>=lab&&lca>=lbc)longest=2;
+      const ka=pk(a),kb=pk(b),kc=pk(c);
+      const edges=[[ka,kb,a,b],[kb,kc,b,c],[kc,ka,c,a]];
+      for(let e=0;e<3;e++){
+        const [k1,k2,i1,i2]=edges[e];
+        const key=k1<k2?k1+"|"+k2:k2+"|"+k1;
+        let rec=map.get(key); if(!rec){rec={n:0,long:0,i1,i2};map.set(key,rec);}
+        rec.n++; if(e===longest)rec.long++;
       }
     }
-    if(bt) bt(i,v);   // スキン変形（ボーン）
-    out[i*3]=v.x; out[i*3+1]=v.y; out[i*3+2]=v.z;
+    const verts=[];
+    for(const rec of map.values()){
+      if(rec.n>=2&&rec.long>=2)continue; // 両側で最長辺＝対角線→省く
+      P.fromBufferAttribute(pos,rec.i1);Q.fromBufferAttribute(pos,rec.i2);
+      verts.push(P.x,P.y,P.z,Q.x,Q.y,Q.z);
+    }
+    const g=new THREE.BufferGeometry();
+    g.setAttribute("position",new THREE.Float32BufferAttribute(verts,3));
+    return g;
   }
-  return out;
-}
-function buildWires(){
-  if(!modelRoot)return;
-  modelRoot.updateMatrixWorld(true);
-  modelRoot.traverse(o=>{
-    if(!o.isMesh||!o.userData.matOrig)return;
-    const l=new THREE.LineSegments(buildQuadWire(o.geometry,deformedPositions(o)),lineMat);
-    l.renderOrder=2; l.visible=false;
-    o.add(l); wires.push(l);
-  });
-}
-function setMode(m){
-  mode=m;
-  if(!modelRoot)return;
-  if(m==="wire"){
-    applyWirePose();
-    disposeWires(); buildWires();
-  }else{
-    // ノーマル復帰：元のモーフ値に戻す（以降mixerが動かす）
-    modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.morphOrig&&o.morphTargetInfluences){ const mo=o.userData.morphOrig; for(let i=0;i<mo.length;i++)o.morphTargetInfluences[i]=mo[i]; } });
-  }
-  modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.matOrig) o.material=(m==="wire")?clayMat:o.userData.matOrig; });
-  wires.forEach(w=>w.visible=(m==="wire"));
-  markMode(m);
-}
-function markMode(m){ [...document.querySelectorAll("#gv-mode button")].forEach(b=>b.classList.toggle("on",b.dataset.mode===m)); }
-
-function clearModel(){
-  if(modelRoot){ scene.remove(modelRoot); modelRoot.traverse(o=>{ if(o.geometry&&o.geometry.dispose)o.geometry.dispose(); }); }
-  disposeWires(); mode="normal";
-  modelRoot=null; mixer=null; actions={}; active=null; emissiveStore=[]; glowEyeNodes=[];
-  document.getElementById("gv-clip").innerHTML="";
-}
-
-function loadModel(name){
-  clearModel();
-  cur=name; P=Object.assign({},MODELS[name]); syncPanel();
-  spin.classList.remove("off"); spinTxt.textContent="読み込み中…";
-  renderer.toneMappingExposure=P.exposure;
-  dirL.intensity=Math.PI*.4*P.dir; ambL.intensity=Math.PI*.4*P.amb;
-
-  loader.load(MODELS[name].glb,(gltf)=>{
-    modelRoot=gltf.scene;
-    modelRoot.traverse(o=>{
-      if(o.isSkinnedMesh)o.frustumCulled=false;
-      if(o.name && o.name.indexOf("human_eye")>=0) glowEyeNodes.push(o);
-      if(o.isMesh){ o.userData.matOrig=o.material; if(o.material){ o.material.envMapIntensity=(P.env==null?1:P.env); } if(o.morphTargetInfluences)o.userData.morphOrig=o.morphTargetInfluences.slice(); }
-      if(o.isMesh&&o.material&&o.material.emissive){
-        emissiveStore.push({mat:o.material, factor:(o.material.emissiveIntensity==null?1:o.material.emissiveIntensity)});
-      }
+  function buildWires(){
+    if(wiresBuilt||!modelRef)return; wiresBuilt=true;
+    modelRef.traverse(o=>{
+      if(!o.isMesh||!o.userData.matToon)return; // 実メッシュのみ（輪郭ハルは対象外）
+      const l=new THREE.LineSegments(buildQuadWire(o.geometry),lineMat);
+      l.renderOrder=2; l.visible=false;
+      o.add(l); wires.push(l);
     });
-    scene.add(modelRoot);
-    applyEmissive(); applyHideEye();
-    setMode("normal");
+  }
+  const white1x1=new THREE.DataTexture(new Uint8Array([255,255,255,255]),1,1); white1x1.needsUpdate=true;
 
-    const clips=gltf.animations||[];
-    const box=new THREE.Box3();
-    if(clips.length){
-      mixer=new THREE.AnimationMixer(modelRoot);
-      clips.forEach(clip=>{
-        mixer.stopAllAction();
-        const a=mixer.clipAction(clip); a.reset(); a.play();
-        const dur=clip.duration||1;
-        for(const t of [0,.2,.4,.6,.8,.999]){ mixer.setTime(t*dur); box.union(computeBounds(modelRoot)); }
-      });
-      mixer.stopAllAction(); mixer.setTime(0);
-      clips.forEach(clip=>{ actions[clip.name]=mixer.clipAction(clip); });
-      buildClipButtons(clips.map(c=>c.name));
-      activate(clips[0].name,0);
-    }else{ box.copy(computeBounds(modelRoot)); }
+  function makeToon(albedoTex, solidColor, prm){
+    let tex=null;
+    if(albedoTex){ tex=albedoTex.clone(); tex.colorSpace=THREE.NoColorSpace; tex.needsUpdate=true; } // 元テクスチャは触らない（ノーマルモード用に維持）
+    const mat=new THREE.ShaderMaterial({
+      vertexShader:VERT, fragmentShader:FRAG, side:THREE.DoubleSide,
+      uniforms:{
+        map:{value:tex||white1x1}, useMap:{value:tex?1:0},
+        baseColor:{value:new THREE.Color().fromArray(solidColor||[1,1,1])},
+        uLightDir:{value:new THREE.Vector3(0,1,1)},
+        uLevel:{value:prm.level}, uTint:{value:new THREE.Color().fromArray(prm.tint)},
+        uRim:{value:prm.rim}, uRimColor:{value:new THREE.Color().fromArray(RIM_COLOR)},
+        uLift:{value:prm.lift}, uThreshold:{value:.46}, uSoft:{value:SOFT}, uBright:{value:1.0},
+      }});
+    mat.userData.baseLevel=prm.level;
+    toonMats.push(mat); return mat;
+  }
+  function paramsFor(name){
+    if(name==="Face")return TUNE.face;
+    if(name==="Body")return TUNE.skin;
+    if(name==="tex_hair")return TUNE.hair;
+    if(name==="tex_body")return TUNE.dark;
+    if(name==="制服"||name==="tex_uniform.001")return TUNE.cloth;
+    return TUNE.cloth;
+  }
+  function traceColorFor(name){
+    if(name==="tex_hair")return TRACE.hair;
+    if(name==="Face"||name==="Body")return TRACE.skin;
+    if(name==="tex_body")return TRACE.dark;
+    if(name==="shoes")return TRACE.shoes;
+    return TRACE.cloth;
+  }
+  function convert(src){
+    if(src.name==="highlight") return new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide});
+    const albedo=src.emissiveMap||src.map||null;
+    let solid=null;
+    if(!albedo){
+      const em=src.emissive&&(src.emissive.r+src.emissive.g+src.emissive.b)>0.001;
+      const c=em?src.emissive:src.color; solid=[c.r,c.g,c.b];
+    }
+    return makeToon(albedo, solid, paramsFor(src.name));
+  }
 
-    const size=box.getSize(new THREE.Vector3());
-    frameCenter=box.getCenter(new THREE.Vector3());
+  // 背面法アウトライン（画面上で一定太さ・頂点カラーRで太さマスク）
+  function outlineMat(cap, traceHex){
+    const m=new THREE.ShaderMaterial({
+      side:THREE.BackSide,
+      uniforms:{oScreen:{value:OUTLINE.screen},oMax:{value:cap},oColor:{value:new THREE.Color(traceHex)}},
+      vertexShader:`
+        uniform float oScreen; uniform float oMax;
+        void main(){
+          float mask=1.0;
+          #ifdef USE_COLOR
+            mask=color.r;
+          #endif
+          vec4 mv=modelViewMatrix*vec4(position,1.0);
+          float w=min(oScreen*max(-mv.z,0.0),oMax)*mask;
+          vec3 p=position+normalize(normal)*w;
+          gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
+        }`,
+      fragmentShader:`
+        uniform vec3 oColor;
+        void main(){ gl_FragColor=vec4(oColor,1.0); }`
+    });
+    m.userData.trace=new THREE.Color(traceHex);
+    m.userData.base=new THREE.Color(OUTLINE.color);
+    outlineMats.push(m); return m;
+  }
+
+  const loader=new GLTFLoader();
+  loader.load("Taigei_figure.glb",(gltf)=>{
+    const model=gltf.scene; modelRef=model;
+    const box=new THREE.Box3().setFromObject(model);
+    const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
     const maxDim=Math.max(size.x,size.y,size.z);
-    frameDist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2);
-    camera.near=maxDim/100; camera.far=maxDim*20;
-    placeCamera();
+
+    const normName=(n)=>String(n||"").replace(/[^0-9A-Za-z_ぁ-んァ-ヶ一-龠]/g,"");
+    const NO_OUTLINE=["tongue","body001"];
+    const isExcluded=(o)=>{
+      for(let cur=o;cur;cur=cur.parent){ if(NO_OUTLINE.includes(normName(cur.name)))return true; }
+      return false;
+    };
+    model.updateMatrixWorld(true);
+    const tmpS=new THREE.Vector3();
+    model.traverse((o)=>{
+      if(!o.isMesh)return;
+      const orig=o.material, matName=(orig&&orig.name)||"";
+      o.userData.matOrig=orig;
+      o.userData.matToon=convert(orig);
+      o.material=o.userData.matToon;
+      if(matName==="highlight")return;
+      if(matName==="")return;
+      if(isExcluded(o))return;
+      if(!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+      o.getWorldScale(tmpS);
+      const r=o.geometry.boundingSphere.radius*Math.max(tmpS.x,tmpS.y,tmpS.z);
+      if(r<maxDim*OUTLINE.minPart && matName!=="tex_hair")return;
+      const cap=Math.min(maxDim*OUTLINE.maxFrac, r*OUTLINE.partCap);
+      const om=outlineMat(cap, traceColorFor(matName));
+      if(o.geometry.attributes.color) om.vertexColors=true;
+      const ol=new THREE.Mesh(o.geometry,om); ol.renderOrder=-1;
+      outlines.push([o,ol]);
+    });
+    outlines.forEach(([o,ol])=>o.add(ol));
+    scene.add(model);
+
+    controls.target.copy(center);
+    const dist=(maxDim/2)/Math.tan((camera.fov*Math.PI/180)/2)*1.25;
+    camera.position.set(center.x+dist*Math.sin(20*Math.PI/180),
+                        center.y+dist*0.10,
+                        center.z+dist*Math.cos(20*Math.PI/180));
+    camera.near=maxDim/100; camera.far=maxDim*20; camera.updateProjectionMatrix();
+    controls.update();
+    window.__dbg={camera,controls,maxDim,center};   // DEBUG HUD用
+
+    applyMode(); applyTrace(); applyShadow(); applyBright();   // UIの現在値を反映
     spin.classList.add("off");
-  },(e)=>{ if(e&&e.total){ spinTxt.textContent="読み込み中 "+Math.round(100*e.loaded/e.total)+"%"; } },
-    (err)=>{ spinTxt.textContent="読み込みに失敗しました"; console.error(err); });
-}
+  },(e)=>{
+    if(e&&e.total){ spinTxt.textContent="読み込み中 "+Math.round(100*e.loaded/e.total)+"%"; }
+  },(err)=>{
+    spinTxt.textContent="読み込みに失敗しました"; console.error(err);
+  });
 
-function placeCamera(){
-  if(!frameCenter)return;
-  controls.target.copy(frameCenter);
-  const a=P.angle*Math.PI/180, d=frameDist*P.zoom;
-  camera.position.set(frameCenter.x+d*Math.sin(a), frameCenter.y+d*P.elev, frameCenter.z+d*Math.cos(a));
-  camera.updateProjectionMatrix(); controls.update();
-}
+  // ============ 比較UI ============
+  const modeBtns=[...document.querySelectorAll("#tv-mode button")];
+  const chkTrace=document.getElementById("tv-trace");
+  const rng=document.getElementById("tv-shadow"), rngVal=document.getElementById("tv-shadow-val");
+  const traceW=document.getElementById("tv-trace-w"), shadowW=document.getElementById("tv-shadow-w");
+  const lightW=document.getElementById("tv-light-w");
+  const pad=document.getElementById("tv-pad"), dot=document.getElementById("tv-dot");
+  const lxEl=document.getElementById("tv-lx"), lyEl=document.getElementById("tv-ly");
+  const rngB=document.getElementById("tv-bright"), rngBVal=document.getElementById("tv-bright-val");
+  let mode="toon";
+  const lightOff={x:1.04,y:.48};  // ライトのオフセット（カメラ基準：右・上）★確定した既定値
+  const PAD_RANGE=1.5;
 
-function activate(name,fade=0.35){
-  const next=actions[name]; if(!next||next===active)return;
-  next.reset(); next.setEffectiveTimeScale(1); next.setEffectiveWeight(1); next.play();
-  if(active) active.crossFadeTo(next,fade,false);
-  active=next; markClip(name);
-}
-function buildClipButtons(names){
-  const box=document.getElementById("gv-clip"); box.innerHTML="";
-  names.forEach(n=>{ const b=document.createElement("button"); b.dataset.clip=n; b.textContent=n;
-    b.addEventListener("click",()=>activate(n)); box.appendChild(b); });
-}
-function markClip(name){ [...document.querySelectorAll("#gv-clip button")].forEach(b=>b.classList.toggle("on",b.dataset.clip===name)); }
+  function updatePadUI(){
+    dot.style.left=((lightOff.x/PAD_RANGE)+1)/2*100+"%";
+    dot.style.top =((-lightOff.y/PAD_RANGE)+1)/2*100+"%";
+    lxEl.textContent=(lightOff.x>=0?"+":"")+lightOff.x.toFixed(2);
+    lyEl.textContent=(lightOff.y>=0?"+":"")+lightOff.y.toFixed(2);
+  }
+  function padFromEvent(e){
+    const r=pad.getBoundingClientRect();
+    let nx=((e.clientX-r.left)/r.width)*2-1, ny=((e.clientY-r.top)/r.height)*2-1;
+    nx=Math.max(-1,Math.min(1,nx)); ny=Math.max(-1,Math.min(1,ny));
+    lightOff.x=+(nx*PAD_RANGE).toFixed(2); lightOff.y=+(-ny*PAD_RANGE).toFixed(2);
+    updatePadUI();
+  }
+  let padDrag=false;
+  pad.addEventListener("pointerdown",e=>{padDrag=true;pad.setPointerCapture(e.pointerId);padFromEvent(e);});
+  pad.addEventListener("pointermove",e=>{if(padDrag)padFromEvent(e);});
+  pad.addEventListener("pointerup",()=>{padDrag=false;});
+  pad.addEventListener("pointercancel",()=>{padDrag=false;});
 
-function applyEmissive(){
-  const suppress=document.getElementById("c-emis").checked;
-  emissiveStore.forEach(e=>{ e.mat.emissiveIntensity = suppress ? 0 : e.factor; });
-}
-function applyHideEye(){
-  const hide=document.getElementById("c-hideeye").checked;
-  glowEyeNodes.forEach(n=>{ n.visible = !hide; });
-}
+  function applyBright(){
+    const v=+rngB.value; rngBVal.textContent=v;
+    for(const m of toonMats) m.uniforms.uBright.value=v/100;
+  }
+  rngB.addEventListener("input",applyBright);
+  updatePadUI();
 
-const out=document.getElementById("out");
-function refreshOut(){
-  out.innerHTML='<span class="k">// '+cur+'</span><br>'+
-    '<span class="k">data-exposure=</span>"'+P.exposure.toFixed(2)+'" '+
-    '<span class="k">data-dir=</span>"'+P.dir.toFixed(3)+'" '+
-    '<span class="k">data-amb=</span>"'+P.amb.toFixed(3)+'" '+
-    '<span class="k">data-env=</span>"'+(P.env==null?1:P.env).toFixed(2)+'" '+
-    '<span class="k">data-angle=</span>"'+P.angle.toFixed(0)+'" '+
-    '<span class="k">data-elev=</span>"'+P.elev.toFixed(2)+'" '+
-    '<span class="k">data-zoom=</span>"'+P.zoom.toFixed(2)+'"';
-}
-function syncPanel(){
-  document.getElementById("s-exp").value=P.exposure; document.getElementById("v-exp").textContent=P.exposure.toFixed(2);
-  document.getElementById("s-dir").value=P.dir;      document.getElementById("v-dir").textContent=P.dir.toFixed(3);
-  document.getElementById("s-amb").value=P.amb;      document.getElementById("v-amb").textContent=P.amb.toFixed(3);
-  document.getElementById("s-env").value=(P.env==null?1:P.env); document.getElementById("v-env").textContent=(P.env==null?1:P.env).toFixed(2);
-  document.getElementById("s-ang").value=P.angle;    document.getElementById("v-ang").textContent=P.angle.toFixed(0);
-  document.getElementById("s-elev").value=P.elev;    document.getElementById("v-elev").textContent=P.elev.toFixed(2);
-  document.getElementById("s-zoom").value=P.zoom;    document.getElementById("v-zoom").textContent=P.zoom.toFixed(2);
-  refreshOut();
-}
-document.getElementById("s-exp").addEventListener("input",e=>{P.exposure=+e.target.value; document.getElementById("v-exp").textContent=P.exposure.toFixed(2); renderer.toneMappingExposure=P.exposure; refreshOut();});
-document.getElementById("s-dir").addEventListener("input",e=>{P.dir=+e.target.value; document.getElementById("v-dir").textContent=P.dir.toFixed(3); dirL.intensity=Math.PI*.4*P.dir; refreshOut();});
-document.getElementById("s-amb").addEventListener("input",e=>{P.amb=+e.target.value; document.getElementById("v-amb").textContent=P.amb.toFixed(3); ambL.intensity=Math.PI*.4*P.amb; refreshOut();});
-document.getElementById("s-env").addEventListener("input",e=>{P.env=+e.target.value; document.getElementById("v-env").textContent=P.env.toFixed(2); if(modelRoot)modelRoot.traverse(o=>{ if(o.isMesh&&o.userData.matOrig&&o.userData.matOrig.envMapIntensity!=null)o.userData.matOrig.envMapIntensity=P.env; }); refreshOut();});
-const sAng=document.getElementById("s-ang"); sAng.addEventListener("input",e=>{P.angle=+e.target.value; document.getElementById("v-ang").textContent=P.angle.toFixed(0); refreshOut();}); sAng.addEventListener("change",placeCamera);
-const sElev=document.getElementById("s-elev"); sElev.addEventListener("input",e=>{P.elev=+e.target.value; document.getElementById("v-elev").textContent=P.elev.toFixed(2); refreshOut();}); sElev.addEventListener("change",placeCamera);
-const sZoom=document.getElementById("s-zoom"); sZoom.addEventListener("input",e=>{P.zoom=+e.target.value; document.getElementById("v-zoom").textContent=P.zoom.toFixed(2); refreshOut();}); sZoom.addEventListener("change",placeCamera);
-document.getElementById("c-emis").addEventListener("change",applyEmissive);
-document.getElementById("c-hideeye").addEventListener("change",applyHideEye);
-const btnRot=document.getElementById("btn-rotate");
-[...document.querySelectorAll("#gv-mode button")].forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
-btnRot.addEventListener("click",()=>{
-  rotateWanted=!rotateWanted;
-  controls.autoRotate=rotateWanted;
-  if(!rotateWanted&&resumeT)clearTimeout(resumeT);
-  btnRot.classList.toggle("on",rotateWanted);
-  btnRot.textContent="オートターン: "+(rotateWanted?"ON":"OFF");
-});
+  function applyMode(){
+    if(modelRef){
+      if(mode==="wire") buildWires(); // 初回だけ構築（対角線除去の計算）
+      modelRef.traverse(o=>{ if(o.isMesh&&o.userData.matToon){
+        o.material=(mode==="toon")?o.userData.matToon:(mode==="normal")?o.userData.matOrig:clayMat;
+      }});
+      outlines.forEach(([o,ol])=>ol.visible=(mode==="toon"));
+      wires.forEach(w=>w.visible=(mode==="wire"));
+    }
+    modeBtns.forEach(b=>b.classList.toggle("on",b.dataset.mode===mode));
+    traceW.classList.toggle("dim",mode!=="toon");
+    shadowW.classList.toggle("dim",mode!=="toon");
+    lightW.classList.toggle("dim",mode!=="toon");
+  }
+  function applyTrace(){
+    const on=chkTrace.checked;
+    for(const m of outlineMats) m.uniforms.oColor.value.copy(on?m.userData.trace:m.userData.base);
+  }
+  function applyShadow(){
+    const v=+rng.value; rngVal.textContent=v;
+    const t=v/100;
+    const th=0.30+0.34*t;                 // 影の面積（しきい値）
+    const sc=Math.min(t*1.7,1.9);         // 影の濃さのスケール
+    for(const m of toonMats){
+      m.uniforms.uThreshold.value=th;
+      const base=m.userData.baseLevel;
+      m.uniforms.uLevel.value=Math.max(.35, 1-(1-base)*sc);
+    }
+  }
+  modeBtns.forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode; applyMode();}));
+  chkTrace.addEventListener("change",applyTrace);
+  rng.addEventListener("input",applyShadow);
 
-[...document.querySelectorAll("#model-sw button")].forEach(b=>b.addEventListener("click",()=>{
-  if(b.dataset.model===cur)return;
-  [...document.querySelectorAll("#model-sw button")].forEach(x=>x.classList.toggle("on",x===b));
-  loadModel(b.dataset.model);
-}));
+  // ライトはカメラに追従（正面やや右上）＝どの角度でもフロントが明るい
+  const L=new THREE.Vector3(), R=new THREE.Vector3();
+  function updateLight(){
+    L.copy(camera.position).sub(controls.target).normalize();
+    R.setFromMatrixColumn(camera.matrixWorld,0);
+    L.addScaledVector(R,lightOff.x).addScaledVector(new THREE.Vector3(0,1,0),lightOff.y).normalize();
+    for(const m of toonMats) m.uniforms.uLightDir.value.copy(L);
+  }
 
-resize();
-loadModel("tiger");
-renderer.setAnimationLoop(()=>{
-  controls.update();
-  if(mixer&&mode!=="wire")mixer.update(clock.getDelta());
-  else clock.getDelta();
-  renderer.render(scene,camera);
-});
+  resize();
+  renderer.setAnimationLoop(()=>{controls.update();updateLight();renderer.render(scene,camera);});
 </script>
-<div class="buildver">build 2026.07.09 18:50 JST</div>
+  <div class="buildver">build 2026.07.13 17:45 JST</div>
+<script src="fit-title.js" defer></script>
+
+<style>
+#dbg-hud{position:fixed;right:12px;bottom:12px;z-index:9999;background:rgba(10,13,18,.92);
+  border:1px solid #E9A94C;border-radius:4px;padding:12px 14px;font-family:"Space Mono",monospace;
+  font-size:12px;line-height:1.7;color:#ECE7DF;max-width:320px}
+#dbg-hud b{color:#E9A94C}
+#dbg-hud button{margin-top:8px;font-family:inherit;font-size:11px;padding:6px 12px;background:none;
+  border:1px solid #E9A94C;border-radius:100px;color:#E9A94C;cursor:pointer}
+#dbg-hud .warn{color:#8C887F;font-size:10px;margin-top:6px}
+</style>
+<div id="dbg-hud">読み込み待ち…</div>
+<script>
+(function(){
+  var hud=document.getElementById("dbg-hud");
+  var last="";
+  function tick(){
+    requestAnimationFrame(tick);
+    var d=window.__dbg; if(!d){return;}
+    var cam=d.camera, tg=d.controls.target, c=d.center, maxDim=d.maxDim;
+    var vx=cam.position.x-tg.x, vy=cam.position.y-tg.y, vz=cam.position.z-tg.z;
+    var distH=Math.sqrt(vx*vx+vz*vz);
+    var angle=Math.atan2(vx,vz)*180/Math.PI;
+    var elev=vy/distH;
+    var base=(maxDim/2)/Math.tan((cam.fov*Math.PI/180)/2);
+    var zoom=distH/base;
+    var ox=(tg.x-c.x)/maxDim, oy=(tg.y-c.y)/maxDim, oz=(tg.z-c.z)/maxDim;
+    var panned=Math.abs(ox)>0.005||Math.abs(oy)>0.005||Math.abs(oz)>0.005;
+    var txt="<b>ANGLE</b> "+angle.toFixed(1)+"°<br>"
+           +"<b>ELEV</b> "+elev.toFixed(3)+"<br>"
+           +"<b>ZOOM</b> "+zoom.toFixed(3)+"<br>"
+           +"<b>FOV</b> "+cam.fov
+           +(panned?("<br><b>TARGETオフセット</b><br>x:"+ox.toFixed(3)+" y:"+oy.toFixed(3)+" z:"+oz.toFixed(3)+" (×maxDim)"):"")
+           +'<br><button id="dbg-copy">この値をコピー</button>'
+           +'<div class="warn">回転・ズームで探して、決まったらこの値を報告してください。'+(panned?"<br>※パン中：targetオフセットも必要":"")+"</div>";
+    if(txt!==last){ hud.innerHTML=txt; last=txt;
+      document.getElementById("dbg-copy").onclick=function(){
+        var line="ANGLE="+angle.toFixed(1)+" / ELEV="+elev.toFixed(3)+" / ZOOM="+zoom.toFixed(3)+" / FOV="+cam.fov
+          +(panned?(" / target offset x:"+ox.toFixed(3)+" y:"+oy.toFixed(3)+" z:"+oz.toFixed(3)):"");
+        navigator.clipboard&&navigator.clipboard.writeText(line);
+        this.textContent="コピーしました";
+      };
+    }
+  }
+  tick();
+})();
+</script>
+
 </body>
 </html>
